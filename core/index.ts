@@ -1,5 +1,18 @@
 import { action } from "./action";
+import { inject, injectNew, provide } from "./di";
+import { type InputSchema, input } from "./input";
 import { namespace } from "./namespace";
-import { provide, inject, injectNew } from "./di";
 import { type Result, result } from "./result";
-export { action, namespace, provide, inject, injectNew, result, type Result };
+import { make } from "./make";
+export {
+  action,
+  inject,
+  injectNew,
+  input,
+  namespace,
+  provide,
+  result,
+  type InputSchema,
+  type Result,
+  make,
+};
