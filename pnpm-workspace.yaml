@@ -1,0 +1,13 @@
+packages:
+  - 'packages/*'
+  - 'examples/*'
+
+catalogs:
+  default:
+    typescript: ^5.7.2
+    tsup: ^8.4.0
+    "@standard-schema/spec": ^1.1.0
+    "@types/node": ^22.13.9
+    "@types/ws": ^8.18.1
+    valibot: ^1.3.0
+    ws: ^8.19.0
