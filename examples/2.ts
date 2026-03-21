@@ -1,9 +1,19 @@
 import * as v from "valibot";
 import { action, make, group, provide } from "../core";
+import { requestStorage, serve } from "../adapters/node";
+import { AsyncLocalStorage } from "node:async_hooks";
 @group("user")
 class UserHandler {
   @action("get")
-  async getAllUser() {}
+  async getAllUser() {
+    const data = requestStorage.getStore();
+    console.log(data);
+
+    return {
+      status: 200,
+      data: "this works",
+    };
+  }
 
   @action("create")
   async createUser() {}
@@ -19,6 +29,6 @@ const app = make({
   groups: [UserHandler, DataHandler],
 });
 
-console.log(app);
-
-await new Promise((r) => setTimeout(r, 99999));
+serve(app).listen(3000, () => {
+  console.log("test");
+});
