@@ -1,9 +1,9 @@
 import type { Maybe, Union } from "./types";
 
 // Symbol to avoid collisions with user-defined properties on the constructor
-const NameSpaceMetaKey = Symbol("oriel-namespace-meta");
+const GroupMetaKey = Symbol("oriel-group-meta");
 
-export type NamespaceMeta = {
+export type GroupMeta = {
   prefix: string;
   middlewares: any[];
 };
@@ -12,22 +12,22 @@ export type NamespaceMeta = {
  * Groups a handler class under a route prefix.
  *
  * @example
- * @namespace("users")
+ * @group("users")
  * class UserHandler { ... }
  */
-export interface NamespaceDecorator {
+export interface GroupDecorator {
   (prefix: string, middlewares?: any[]): ClassDecorator;
-  getMeta(target: Union<[object, Function]>): Maybe<NamespaceMeta>;
+  getMeta(target: Union<[object, Function]>): Maybe<GroupMeta>;
 }
 
-export const namespace: NamespaceDecorator = (prefix, middlewares = []) => {
+export const group: GroupDecorator = (prefix, middlewares = []) => {
   return (target: any) => {
-    target[NameSpaceMetaKey] = { prefix, middlewares };
+    target[GroupMetaKey] = { prefix, middlewares };
   };
 };
 
 // normalizes instance → constructor so getMeta works on both
-namespace.getMeta = (target: Union<[object, Function]>) => {
+group.getMeta = (target: Union<[object, Function]>) => {
   const ctor: any = typeof target === "function" ? target : target.constructor;
-  return ctor[NameSpaceMetaKey];
+  return ctor[GroupMetaKey];
 };

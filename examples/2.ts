@@ -1,7 +1,6 @@
 import * as v from "valibot";
-import { action, make, namespace } from "../core";
-
-@namespace("user")
+import { action, make, group, provide } from "../core";
+@group("user")
 class UserHandler {
   @action("get")
   async getAllUser() {}
@@ -10,8 +9,16 @@ class UserHandler {
   async createUser() {}
 }
 
-make({
-  namespaces: [UserHandler],
+@group("data")
+export class DataHandler {
+  @action("parse")
+  async parse() {}
+}
+
+const app = make({
+  groups: [UserHandler, DataHandler],
 });
+
+console.log(app);
 
 await new Promise((r) => setTimeout(r, 99999));

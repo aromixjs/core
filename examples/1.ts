@@ -1,11 +1,11 @@
 import {
   action,
-  namespace,
   provide,
   inject,
   injectNew,
   result,
   type Result,
+  group,
 } from "../core";
 
 // Services
@@ -67,7 +67,7 @@ class ReportService {
 
 // Handlers
 
-@namespace("user")
+@group("user")
 class UserHandler {
   private db = inject(Database);
 
@@ -84,8 +84,8 @@ class UserHandler {
   }
 }
 
-@namespace("data")
-class DataHandler {
+@group("data")
+export class DataHandler {
   private reports = inject(ReportService);
 
   @action("parse")
@@ -108,7 +108,7 @@ const p2 = injectNew(CsvParser);
 console.log("injectNew() transient:", p1 === p2); // false
 
 // decorator metadata
-console.log("@namespace meta:", namespace.getMeta(UserHandler));
+console.log("@group meta:", group.getMeta(UserHandler));
 console.log("@action meta:", action.getMeta(UserHandler, "get"));
 
 // result
