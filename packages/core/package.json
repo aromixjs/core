@@ -19,6 +19,6 @@
     "@types/node": "catalog:"
   },
   "dependencies": {
-    "@standard-schema/spec": "catalog:"
+    "@standard-schema/spec": "^1.1.0"
   }
 }
