@@ -1,3 +1,5 @@
 import { definePackageConfig } from "../../tsup.config";
 
-export default definePackageConfig();
+export default definePackageConfig({
+  dts: false,
+});

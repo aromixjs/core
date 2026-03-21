@@ -37,7 +37,8 @@ export function inject<T extends new () => any>(ctor: T): InstanceType<T> {
 
   if (!token) throw new Error("No Token Found");
 
-  if (ServiceRegistry.has(token)) return ServiceRegistry.get(token) as InstanceType<T>;
+  if (ServiceRegistry.has(token))
+    return ServiceRegistry.get(token) as InstanceType<T>;
 
   const instance = new ctor();
   ServiceRegistry.set(token, instance);

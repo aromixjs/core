@@ -1,20 +1,21 @@
-import { action } from "./action";
-import { inject, injectNew, provide } from "./di";
-import { group } from "./group";
-import { type InputSchema, input } from "./input";
-import { type AromixDescriptor, make } from "./make";
-import { type Result, result } from "./result";
+import { action } from "./lib/action";
+import { inject, injectNew, provide } from "./lib/di";
+import { group } from "./lib/group";
+import { type InputSchema, input } from "./lib/input";
+import { type AromixDescriptor, make } from "./lib/make";
+import { type Result, result } from "./lib/result";
 
 export {
   action,
+  group,
   inject,
   injectNew,
-  provide,
   input,
   make,
-  group,
+  provide,
   result,
+  type AromixDescriptor,
   type InputSchema,
-  type Result,
-  type AromixDescriptor
+  type Result
 };
+

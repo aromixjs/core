@@ -1,5 +1,5 @@
 {
-  "name": "@aromix/enterprise-api",
+  "name": "@aromix/enterprise",
   "private": true,
   "type": "module",
   "scripts": {
@@ -8,13 +8,12 @@
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
-    "tsup": "catalog:",
-    "typescript": "catalog:",
-    "@types/node": "catalog:"
+    "tsup": "^8.4.0",
+    "typescript": "^5.7.2",
+    "@types/node": "^22.13.9"
   },
   "dependencies": {
     "@aromix/core": "workspace:*",
-    "@aromix/node": "workspace:*",
-    "valibot": "catalog:"
+    "@aromix/node": "workspace:*"
   }
 }

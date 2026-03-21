@@ -9,13 +9,11 @@
     "core:dev": "pnpm --filter @aromix/core dev",
     "node:build": "pnpm --filter @aromix/node build",
     "node:dev": "pnpm --filter @aromix/node dev",
-    "basic-api:dev": "pnpm --filter @aromix/basic-api dev",
-    "enterprise-api:dev": "pnpm --filter @aromix/enterprise-api dev",
-    "typecheck": "pnpm -r typecheck",
-    "format": "prettier --write ."
+    "basic:dev": "pnpm --filter @aromix/basic dev",
+    "enterprise:dev": "pnpm --filter @aromix/enterprise dev",
+    "typecheck": "pnpm -r typecheck"
   },
   "devDependencies": {
-    "prettier": "^3.5.3",
     "typescript": "catalog:",
     "tsup": "catalog:"
   },

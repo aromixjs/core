@@ -19,7 +19,6 @@
     "@types/node": "catalog:"
   },
   "dependencies": {
-    "valibot": "catalog:",
     "@standard-schema/spec": "catalog:"
   }
 }
