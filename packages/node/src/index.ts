@@ -1,18 +1,60 @@
-import { createServer } from "node:http";
+import { createServer, IncomingMessage } from "node:http";
 import { AromixDescriptor } from "@aromix/core";
 import { AsyncLocalStorage } from "node:async_hooks";
+import { RequestContext, ResponseMethods, ResponsePayload } from "./types";
 
-export interface RawRequest {
-  body: unknown;
-  headers: Record<string, string | string[] | undefined>;
-  ip: string;
-  action: string;
+export const requestStorage = new AsyncLocalStorage<RequestContext>();
+
+function buildResponseMethods(): ResponseMethods {
+  return {
+    send: ({ status, data }) => ({ status, data }),
+    end: (status = 204) => ({ status }),
+    redirect: (url, status = 302) => ({ status, redirect: url }),
+  };
 }
 
-export const requestStorage = new AsyncLocalStorage<RawRequest>();
+function readBody(req: IncomingMessage): Promise<unknown> {
+  return new Promise((resolve) => {
+    let raw = "";
+    req.on("data", (chunk) => (raw += chunk));
+    req.on("end", () => {
+      try {
+        resolve(JSON.parse(raw));
+      } catch {
+        resolve({});
+      }
+    });
+  });
+}
+
+function writeResponse(
+  res: import("node:http").ServerResponse,
+  payload: ResponsePayload,
+) {
+  if (payload.redirect) {
+    res.writeHead(payload.status, { Location: payload.redirect });
+    res.end();
+    return;
+  }
+
+  if (payload.data === undefined) {
+    res.writeHead(payload.status);
+    res.end();
+    return;
+  }
+
+  const isText = typeof payload.data === "string";
+  const contentType = isText ? "text/plain" : "application/json";
+  const body = isText ? payload.data : JSON.stringify(payload.data);
+
+  res.writeHead(payload.status, { "Content-Type": contentType });
+  res.end(body);
+}
 
 export function serve(descriptor: AromixDescriptor) {
-  const server = createServer(async (req, res) => {
+  const server = createServer();
+
+  server.on("request", async (req, res) => {
     const action = req.headers["x-action"] as string | undefined;
 
     if (!action || !descriptor.handlers.has(action)) {
@@ -21,32 +63,20 @@ export function serve(descriptor: AromixDescriptor) {
       return;
     }
 
-    const body = await new Promise<unknown>((resolve) => {
-      let raw = "";
-      req.on("data", (chunk) => (raw += chunk));
-      req.on("end", () => {
-        try {
-          resolve(JSON.parse(raw));
-        } catch {
-          resolve({});
-        }
-      });
-    });
+    const body = await readBody(req);
 
-    const raw: RawRequest = {
+    const context: RequestContext = {
       body,
       headers: req.headers,
       ip: req.socket.remoteAddress ?? "",
       action,
+      ...buildResponseMethods(),
     };
 
     const handler = descriptor.handlers.get(action)!;
-    const result = await requestStorage.run(raw, () => handler());
+    const payload = await requestStorage.run(context, () => handler());
 
-    res.writeHead(result.status, { "Content-Type": "application/json" });
-    res.end(
-      result.data !== undefined ? JSON.stringify(result.data) : undefined,
-    );
+    writeResponse(res, payload);
   });
 
   return server;
