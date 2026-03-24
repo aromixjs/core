@@ -25,7 +25,5 @@ export function input<T extends InputSchema>(schema?: T) {
     throw new Error("[aromix] input() called outside of a request context.");
   }
 
-  if (!schema) return ctx;
-
-  console.log(schema);
+  return ctx;
 }

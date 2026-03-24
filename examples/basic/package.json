@@ -9,12 +9,13 @@
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
-    "typescript": "catalog:",
     "@types/node": "catalog:",
-    "tsx": "catalog:"
+    "tsx": "catalog:",
+    "typescript": "catalog:"
   },
   "dependencies": {
     "@aromix/core": "workspace:*",
-    "@aromix/node": "workspace:*"
+    "@aromix/node": "workspace:*",
+    "valibot": "^1.3.1"
   }
 }
