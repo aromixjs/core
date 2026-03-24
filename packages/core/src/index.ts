@@ -1,10 +1,9 @@
 import { action } from "./lib/action";
 import {
-  type Context,
   type ContextSchema,
   contextStorage,
   getContext,
-  type ResponsePayload,
+  type RawContext,
 } from "./lib/context";
 import { inject, injectNew, provide } from "./lib/di";
 import { group } from "./lib/group";
@@ -22,9 +21,7 @@ export {
   provide,
   result,
   type AromixDescriptor,
-  type ContextSchema as InputSchema,
-  type Context as RequestContext,
-  type ResponsePayload,
-  type Result
+  type ContextSchema,
+  type RawContext,
+  type Result,
 };
-

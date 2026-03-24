@@ -1,5 +1,5 @@
 import { createServer, IncomingMessage, ServerResponse } from "node:http";
-import { AromixDescriptor, contextStorage, RequestContext } from "@aromix/core";
+import { AromixDescriptor, contextStorage, RawContext } from "@aromix/core";
 import { TLSSocket } from "node:tls";
 import { parseBody, toWebRequest, writeNodeResponse } from "./utils";
 
@@ -25,7 +25,7 @@ export function serve(descriptor: AromixDescriptor) {
 
     const body = await parseBody(webReq);
 
-    const context: RequestContext = {
+    const context: RawContext = {
       body,
       headers: Object.fromEntries(webReq.headers.entries()),
     };
