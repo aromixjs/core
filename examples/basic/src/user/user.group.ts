@@ -1,4 +1,4 @@
-import { action, group, inject, input, InputSchema } from "@aromix/core";
+import { action, getContext, group, inject, InputSchema } from "@aromix/core";
 import { UserService } from "./user.service";
 import * as v from "valibot";
 
@@ -18,11 +18,9 @@ export class UserGroup {
 
   @action("get")
   async get() {
-    const ctx = await input(userGetInput);
+    const ctx = await getContext(userGetInput);
 
     console.log(ctx.body.email);
-
-
 
     return new Response("it works", {
       status: 200,
