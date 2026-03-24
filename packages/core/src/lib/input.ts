@@ -14,7 +14,6 @@ export interface ResponsePayload {
 export type RequestContext = {
   body: unknown;
   headers: Record<string, string | string[] | undefined>;
-  send<T>(payload: { status: number; data: T }): ResponsePayload;
 };
 
 export const contextStorage = new AsyncLocalStorage<RequestContext>();

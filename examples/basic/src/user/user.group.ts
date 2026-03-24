@@ -1,20 +1,17 @@
-import { action, group, inject } from "@aromix/core";
+import { action, group, inject, input } from "@aromix/core";
 import { UserService } from "./user.service";
-import { requestStorage } from "@aromix/node";
 @group("user")
 export class UserGroup {
   private userService = inject(UserService);
 
   @action("get")
   get() {
-    const ctx = requestStorage.getStore();
+    const ctx = input();
 
-    return ctx?.send({
+    console.log(ctx);
+
+    return new Response("it works", {
       status: 200,
-      data: {
-        user: "istiuak",
-        age: 19,
-      },
     });
   }
 

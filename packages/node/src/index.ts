@@ -1,44 +1,17 @@
 import { createServer, IncomingMessage, ServerResponse } from "node:http";
-import {
-  AromixDescriptor,
-  contextStorage,
-  RequestContext,
-  ResponsePayload,
-} from "@aromix/core";
-import { AsyncLocalStorage } from "node:async_hooks";
-
-async function toWebRequest(req: IncomingMessage): Promise<Request> {
-  const chunks: Buffer[] = [];
-  for await (const chunk of req) chunks.push(chunk);
-  return new Request(`http://localhost${req.url}`, {
-    method: req.method,
-    headers: req.headers as Record<string, string>,
-    body: chunks.length ? Buffer.concat(chunks) : null,
-  });
-}
-
-function toWebResponse(payload: ResponsePayload): Response {
-  if (payload.data === undefined) {
-    return new Response(null, { status: payload.status });
-  }
-  const isText = typeof payload.data === "string";
-  return new Response(
-    isText ? (payload.data as string) : JSON.stringify(payload.data),
-    {
-      status: payload.status,
-      headers: { "Content-Type": isText ? "text/plain" : "application/json" },
-    },
-  );
-}
-async function writeNodeResponse(res: ServerResponse, webRes: Response) {
-  webRes.headers.forEach((value, key) => res.setHeader(key, value));
-  res.writeHead(webRes.status);
-  res.end(webRes.body ? Buffer.from(await webRes.arrayBuffer()) : null);
-}
+import { AromixDescriptor, contextStorage, RequestContext } from "@aromix/core";
+import { TLSSocket } from "node:tls";
+import { parseBody, toWebRequest, writeNodeResponse } from "./utils";
 
 export function serve(descriptor: AromixDescriptor) {
   return createServer(async (req: IncomingMessage, res: ServerResponse) => {
-    const webReq = await toWebRequest(req);
+    // Get the request url
+    const protocol = req.socket instanceof TLSSocket ? "https" : "http";
+    const fullUrl = new URL(req.url!, `${protocol}://${req.headers.host}`);
+
+    // convert to web request
+    const webReq = toWebRequest(fullUrl.href, req);
+
     const action = webReq.headers.get("x-action");
 
     if (!action || !descriptor.handlers.has(action)) {
@@ -49,15 +22,17 @@ export function serve(descriptor: AromixDescriptor) {
       return;
     }
 
+
+    const body = await parseBody(webReq);
+
     const context: RequestContext = {
-      body: await webReq.json().catch(() => ({})),
-      headers: Object.fromEntries(webReq.headers),
-      send: ({ status, data }) => ({ status, data }),
+      body,
+      headers: Object.fromEntries(webReq.headers.entries()),
     };
 
     const handler = descriptor.handlers.get(action)!;
     const payload = await contextStorage.run(context, () => handler());
 
-    await writeNodeResponse(res, toWebResponse(payload));
+    await writeNodeResponse(res, payload);
   });
 }
