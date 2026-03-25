@@ -3,9 +3,7 @@ import { getContext, Middleware } from "@aromix/core";
 export function test(): Middleware {
   return {
     name: "test",
-    async run(next) {
-      const ctx = await getContext();
-
+    async run(ctx, next) {
       console.log(ctx);
 
       console.log("middleware ran");

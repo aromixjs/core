@@ -1,6 +1,6 @@
 import { action } from "./action";
 import { RawContext, ReplyValue } from "./context";
-import { group } from "./group";
+import { Group } from "./group";
 import { Middleware } from "./middleware";
 
 export interface MakeOptions {
@@ -27,7 +27,7 @@ export function make(options: MakeOptions) {
 
   for (const gp of options.groups) {
     const instance = new gp();
-    const groupMeta = group.getMeta(instance);
+    const groupMeta = Group.getMeta(instance);
     const actionMap = action.getMeta(instance);
 
     if (!groupMeta || !actionMap) continue;

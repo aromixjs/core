@@ -1,7 +1,7 @@
+import { contextStorage } from "./context";
 import { Middleware } from "./middleware";
 import type { Maybe, Union } from "./types";
 
-// Symbol to avoid collisions with user-defined properties on the constructor
 const GroupMetaKey = Symbol("aromix-group-meta");
 
 export type GroupMeta = {
@@ -9,26 +9,51 @@ export type GroupMeta = {
   middlewares: Middleware[];
 };
 
-/**
- * Groups a handler class under a route prefix.
- *
- * @example
- * @group("users")
- * class UserHandler { ... }
- */
-export interface GroupDecorator {
-  (prefix: string, middlewares?: Middleware[]): ClassDecorator;
-  getMeta(target: Union<[object, Function]>): Maybe<GroupMeta>;
+export type GroupConstructor = typeof GroupBase;
+
+export class GroupBase {
+  static readonly [GroupMetaKey]: GroupMeta;
+
+  protected get req() {
+    const ctx = contextStorage.getStore();
+    if (!ctx) {
+      throw new Error(
+        "[aromix] this.req accessed outside of a request context. " +
+          "Only access inside @action methods.",
+      );
+    }
+    return ctx;
+  }
+
+  protected get res() {
+    const ctx = contextStorage.getStore();
+    if (!ctx) {
+      throw new Error(
+        "[aromix] this.res accessed outside of a request context. " +
+          "Only access inside @action methods.",
+      );
+    }
+    return ctx;
+  }
 }
 
-export const group: GroupDecorator = (prefix, middlewares = []) => {
-  return (target: any) => {
-    target[GroupMetaKey] = { prefix, middlewares };
-  };
-};
+export function Group(
+  prefix: string,
+  middlewares: Middleware[] = [],
+): GroupConstructor {
+  class GroupInstance extends GroupBase {
+    static readonly [GroupMetaKey]: GroupMeta = { prefix, middlewares };
+  }
 
-// normalizes instance → constructor so getMeta works on both
-group.getMeta = (target: Union<[object, Function]>) => {
-  const ctor: any = typeof target === "function" ? target : target.constructor;
-  return ctor[GroupMetaKey];
-};
+  return GroupInstance;
+}
+
+export namespace Group {
+  export function getMeta(target: Union<[object, Function]>): Maybe<GroupMeta> {
+    const ctor =
+      typeof target === "function"
+        ? target
+        : Object.getPrototypeOf(target).constructor;
+    return ctor[GroupMetaKey];
+  }
+}
