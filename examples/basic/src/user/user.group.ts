@@ -1,7 +1,5 @@
-import { action, ContextSchema, getContext, group, inject } from "@aromix/core";
+import { action, getContext, group, inject } from "@aromix/core";
 import { UserService } from "./user.service";
-import { userGetInput } from "./user.schema";
-
 
 @group("user")
 export class UserGroup {
@@ -9,9 +7,13 @@ export class UserGroup {
 
   @action("get")
   async get() {
-    const ctx = await getContext(userGetInput);
-    return new Response("it works", {
+    const ctx = await getContext();
+
+    return ctx.reply({
       status: 200,
+      data: {
+        username: "test",
+      },
     });
   }
 

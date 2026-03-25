@@ -1,6 +1,6 @@
+import { ReplyValue } from "@aromix/core";
 import { IncomingMessage, ServerResponse } from "http";
 import { Readable } from "stream";
-
 
 /// NOTE:: NO NEED  TO GIVE STRICT TYPES HERE THE VALIDATION SCHEMA DECIDES WHAT TYPE IT WILL BE
 export async function parseBody(req: Request) {
@@ -52,8 +52,42 @@ export function toWebRequest(url: string, req: IncomingMessage): Request {
   });
 }
 
-export async function writeNodeResponse(res: ServerResponse, webRes: Response) {
-  webRes.headers.forEach((value, key) => res.setHeader(key, value));
-  res.writeHead(webRes.status);
-  res.end(webRes.body ? Buffer.from(await webRes.arrayBuffer()) : null);
+export async function writeNodeResponse(res: ServerResponse, value: ReplyValue) {
+  if (value.headers) {
+    for (const [key, val] of Object.entries(value.headers)) {
+      res.setHeader(key, val);
+    }
+  }
+
+  const body =
+    value.data !== undefined ? JSON.stringify(value.data) : null;
+
+  if (body && !res.hasHeader("content-type")) {
+    res.setHeader("Content-Type", "application/json");
+  }
+
+  res.writeHead(value.status);
+  res.end(body ? Buffer.from(body) : null);
+}
+
+
+export function parseCookies(
+  cookieHeader: string | null,
+): Record<string, string> {
+  if (!cookieHeader) return {};
+
+  return Object.fromEntries(
+    cookieHeader
+      .split(";")
+      .map((pair) => pair.trim())
+      .filter(Boolean)
+      .map((pair) => {
+        const eq = pair.indexOf("=");
+        if (eq === -1) return [pair, ""] as [string, string];
+        const key = pair.slice(0, eq).trim();
+        const val = pair.slice(eq + 1).trim();
+        return [key, decodeURIComponent(val)] as [string, string];
+      })
+      .filter(([key]) => key.length > 0),
+  );
 }

@@ -1,7 +1,7 @@
 import type { Maybe, Union } from "./types";
 
 // Symbol to avoid collisions with user-defined properties on the constructor
-const GroupMetaKey = Symbol("oriel-group-meta");
+const GroupMetaKey = Symbol("aromix-group-meta");
 
 export type GroupMeta = {
   prefix: string;

@@ -5,8 +5,6 @@ import { UserGroup } from "./user/user.group";
 
 const app = make({
   groups: [UserGroup],
-  plugins: [
-  ],
 });
 
 serve(app).listen(3000, () => {

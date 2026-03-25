@@ -1,27 +1,8 @@
-import { action } from "./lib/action";
-import {
-  type ContextSchema,
-  contextStorage,
-  getContext,
-  type RawContext,
-} from "./lib/context";
-import { inject, injectNew, provide } from "./lib/di";
-import { group } from "./lib/group";
-import { type AromixDescriptor, make } from "./lib/make";
-import { type Result, result } from "./lib/result";
+export * from "./lib/action";
+export * from "./lib/context";
+export * from "./lib/di";
+export * from "./lib/group";
+export * from "./lib/make";
+export * from "./lib/result";
+export * from "./lib/types.d";
 
-export {
-  action,
-  contextStorage,
-  getContext,
-  group,
-  inject,
-  injectNew,
-  make,
-  provide,
-  result,
-  type AromixDescriptor,
-  type ContextSchema,
-  type RawContext,
-  type Result,
-};

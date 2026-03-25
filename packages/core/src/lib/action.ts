@@ -1,7 +1,7 @@
 import type { Maybe, Union } from "./types";
 
 // stored on the constructor (not the prototype) so it's accessible from the class itself
-const ActionMetaKey = Symbol("oriel-action-meta");
+const ActionMetaKey = Symbol("aromix-action-meta");
 
 type ActionMeta = {
   prefix: string;
