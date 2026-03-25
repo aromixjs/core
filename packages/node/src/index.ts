@@ -1,7 +1,6 @@
 import { createServer, IncomingMessage, ServerResponse } from "node:http";
 import {
   AromixDescriptor,
-  contextStorage,
   RawContext,
   runChain,
 } from "@aromix/core";

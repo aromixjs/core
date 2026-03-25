@@ -1,3 +1,4 @@
+import { Middleware } from "./middleware";
 import type { Maybe, Union } from "./types";
 
 // stored on the constructor (not the prototype) so it's accessible from the class itself
@@ -5,7 +6,7 @@ const ActionMetaKey = Symbol("aromix-action-meta");
 
 type ActionMeta = {
   prefix: string;
-  middlewares: any[];
+  middlewares: Middleware[];
   key: string;
 };
 
@@ -13,7 +14,7 @@ type ActionMeta = {
 type ActionMetaMap = Record<string, ActionMeta>;
 
 interface ActionDecorator {
-  (prefix: string, middlewares?: any[]): MethodDecorator;
+  (prefix: string, middlewares?: Middleware[]): MethodDecorator;
   getMeta(target: Union<[object, Function]>): Maybe<ActionMetaMap>;
   getMeta(target: Union<[object, Function]>, key: string): Maybe<ActionMeta>;
 }

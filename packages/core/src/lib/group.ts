@@ -1,3 +1,4 @@
+import { Middleware } from "./middleware";
 import type { Maybe, Union } from "./types";
 
 // Symbol to avoid collisions with user-defined properties on the constructor
@@ -5,7 +6,7 @@ const GroupMetaKey = Symbol("aromix-group-meta");
 
 export type GroupMeta = {
   prefix: string;
-  middlewares: any[];
+  middlewares: Middleware[];
 };
 
 /**
@@ -16,7 +17,7 @@ export type GroupMeta = {
  * class UserHandler { ... }
  */
 export interface GroupDecorator {
-  (prefix: string, middlewares?: any[]): ClassDecorator;
+  (prefix: string, middlewares?: Middleware[]): ClassDecorator;
   getMeta(target: Union<[object, Function]>): Maybe<GroupMeta>;
 }
 
