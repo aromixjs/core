@@ -18,6 +18,7 @@ function parseCookies(cookieHeader: string | null): Record<string, string> {
 }
 
 export function serve(descriptor: AromixDescriptor) {
+
   return createServer(async (req: IncomingMessage, res: ServerResponse) => {
     // Get the request url
     const protocol = req.socket instanceof TLSSocket ? "https" : "http";
@@ -38,6 +39,7 @@ export function serve(descriptor: AromixDescriptor) {
     }
 
     const body = await parseBody(webReq);
+
     const context: RawContext = {
       body,
       headers: Object.fromEntries(webReq.headers.entries()),
@@ -48,8 +50,9 @@ export function serve(descriptor: AromixDescriptor) {
         Object.freeze({ _type: "reply" as const, ...options }),
     };
 
+
     const entry = descriptor.handlers.get(action)!;
-    const payload = await runChain(entry.chain, context, entry.handler);
+ const payload = await runChain(entry.chain, context, entry.handler);
 
     if (!payload || payload._type !== "reply") {
       await writeNodeResponse(res, {

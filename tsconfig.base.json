@@ -16,8 +16,6 @@
     "declaration": true,
     "declarationMap": true,
     "emitDeclarationOnly": true,
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
     "composite": false,
     "rootDir": "src",
     "outDir": "dist/types"

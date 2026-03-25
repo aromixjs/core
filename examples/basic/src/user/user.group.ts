@@ -1,23 +1,23 @@
-import { action, getContext, group, inject } from "@aromix/core";
+import { action, getContext, group, inject, RawContext } from "@aromix/core";
 import { UserService } from "./user.service";
+import { test } from "./test.middlware";
+import { test2 } from "./teeset2";
+import { userGetInput } from "./user.schema";
 
-@group("user")
+@group("user", [test2()])
 export class UserGroup {
   private userService = inject(UserService);
 
-  @action("get")
-  async get() {
-    const ctx = await getContext();
+  @action("get", [test()])
+  async get(ctx: RawContext) {
+
+
 
     return ctx.reply({
       status: 200,
       data: {
-        cookies: ctx.headers['cookie'],
         username: "test",
       },
     });
   }
-
-  @action("create")
-  create() {}
 }

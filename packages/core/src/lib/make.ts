@@ -1,5 +1,5 @@
 import { action } from "./action";
-import { ReplyValue } from "./context";
+import { RawContext, ReplyValue } from "./context";
 import { group } from "./group";
 import { Middleware } from "./middleware";
 
@@ -11,7 +11,7 @@ export interface MakeOptions {
 
 export interface DispatchEntry {
   chain: readonly Middleware[];
-  handler: () => Promise<ReplyValue>;
+  handler: (ctx: RawContext) => Promise<ReplyValue>;
 }
 
 export interface AromixDescriptor {
@@ -30,9 +30,7 @@ export function make(options: MakeOptions) {
     const groupMeta = group.getMeta(instance);
     const actionMap = action.getMeta(instance);
 
-    if (!groupMeta || !actionMap) {
-      continue;
-    }
+    if (!groupMeta || !actionMap) continue;
 
     for (const [methodKey, actionMeta] of Object.entries(actionMap)) {
       const fullKey = `${groupMeta.prefix}:${actionMeta.prefix}`;
@@ -45,7 +43,8 @@ export function make(options: MakeOptions) {
 
       descriptor.handlers.set(fullKey, {
         chain,
-        handler: (instance[methodKey] as Function).bind(instance),
+        handler: (ctx: RawContext) =>
+          (instance[methodKey] as Function).call(instance, ctx),
       });
     }
   }

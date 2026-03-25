@@ -1,7 +1,6 @@
 import { Middleware } from "./middleware";
 import type { Maybe, Union } from "./types";
 
-// stored on the constructor (not the prototype) so it's accessible from the class itself
 const ActionMetaKey = Symbol("aromix-action-meta");
 
 type ActionMeta = {
@@ -10,7 +9,6 @@ type ActionMeta = {
   key: string;
 };
 
-// all actions on a class are stored as a single map keyed by method name
 type ActionMetaMap = Record<string, ActionMeta>;
 
 interface ActionDecorator {
@@ -22,14 +20,12 @@ interface ActionDecorator {
 export const action: ActionDecorator = (prefix, middlewares = []) => {
   return (target, key) => {
     const ctor: any = target.constructor;
-    // merge into existing map so multiple @action decorators on the same class don't overwrite each other
     const existing = ctor[ActionMetaKey] ?? {};
     existing[String(key)] = { prefix, middlewares, key };
     ctor[ActionMetaKey] = existing;
   };
 };
 
-// overloaded — returns single ActionMeta when key is provided, full map otherwise
 action.getMeta = (target: Union<[object, Function]>, key?: string) => {
   const ctor: any = typeof target === "function" ? target : target.constructor;
   const map = ctor[ActionMetaKey];
