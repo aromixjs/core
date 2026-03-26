@@ -1,4 +1,3 @@
-import { RawRequest } from "./request";
 import { ResponseBuilder } from "./response";
 
 export type Hook =

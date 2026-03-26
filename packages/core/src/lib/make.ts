@@ -1,12 +1,12 @@
 import { action } from "./action";
 import { group } from "./group";
+import { Hook } from "./hooks";
 import { Middleware } from "./middleware";
 import { ResponseBuilder } from "./response";
 
 export interface MakeOptions {
   groups: Array<new () => any>;
-  plugins?: Array<any>;
-  middlewares?: Middleware[];
+  hooks: Hook[];
 }
 
 export interface DispatchEntry {
@@ -38,7 +38,7 @@ export function make(options: MakeOptions): AromixDescriptor {
       const chain: Middleware[] = [
         ...globalMiddlewares,
         ...groupMeta.middlewares,
-        ...actionMeta.middlewares,
+        ...actionMeta.hooks,
       ];
 
       descriptor.handlers.set(fullKey, {

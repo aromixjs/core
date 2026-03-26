@@ -1,16 +1,16 @@
-import { Middleware } from "./middleware";
+import { Hook } from "./hooks";
 import type { Maybe, Union } from "./types";
 
 const GroupMetaKey = Symbol("aromix-group-meta");
 
 export type GroupMeta = {
   prefix: string;
-  middlewares: Middleware[];
+  hooks: Hook[];
 };
 
-export function group(prefix: string, middlewares: Middleware[] = []): ClassDecorator {
+export function group(prefix: string, hooks: Hook[] = []): ClassDecorator {
   return (target: any) => {
-    target[GroupMetaKey] = { prefix, middlewares } satisfies GroupMeta;
+    target[GroupMetaKey] = { prefix, hooks } satisfies GroupMeta;
   };
 }
 
