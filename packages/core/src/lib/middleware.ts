@@ -1,4 +1,4 @@
-import { contextStorage, RawContext, ReplyValue } from "./context";
+import { contextStorage, RawContext, ReplyValue } from "./request";
 
 export type Next = () => Promise<ReplyValue>;
 

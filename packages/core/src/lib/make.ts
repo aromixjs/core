@@ -1,7 +1,7 @@
 import { action } from "./action";
-import { RawContext, ReplyValue } from "./context";
 import { group } from "./group";
 import { Middleware } from "./middleware";
+import { RawContext, ReplyValue } from "./request";
 
 export interface MakeOptions {
   groups: Array<new () => any>;
