@@ -1,6 +1,5 @@
 import type { Maybe, Union } from "./types";
 
-
 const ServiceRegistry = new Map<symbol, object>();
 const ServiceMetaKey = Symbol("aromix-service-meta");
 
@@ -8,25 +7,20 @@ export type ServiceMeta = {
   token: symbol;
 };
 
-export interface ServiceDecorator {
-  (): ClassDecorator;
-  getMeta(target: Union<[object, Function]>): Maybe<ServiceMeta>;
-}
-
-export const provide: ServiceDecorator = () => {
+export function provide(): ClassDecorator {
   return (target: any) => {
-    // UUID prefix ensures uniqueness even if two classes share the same name
     target[ServiceMetaKey] = {
       token: Symbol(`${crypto.randomUUID()}:${target.name || "Anonymous"}`),
     } satisfies ServiceMeta;
   };
-};
+}
 
-// normalizes instance → constructor so getMeta works on both
-provide.getMeta = (target: Union<[object, Function]>) => {
-  const ctor: any = typeof target === "function" ? target : target.constructor;
-  return ctor[ServiceMetaKey];
-};
+export namespace provide {
+  export function getMeta(target: Union<[object, Function]>): Maybe<ServiceMeta> {
+    const ctor: any = typeof target === "function" ? target : target.constructor;
+    return ctor[ServiceMetaKey];
+  }
+}
 
 /**
  * Returns the singleton instance for the given class.

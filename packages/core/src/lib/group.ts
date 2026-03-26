@@ -1,4 +1,3 @@
-import { contextStorage } from "./context";
 import { Middleware } from "./middleware";
 import type { Maybe, Union } from "./types";
 
@@ -9,51 +8,15 @@ export type GroupMeta = {
   middlewares: Middleware[];
 };
 
-export type GroupConstructor = typeof GroupBase;
-
-export class GroupBase {
-  static readonly [GroupMetaKey]: GroupMeta;
-
-  protected get req() {
-    const ctx = contextStorage.getStore();
-    if (!ctx) {
-      throw new Error(
-        "[aromix] this.req accessed outside of a request context. " +
-          "Only access inside @action methods.",
-      );
-    }
-    return ctx;
-  }
-
-  protected get res() {
-    const ctx = contextStorage.getStore();
-    if (!ctx) {
-      throw new Error(
-        "[aromix] this.res accessed outside of a request context. " +
-          "Only access inside @action methods.",
-      );
-    }
-    return ctx;
-  }
+export function group(prefix: string, middlewares: Middleware[] = []): ClassDecorator {
+  return (target: any) => {
+    target[GroupMetaKey] = { prefix, middlewares } satisfies GroupMeta;
+  };
 }
 
-export function Group(
-  prefix: string,
-  middlewares: Middleware[] = [],
-): GroupConstructor {
-  class GroupInstance extends GroupBase {
-    static readonly [GroupMetaKey]: GroupMeta = { prefix, middlewares };
-  }
-
-  return GroupInstance;
-}
-
-export namespace Group {
+export namespace group {
   export function getMeta(target: Union<[object, Function]>): Maybe<GroupMeta> {
-    const ctor =
-      typeof target === "function"
-        ? target
-        : Object.getPrototypeOf(target).constructor;
+    const ctor: any = typeof target === "function" ? target : target.constructor;
     return ctor[GroupMetaKey];
   }
 }
