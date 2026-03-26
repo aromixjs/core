@@ -1,7 +1,7 @@
 import { action } from "./action";
 import { group } from "./group";
 import { Middleware } from "./middleware";
-import { RawContext, ReplyValue } from "./request";
+import { ResponseBuilder } from "./response";
 
 export interface MakeOptions {
   groups: Array<new () => any>;
@@ -11,14 +11,14 @@ export interface MakeOptions {
 
 export interface DispatchEntry {
   chain: readonly Middleware[];
-  handler: (ctx: RawContext) => Promise<ReplyValue>;
+  handler: () => Promise<ResponseBuilder>;
 }
 
 export interface AromixDescriptor {
   handlers: Map<string, DispatchEntry>;
 }
 
-export function make(options: MakeOptions) {
+export function make(options: MakeOptions): AromixDescriptor {
   const descriptor: AromixDescriptor = {
     handlers: new Map(),
   };
@@ -43,8 +43,7 @@ export function make(options: MakeOptions) {
 
       descriptor.handlers.set(fullKey, {
         chain,
-        handler: (ctx: RawContext) =>
-          (instance[methodKey] as Function).call(instance, ctx),
+        handler: () => (instance[methodKey] as Function).call(instance),
       });
     }
   }

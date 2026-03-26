@@ -1,8 +1,9 @@
-import { contextStorage, RawContext, ReplyValue } from "./request";
+import { RawRequest, requestStorage } from "./request";
+import { ResponseBuilder } from "./response";
 
-export type Next = () => Promise<ReplyValue>;
+export type Next = () => Promise<ResponseBuilder>;
 
-export type MiddlewareFn = (ctx: RawContext, next: Next) => Promise<ReplyValue>;
+export type MiddlewareFn = (next: Next) => Promise<ResponseBuilder>;
 
 export interface Middleware {
   readonly name: string;
@@ -11,18 +12,18 @@ export interface Middleware {
 
 export async function runChain(
   chain: readonly Middleware[],
-  ctx: RawContext,
-  handler: (ctx: RawContext) => Promise<ReplyValue>,
-): Promise<ReplyValue> {
+  raw: RawRequest,
+  handler: () => Promise<ResponseBuilder>,
+): Promise<ResponseBuilder> {
   let index = 0;
 
-  const next = (): Promise<ReplyValue> => {
+  const next = (): Promise<ResponseBuilder> => {
     if (index < chain.length) {
       const mw = chain[index++];
-      return mw.run(ctx, next);
+      return mw.run(next);
     }
-    return handler(ctx);
+    return handler();
   };
 
-  return contextStorage.run(ctx, next);
+  return requestStorage.run(raw, next);
 }
