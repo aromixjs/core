@@ -1,5 +1,4 @@
-import { ReplyValue } from "@aromix/core";
-import { IncomingMessage, ServerResponse } from "http";
+import { IncomingMessage } from "http";
 import { Readable } from "stream";
 
 /// NOTE:: NO NEED  TO GIVE STRICT TYPES HERE THE VALIDATION SCHEMA DECIDES WHAT TYPE IT WILL BE
@@ -38,38 +37,16 @@ export async function parseBody(req: Request) {
 }
 
 export function toWebRequest(url: string, req: IncomingMessage): Request {
-  let body: ReadableStream | undefined = undefined;
-
-  if (req.method !== "GET" && req.method !== "HEAD") {
-    body = Readable.toWeb(req);
-  }
-
   return new Request(url, {
     method: req.method,
     headers: req.headers as Record<string, string | string[]>,
-    body,
+    body:
+      req.method !== "GET" && req.method !== "HEAD"
+        ? Readable.toWeb(req)
+        : undefined,
     duplex: "half",
   });
 }
-
-export async function writeNodeResponse(res: ServerResponse, value: ReplyValue) {
-  if (value.headers) {
-    for (const [key, val] of Object.entries(value.headers)) {
-      res.setHeader(key, val);
-    }
-  }
-
-  const body =
-    value.data !== undefined ? JSON.stringify(value.data) : null;
-
-  if (body && !res.hasHeader("content-type")) {
-    res.setHeader("Content-Type", "application/json");
-  }
-
-  res.writeHead(value.status);
-  res.end(body ? Buffer.from(body) : null);
-}
-
 
 export function parseCookies(
   cookieHeader: string | null,
@@ -83,10 +60,10 @@ export function parseCookies(
       .filter(Boolean)
       .map((pair) => {
         const eq = pair.indexOf("=");
-        if (eq === -1) return [pair, ""] as [string, string];
-        const key = pair.slice(0, eq).trim();
-        const val = pair.slice(eq + 1).trim();
-        return [key, decodeURIComponent(val)] as [string, string];
+        const key = eq === -1 ? pair : pair.slice(0, eq).trim();
+        const val =
+          eq === -1 ? "" : decodeURIComponent(pair.slice(eq + 1).trim());
+        return [key, val] as [string, string];
       })
       .filter(([key]) => key.length > 0),
   );
