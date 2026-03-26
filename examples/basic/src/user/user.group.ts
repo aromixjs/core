@@ -1,11 +1,15 @@
+//@ts-nocheck
 import { action, Group } from "@aromix/core";
+import { test } from "./test.middlware";
+import { userGetInput } from "./user.schema";
 
-export class UserGroup extends Group("user") {
+
+@group('test')
+export class UserGroup {
   @action("test")
   test() {
-    return this.res.reply({
-      data: this.req,
-      status: 200,
-    });
+    const req = request(userGetInput);
+
+    res.reply({ status: 200 });
   }
 }
