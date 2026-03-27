@@ -8,7 +8,7 @@ export type GroupMeta = {
   hooks?: Hook[];
 };
 
-export function group(prefix: string, hooks: Hook[]): ClassDecorator {
+export function group(prefix: string, hooks?: Hook[]): ClassDecorator {
   return (target: any) => {
     target[GroupMetaKey] = { prefix, hooks } satisfies GroupMeta;
   };

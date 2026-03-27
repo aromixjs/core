@@ -6,6 +6,9 @@ const app = make({
   groups: [UserGroup],
 });
 
+console.log(app);
+
+
 serve(app).listen(3000, () => {
   console.log("App is running on port 3000");
 });
