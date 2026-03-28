@@ -22,7 +22,7 @@ export function ResponseLogger(): Hook {
   return {
     event: "after:handler",
     run(builder) {
-      console.log(builder.toReplyValue());
+      console.log('response ->',builder.toReplyValue());
     },
   };
 }
