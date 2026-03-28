@@ -36,3 +36,20 @@ export async function tryAll<T extends readonly unknown[]>(fns: { [K in keyof T]
     })
   ) as unknown as { [K in keyof T]: Result<T[K], "unexpected_error"> };
 }
+
+
+
+export function match<T, E extends string, R>(
+  result: Result<T, E>,
+  arms: { [K in E]: () => R } & { ok: (data: T) => R }
+): R {
+  if (result.ok) return arms.ok(result.data)
+  return arms[result.err]()
+}
+
+export function matchErr<E extends string, R>(
+  result: Err<E>,
+  arms: { [K in E]: () => R }
+): R {
+  return arms[result.err]()
+}
