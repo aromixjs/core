@@ -2,14 +2,13 @@ import {
   ActionNotFoundError,
   AromixDescriptor,
   InvalidResponseError,
+  Output,
   RawRequest,
   requestStorage,
-  response,
-  ResponseBuilder,
 } from "@aromix/core";
 import { createServer, IncomingMessage, ServerResponse } from "node:http";
 import { TLSSocket } from "node:tls";
-import { parseBody, parseCookies, toWebRequest } from "./utils";
+import { parseBody, parseCookies, toWebRequest, writeResponse } from "./utils";
 
 export function serve(descriptor: AromixDescriptor) {
   const server = createServer();
@@ -33,12 +32,12 @@ export function serve(descriptor: AromixDescriptor) {
       };
 
       const result = await requestStorage.run(raw, async () => {
-        let builder: ResponseBuilder;
+        let builder: Output;
 
         // short circuit if before handler returns any value
         for (const hook of entry.beforeHandlerHooks) {
           const short = await hook.run();
-          if (short instanceof ResponseBuilder) {
+          if (short !== undefined) {
             builder = short;
             break;
           }
@@ -47,9 +46,9 @@ export function serve(descriptor: AromixDescriptor) {
         if (!builder!) {
           const handlerResult = await entry.handler();
 
-          // handler returned something other than ResponseBuilder
-          if (!(handlerResult instanceof ResponseBuilder)) {
-            throw new InvalidResponseError(`Handler '${action}' must return a ResponseBuilder.`);
+          // handler returned something other than Output
+          if (typeof handlerResult !== "object" || handlerResult === null || !("ok" in handlerResult)) {
+            throw new InvalidResponseError(`Handler '${action}' must return an Output.`);
           }
 
           builder = handlerResult;
@@ -58,7 +57,7 @@ export function serve(descriptor: AromixDescriptor) {
         for (const hook of entry.afterHandlerHooks) {
           const override = await hook.run(builder);
 
-          if (override instanceof ResponseBuilder) {
+          if (override !== undefined) {
             builder = override;
           }
         }
@@ -66,26 +65,15 @@ export function serve(descriptor: AromixDescriptor) {
         return builder;
       });
 
-      const reply = result.toReplyValue();
-      serverRes.statusCode = reply.status;
-
-      for (const [k, v] of Object.entries(reply.headers)) {
-        serverRes.setHeader(k, v);
-      }
-      if (reply.data !== undefined) {
-        serverRes.setHeader("content-type", "application/json");
-        serverRes.end(JSON.stringify(reply.data));
-      } else {
-        serverRes.end();
-      }
+      writeResponse(serverRes, result);
     } catch (error) {
       const errorHooks = entry?.errorHooks ?? [];
-      let result: ResponseBuilder | undefined;
+      let result: Output | undefined;
 
       for (const hook of errorHooks) {
         try {
           const handled = await hook.run(error);
-          if (handled instanceof ResponseBuilder) {
+          if (handled !== undefined) {
             result = handled;
             break;
           }
@@ -94,20 +82,14 @@ export function serve(descriptor: AromixDescriptor) {
         }
       }
 
-      const fallback = result ?? response.internalError("Something went wrong");
-      const reply = fallback.toReplyValue();
+      const fallback: Output = result ?? {
+        ok: false,
+        code: "INTERNAL",
+        data: null,
+        error: "Something went wrong",
+      };
 
-      serverRes.statusCode = reply.status;
-      for (const [k, v] of Object.entries(reply.headers)) {
-        serverRes.setHeader(k, v);
-      }
-
-      if (reply.data !== undefined) {
-        serverRes.setHeader("content-type", "application/json");
-        serverRes.end(JSON.stringify(reply.data));
-      } else {
-        serverRes.end();
-      }
+      writeResponse(serverRes, fallback);
     }
   });
 

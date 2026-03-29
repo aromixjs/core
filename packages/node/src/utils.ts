@@ -1,4 +1,5 @@
-import { IncomingMessage } from "http";
+import { Output } from "@aromix/core";
+import { IncomingMessage, ServerResponse } from "http";
 import { Readable } from "stream";
 
 /// NOTE:: NO NEED  TO GIVE STRICT TYPES HERE THE VALIDATION SCHEMA DECIDES WHAT TYPE IT WILL BE
@@ -61,4 +62,12 @@ export function parseCookies(cookieHeader: string | null): Record<string, string
       })
       .filter(([key]) => key.length > 0)
   );
+}
+
+
+export function writeResponse(serverRes: ServerResponse, body: Output): void {
+  const json = JSON.stringify(body);
+  serverRes.statusCode = 200;
+  serverRes.setHeader("content-type", "application/json");
+  serverRes.end(json);
 }
