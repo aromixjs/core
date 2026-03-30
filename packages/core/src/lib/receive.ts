@@ -7,6 +7,7 @@ export type IncomingPacket = {
   headers: Record<string, string>;
   ip: string;
   action: string;
+  url: URL;
 };
 
 export type PacketSchema = {
