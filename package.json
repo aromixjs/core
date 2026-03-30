@@ -11,6 +11,8 @@
     "node:dev": "pnpm --filter @aromix/node dev",
     "client:build": "pnpm --filter @aromix/client build",
     "client:dev": "pnpm --filter @aromix/client dev",
+    "cli:build": "pnpm --filter @aromix/cli build",
+    "cli:dev": "pnpm --filter @aromix/cli dev",
     "basic:dev": "pnpm --filter @aromix/basic dev",
     "basic:build": "pnpm --filter @aromix/basic build",
     "enterprise:dev": "pnpm --filter @aromix/enterprise dev",

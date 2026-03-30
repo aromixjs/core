@@ -80,6 +80,18 @@ importers:
         specifier: 'catalog:'
         version: 5.9.3
 
+  packages/cli:
+    devDependencies:
+      '@types/node':
+        specifier: 'catalog:'
+        version: 22.19.15
+      tsup:
+        specifier: 'catalog:'
+        version: 8.5.1(tsx@4.21.0)(typescript@5.9.3)
+      typescript:
+        specifier: 'catalog:'
+        version: 5.9.3
+
   packages/client:
     dependencies:
       '@msgpack/msgpack':
