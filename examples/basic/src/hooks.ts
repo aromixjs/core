@@ -1,9 +1,9 @@
-import { Hook, request, response } from "@aromix/core";
+import { Hook, input, output } from "@aromix/core";
 
 export const loggerHook: Hook = {
   event: "before:handler",
   run: () => {
-    const raw = request();
+    const raw = input();
     console.log(`→ ${raw.action} from ${raw.ip}`);
   },
 };
@@ -11,18 +11,10 @@ export const loggerHook: Hook = {
 export const authHook: Hook = {
   event: "before:handler",
   run: () => {
-    const raw = request();
+    const raw = input();
     if (!raw.headers["authorization"]) {
-      return response.unauthorized("Missing token"); // short-circuit
+      return output("UNAUTHORIZED", "Missing token"); // short-circuit
     }
   },
 };
 
-export function ResponseLogger(): Hook {
-  return {
-    event: "after:handler",
-    run(builder) {
-      
-    },
-  };
-}

@@ -18,8 +18,11 @@
   },
   "devDependencies": {
     "@aromix/core": "workspace:*",
+    "@types/node": "catalog:",
     "tsup": "catalog:",
-    "typescript": "catalog:",
-    "@types/node": "catalog:"
+    "typescript": "catalog:"
+  },
+  "dependencies": {
+    "@msgpack/msgpack": "^3.1.3"
   }
 }

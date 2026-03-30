@@ -1,7 +1,7 @@
 import { action } from "./action";
 import { group } from "./group";
 import { Hook } from "./hooks";
-import { Output } from "./output";
+import { Output } from "./send";
 
 export interface MakeOptions {
   groups: Array<new () => any>;

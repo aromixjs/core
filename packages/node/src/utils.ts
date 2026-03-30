@@ -1,73 +1,49 @@
 import { Output } from "@aromix/core";
+import { decode, encode } from "@msgpack/msgpack";
 import { IncomingMessage, ServerResponse } from "http";
 import { Readable } from "stream";
+import { TLSSocket } from "tls";
 
 /// NOTE:: NO NEED  TO GIVE STRICT TYPES HERE THE VALIDATION SCHEMA DECIDES WHAT TYPE IT WILL BE
-export async function parseBody(req: Request) {
-  const contentType = req.headers.get("content-type");
+export async function parseIncoming(req: IncomingMessage) {
+  const protocol = req.socket instanceof TLSSocket ? "https" : "http";
+  const fullUrl = new URL(req.url!, `${protocol}://${req.headers.host}`);
 
-  switch (contentType) {
-    case "application/json": {
-      return req.json();
-    }
-
-    case "multipart/form-data":
-    case "application/x-www-form-urlencoded": {
-      const form = await req.formData();
-      return Object.fromEntries(form.entries());
-    }
-
-    case "text/plain": {
-      return req.text();
-    }
-
-    case "application/octet-stream": {
-      return req.arrayBuffer();
-    }
-
-    default: {
-      if (contentType?.includes("json")) {
-        return req.json();
-      }
-      if (contentType?.startsWith("text/")) {
-        return req.text();
-      }
-      return {};
-    }
-  }
-}
-
-export function toWebRequest(url: string, req: IncomingMessage): Request {
-  return new Request(url, {
+  const webReq = new Request(fullUrl.href, {
     method: req.method,
     headers: req.headers as Record<string, string | string[]>,
     body: req.method !== "GET" && req.method !== "HEAD" ? Readable.toWeb(req) : undefined,
     duplex: "half",
   });
+
+  const contentType = webReq.headers.get("content-type");
+
+  if (contentType !== "application/msgpack") {
+    throw new Error("Expected content-type: application/msgpack");
+  }
+
+  const action = webReq.headers.get("x-action");
+
+  if (!action) {
+    throw new Error("Missing X-Action header");
+  }
+
+  const buffer = await webReq.arrayBuffer();
+  const body = buffer.byteLength > 0 ? decode(new Uint8Array(buffer)) : {};
+
+  return {
+    action,
+    body,
+    headers: Object.fromEntries(webReq.headers.entries()),
+    cookies: webReq.headers.get("cookie"),
+    ip: req.socket.remoteAddress ?? "",
+    url: fullUrl,
+  };
 }
 
-export function parseCookies(cookieHeader: string | null): Record<string, string> {
-  if (!cookieHeader) return {};
-
-  return Object.fromEntries(
-    cookieHeader
-      .split(";")
-      .map((pair) => pair.trim())
-      .filter(Boolean)
-      .map((pair) => {
-        const eq = pair.indexOf("=");
-        const key = eq === -1 ? pair : pair.slice(0, eq).trim();
-        const val = eq === -1 ? "" : decodeURIComponent(pair.slice(eq + 1).trim());
-        return [key, val] as [string, string];
-      })
-      .filter(([key]) => key.length > 0)
-  );
-}
-
-
-export function writeResponse(serverRes: ServerResponse, body: Output): void {
-  const json = JSON.stringify(body);
+export function writeResponse(serverRes: ServerResponse, body: unknown): void {
+  const encoded = encode(body);
   serverRes.statusCode = 200;
-  serverRes.setHeader("content-type", "application/json");
-  serverRes.end(json);
+  serverRes.setHeader("content-type", "application/msgpack");
+  serverRes.end(Buffer.from(encoded));
 }
