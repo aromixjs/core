@@ -1,83 +1,87 @@
-import { ActionNotFoundError, AromixDescriptor, packetStorage, Send } from "@aromix/core";
+import { AromixDescriptor } from "@aromix/core";
 import { createServer, IncomingMessage, ServerResponse } from "node:http";
-import { parseIncoming, writeResponse } from "./utils";
+import { Readable } from "node:stream";
+import { TLSSocket } from "node:tls";
 
 export function serve(descriptor: AromixDescriptor) {
   const server = createServer();
 
-  server.on("request", async (req: IncomingMessage, serverRes: ServerResponse) => {
-    serverRes.setHeader("Access-Control-Allow-Origin", "*");
-    serverRes.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
-    serverRes.setHeader("Access-Control-Allow-Headers", "*");
+  server.on("request", async (req: IncomingMessage, res: ServerResponse) => {
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, PATCH, OPTIONS");
+    res.setHeader("Access-Control-Allow-Headers", "*");
 
-    let entry: ReturnType<AromixDescriptor["handlers"]["get"]>;
-
-    try {
-      const raw = await parseIncoming(req);
-      entry = descriptor.handlers.get(raw.action);
-      if (!entry) throw new ActionNotFoundError(raw.action);
-      const definedEntry = entry;
-
-      const result = await packetStorage.run(raw, async () => {
-        let output: Send | void = undefined;
-
-        for (const hook of definedEntry.beforeHandlerHooks) {
-          const short = await hook.run();
-          if (short !== undefined) {
-            output = short;
-            break;
-          }
-        }
-
-        if (output === undefined) {
-          output = await definedEntry.handler();
-        }
-        for (const hook of definedEntry.afterHandlerHooks) {
-          const override = await hook.run(output as Send);
-          if (override !== undefined) output = override;
-        }
-
-        return output;
-      });
-
-      writeResponse(serverRes, result);
-    } catch (error) {
-      const errorHooks = entry?.errorHooks ?? [];
-      let handled: Send | undefined;
-
-      for (const hook of errorHooks) {
-        try {
-          const out = await hook.run(error);
-          if (out !== undefined) {
-            handled = out;
-            break;
-          }
-        } catch {
-          continue;
-        }
-      }
-
-      writeResponse(
-        serverRes,
-        handled ?? {
-          data: null,
-          errors: [{ message: "Something went wrong" }],
-        }
-      );
+    if (req.method === "OPTIONS") {
+      res.writeHead(204).end();
+      return;
     }
+
+    const webReq = toWebRequest(req);
+    const webRes = await dispatch(webReq, descriptor);
+    await writeWebResponse(res, webRes);
   });
 
   server.on("listening", async () => {
-    for (const hook of descriptor.appStartHooks) {
-      await hook.run();
-    }
+    for (const hook of descriptor.appStartHooks) await hook.run();
   });
 
   server.on("close", async () => {
-    for (const hook of descriptor.appStopHooks) {
-      await hook.run();
-    }
+    for (const hook of descriptor.appStopHooks) await hook.run();
   });
 
   return server;
+}
+
+// converts node IncomingMessage → web Request
+function toWebRequest(req: IncomingMessage): Request {
+  const protocol = req.socket instanceof TLSSocket ? "https" : "http";
+  const url = new URL(req.url!, `${protocol}://${req.headers.host}`);
+
+  return new Request(url.href, {
+    method: req.method,
+    headers: req.headers as Record<string, string>,
+    body: req.method !== "GET" && req.method !== "HEAD" ? (Readable.toWeb(req) as ReadableStream) : undefined,
+    // @ts-ignore — node fetch needs this
+    duplex: "half",
+  });
+}
+
+// matches request against registered plugin routes
+async function dispatch(req: Request, descriptor: AromixDescriptor): Promise<Response> {
+  const url = new URL(req.url);
+  const method = req.method.toUpperCase();
+
+  for (const route of descriptor.routes) {
+    if (route.method !== method) continue;
+    if (!matchPath(route.path, url.pathname)) continue;
+
+    try {
+      return await route.handler(req);
+    } catch (err) {
+      console.error(`[aromix] route error ${method} ${route.path}`, err);
+      return new Response("Internal server error", { status: 500 });
+    }
+  }
+
+  return new Response("Not found", { status: 404 });
+}
+
+// writes web Response → node ServerResponse
+async function writeWebResponse(res: ServerResponse, webRes: Response): Promise<void> {
+  res.statusCode = webRes.status;
+
+  webRes.headers.forEach((value, key) => res.setHeader(key, value));
+
+  const body = await webRes.arrayBuffer();
+  res.end(Buffer.from(body));
+}
+
+// simple path matcher — supports :param segments
+function matchPath(pattern: string, pathname: string): boolean {
+  const patternParts = pattern.split("/");
+  const pathnameParts = pathname.split("/");
+
+  if (patternParts.length !== pathnameParts.length) return false;
+
+  return patternParts.every((part, i) => part.startsWith(":") || part === pathnameParts[i]);
 }
