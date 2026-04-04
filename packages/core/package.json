@@ -17,8 +17,5 @@
     "tsup": "catalog:",
     "typescript": "catalog:",
     "@types/node": "catalog:"
-  },
-  "dependencies": {
-    "@standard-schema/spec": "^1.1.0"
   }
 }
