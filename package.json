@@ -9,6 +9,8 @@
     "core:dev": "pnpm --filter @aromix/core dev",
     "node:build": "pnpm --filter @aromix/node build",
     "node:dev": "pnpm --filter @aromix/node dev",
+    "mongo:build": "pnpm --filter @aromix/mongo build",
+    "mongo:dev": "pnpm --filter @aromix/mongo dev",
     
     "basic:dev": "pnpm --filter @aromix/basic dev",
     "basic:build": "pnpm --filter @aromix/basic build",
