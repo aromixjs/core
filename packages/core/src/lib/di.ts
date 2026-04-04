@@ -1,16 +1,22 @@
 import type { Maybe, Union } from "./types";
 
-const ServiceRegistry = new Map<symbol, object>();
 const ServiceMetaKey = Symbol("aromix-service-meta");
+const ServiceRegistry = new Map<symbol, unknown>();
 
 export type ServiceMeta = {
   token: symbol;
+  name: string;
 };
 
+/**
+ * Decorator to mark a class as a service
+ */
 export function provide(): ClassDecorator {
   return (target: any) => {
+    const name = target.name || "Anonymous";
     target[ServiceMetaKey] = {
-      token: Symbol(`${crypto.randomUUID()}:${target.name || "Anonymous"}`),
+      token: Symbol(`service:${crypto.randomUUID()}:${name}`),
+      name,
     } satisfies ServiceMeta;
   };
 }
@@ -23,27 +29,67 @@ export namespace provide {
 }
 
 /**
- * Returns the singleton instance for the given class.
- * Creates and caches it on first call, returns the same instance on subsequent calls.
+ * Get singleton instance.
+ * Works for both @provide() decorated classes and services registered via plugins.
  */
-export function inject<T extends new () => any>(ctor: T): InstanceType<T> {
-  const { token } = provide.getMeta(ctor) || {};
+export function inject<T>(ctor: new (...args: any[]) => T): T {
+  const meta = provide.getMeta(ctor);
 
-  if (!token) throw new Error("No Token Found");
+  if (!meta?.token) {
+    throw new Error(
+      `No service metadata found for ${ctor.name || "unknown constructor"}. ` +
+        `Did you forget @provide() or register it via plugin?`
+    );
+  }
 
-  if (ServiceRegistry.has(token)) return ServiceRegistry.get(token) as InstanceType<T>;
+  if (ServiceRegistry.has(meta.token)) {
+    return ServiceRegistry.get(meta.token) as T;
+  }
 
   const instance = new ctor();
-  ServiceRegistry.set(token, instance);
+  ServiceRegistry.set(meta.token, instance);
   return instance;
 }
 
 /**
- * Creates a fresh instance on every call — no caching, no shared state.
- * Use for stateful per-operation classes where sharing would be incorrect.
+ * Always create a fresh instance (never cached)
  */
-export function injectNew<T extends new () => any>(ctor: T): InstanceType<T> {
-  const { token } = provide.getMeta(ctor) || {};
-  if (!token) throw new Error("No Token Found");
+export function injectNew<T>(ctor: new (...args: any[]) => T): T {
+  const meta = provide.getMeta(ctor);
+  if (!meta?.token) {
+    throw new Error(
+      `No service metadata found for ${ctor.name || "unknown constructor"}. ` +
+        `Did you forget @provide() or register it via plugin?`
+    );
+  }
+
+  // For plugin-registered services, we always respect the pre-created singleton,
+  // but since injectNew wants fresh, we still instantiate new here.
+  // (If you want plugin factories to be re-run, we can adjust later)
   return new ctor();
+}
+
+/**
+ * Register a service from plugin (or manually).
+ * Immediately creates the instance and stores it in the main registry.
+ */
+export function registerService<T>(ctor: new (...args: any[]) => T, factory: () => T): void {
+  const meta = provide.getMeta(ctor);
+  if (!meta?.token) {
+    throw new Error(
+      `Cannot register service ${ctor.name || "unknown"}: ` + `Class must be decorated with @provide() first.`
+    );
+  }
+
+  if (ServiceRegistry.has(meta.token)) {
+    console.warn(`Service ${meta.name} is already registered. Overwriting.`);
+  }
+
+  const instance = factory();
+  ServiceRegistry.set(meta.token, instance);
+}
+
+// Optional: Clear registry (useful for testing / hot reload)
+export function clearServiceRegistry(): void {
+  ServiceRegistry.clear();
 }
