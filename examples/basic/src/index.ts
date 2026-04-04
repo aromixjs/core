@@ -1,11 +1,9 @@
-//@ts-nocheck
-
 import { make } from "@aromix/core";
 import { serve } from "@aromix/node";
+import { view } from "./view";
 
 const app = make({
-plugins:[view()]
-
+  plugins: [view()],
 });
 
 serve(app).listen(3000, () => {
