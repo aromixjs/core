@@ -1,5 +1,3 @@
-import { Send } from "./send";
-
 export type Hook =
   | {
       event: "app:start";
@@ -10,14 +8,6 @@ export type Hook =
       run: () => Promise<void> | void;
     }
   | {
-      event: "before:handler";
-      run: () => Promise<Send | void> | Send | void;
-    }
-  | {
-      event: "after:handler";
-      run: (result: Send) => Promise<Send> | Send;
-    }
-  | {
       event: "error";
-      run: (error: unknown) => Promise<Send> | Send;
+      run: (error: unknown) => Promise<any> | any;
     };
