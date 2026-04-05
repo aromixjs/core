@@ -2,29 +2,28 @@
   "name": "@aromix/root",
   "private": true,
   "type": "module",
+  "workspaces": [
+    "packages/*",
+    "examples/*"
+  ],
   "scripts": {
-    "build": "pnpm -r build",
-    "dev": "pnpm -r dev",
-    "core:build": "pnpm --filter @aromix/core build",
-    "core:dev": "pnpm --filter @aromix/core dev",
-    "node:build": "pnpm --filter @aromix/node build",
-    "node:dev": "pnpm --filter @aromix/node dev",
-    "mongo:build": "pnpm --filter @aromix/mongo build",
-    "mongo:dev": "pnpm --filter @aromix/mongo dev",
-    
-    "basic:dev": "pnpm --filter @aromix/basic dev",
-    "basic:build": "pnpm --filter @aromix/basic build",
-    "enterprise:dev": "pnpm --filter @aromix/enterprise dev",
-    "enterprise:build": "pnpm --filter @aromix/enterprise build",
-    "typecheck": "pnpm -r typecheck",
-    "clean": "rimraf --glob **/node_modules **/dist",
-    "format": "prettier --write ."
+    "build": "bun run --filter '*' build",
+    "core:build": "bun run --filter @aromix/core build",
+    "core:dev": "bun run --filter @aromix/core dev",
+    "node:build": "bun run --filter @aromix/node build",
+    "node:dev": "bun run --filter @aromix/node dev",
+    "mongo:build": "bun run --filter @aromix/mongo build",
+    "mongo:dev": "bun run --filter @aromix/mongo dev",
+    "basic:dev": "bun run --filter @aromix/basic dev",
+    "basic:build": "bun run --filter @aromix/basic build",
+    "enterprise:dev": "bun run --filter @aromix/enterprise dev",
+    "enterprise:build": "bun run --filter @aromix/enterprise build",
+    "typecheck": "bun run --filter '*' typecheck",
+    "clean": "rm -rf **/node_modules **/dist",
+    "format": "bun fmt"
   },
   "devDependencies": {
-    "prettier": "^3.8.1",
-    "rimraf": "catalog:",
-    "tsup": "catalog:",
-    "typescript": "catalog:"
-  },
-  "packageManager": "pnpm@10.18.0"
+    "@types/bun": "^1.1.13",
+    "typescript": "^5.7.2"
+  }
 }

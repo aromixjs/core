@@ -3,15 +3,10 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "tsx watch --inspect src/index.ts",
-    "build": "tsc",
-    "start": "node dist/index.js",
+    "dev": "bun --watch src/index.ts",
+    "build": "bun build src/index.ts --outdir dist --target bun --format esm && tsc --emitDeclarationOnly",
+    "start": "bun run dist/index.js",
     "typecheck": "tsc --noEmit"
-  },
-  "devDependencies": {
-    "@types/node": "catalog:",
-    "tsx": "catalog:",
-    "typescript": "catalog:"
   },
   "dependencies": {
     "@aromix/core": "workspace:*",

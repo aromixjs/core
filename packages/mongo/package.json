@@ -9,20 +9,14 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsup",
-    "dev": "tsup --watch",
+    "build": "bun build src/index.ts --outdir dist --target bun --format esm && tsc --emitDeclarationOnly",
+    "dev": "bun --watch src/index.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "mongodb": "^6.12.0"
   },
   "peerDependencies": {
-    "@aromix/core": "workspace:*"
-  },
-  "devDependencies": {
-    "tsup": "catalog:",
-    "typescript": "catalog:",
-    "@types/node": "catalog:",
     "@aromix/core": "workspace:*"
   }
 }

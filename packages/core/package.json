@@ -9,13 +9,8 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsup",
-    "dev": "tsup --watch",
+    "build": "bun build src/index.ts --outdir dist --target bun --format esm && tsc --emitDeclarationOnly",
+    "dev": "bun --watch src/index.ts",
     "typecheck": "tsc --noEmit"
-  },
-  "devDependencies": {
-    "tsup": "catalog:",
-    "typescript": "catalog:",
-    "@types/node": "catalog:"
   }
 }
