@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@aromix/core": "workspace:*",
-    "@aromix/node": "workspace:*",
+    "@aromix/bun": "workspace:*",
     "@aromix/mongo": "workspace:*",
     "valibot": "^1.3.1"
   },

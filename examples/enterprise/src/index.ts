@@ -1,5 +1,5 @@
 import { make } from "@aromix/core";
-import { serve } from "@aromix/node";
+import { serve } from "@aromix/bun";
 import { UserHandler } from "./handlers/user.handler";
 
 /**
@@ -10,10 +10,6 @@ const app = make({
   groups: [UserHandler],
 });
 
-const port = 4000; // Running on 4000 to avoid conflict with basic-api if user runs both
-const server = serve(app);
-
-server.listen(port, () => {
-  console.log(`🚀 Enterprise API (Complex) up on http://localhost:${port}`);
-  console.log(`💡 This example features nested services (Logger -> Database -> UserHandler)`);
-});
+serve(app, { port: 4000 });
+console.log(`🚀 Enterprise API (Complex) up on http://localhost:${4000}`);
+console.log(`💡 This example features nested services (Logger -> Database -> UserHandler)`);

@@ -1,5 +1,5 @@
 {
-  "name": "@aromix/node",
+  "name": "@aromix/bun",
   "version": "0.0.1",
   "type": "module",
   "main": "./dist/index.js",

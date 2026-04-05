@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@aromix/core": "workspace:*",
-    "@aromix/node": "workspace:*"
+    "@aromix/bun": "workspace:*"
   },
   "devDependencies": {
     "@types/bun": "^1.1.13",
