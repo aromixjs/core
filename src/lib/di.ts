@@ -1,5 +1,3 @@
-import type { Maybe, Union } from "./types";
-
 const ServiceMetaKey = Symbol("aromix-service-meta");
 const ServiceRegistry = new Map<symbol, unknown>();
 
@@ -8,9 +6,6 @@ export type ServiceMeta = {
   name: string;
 };
 
-/**
- * Decorator to mark a class as a service
- */
 export function provide(): ClassDecorator {
   return (target: any) => {
     const name = target.name || "Anonymous";
@@ -22,8 +17,9 @@ export function provide(): ClassDecorator {
 }
 
 export namespace provide {
-  export function getMeta(target: Union<[object, Function]>): Maybe<ServiceMeta> {
-    const ctor: any = typeof target === "function" ? target : target.constructor;
+  export function getMeta(target: object | Function): ServiceMeta | undefined {
+    const ctor: any =
+      typeof target === "function" ? target : target.constructor;
     return ctor[ServiceMetaKey];
   }
 }
@@ -38,7 +34,7 @@ export function inject<T>(ctor: new (...args: any[]) => T): T {
   if (!meta?.token) {
     throw new Error(
       `No service metadata found for ${ctor.name || "unknown constructor"}. ` +
-        `Did you forget @provide() or register it via plugin?`
+        `Did you forget @provide() or register it via plugin?`,
     );
   }
 
@@ -59,7 +55,7 @@ export function injectNew<T>(ctor: new (...args: any[]) => T): T {
   if (!meta?.token) {
     throw new Error(
       `No service metadata found for ${ctor.name || "unknown constructor"}. ` +
-        `Did you forget @provide() or register it via plugin?`
+        `Did you forget @provide() or register it via plugin?`,
     );
   }
 
@@ -67,29 +63,4 @@ export function injectNew<T>(ctor: new (...args: any[]) => T): T {
   // but since injectNew wants fresh, we still instantiate new here.
   // (If you want plugin factories to be re-run, we can adjust later)
   return new ctor();
-}
-
-/**
- * Register a service from plugin (or manually).
- * Immediately creates the instance and stores it in the main registry.
- */
-export function registerService<T>(ctor: new (...args: any[]) => T, factory: () => T): void {
-  const meta = provide.getMeta(ctor);
-  if (!meta?.token) {
-    throw new Error(
-      `Cannot register service ${ctor.name || "unknown"}: ` + `Class must be decorated with @provide() first.`
-    );
-  }
-
-  if (ServiceRegistry.has(meta.token)) {
-    console.warn(`Service ${meta.name} is already registered. Overwriting.`);
-  }
-
-  const instance = factory();
-  ServiceRegistry.set(meta.token, instance);
-}
-
-// Optional: Clear registry (useful for testing / hot reload)
-export function clearServiceRegistry(): void {
-  ServiceRegistry.clear();
 }

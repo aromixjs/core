@@ -12,11 +12,7 @@
     "build": "bun run build.ts && tsc --emitDeclarationOnly",
     "dev": "bun --watch src/index.ts",
     "typecheck": "tsc --noEmit",
-    "clean": "rm -rf dist",
-    "format": "bun fmt"
-  },
-  "dependencies": {
-    "mongodb": "^6.12.0"
+    "clean": "rm -rf dist"
   },
   "devDependencies": {
     "@types/bun": "^1.1.13",
