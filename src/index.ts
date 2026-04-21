@@ -1,4 +1,3 @@
-export * from "./desire";
 export * from "./lib/app";
 export * from "./lib/di";
 export * from "./lib/hooks";

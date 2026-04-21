@@ -1,66 +1,35 @@
-const ServiceMetaKey = Symbol("aromix-service-meta");
-const ServiceRegistry = new Map<symbol, unknown>();
-
-export type ServiceMeta = {
-  token: symbol;
-  name: string;
-};
+const MetaKey = Symbol("aromix:meta");
+const Registry = new Map<symbol, unknown>();
+export type Token<T> = symbol & { readonly __type: T };
+export const createToken = <T>(name: string) => Symbol(name) as Token<T>;
 
 export function provide(): ClassDecorator {
   return (target: any) => {
-    const name = target.name || "Anonymous";
-    target[ServiceMetaKey] = {
-      token: Symbol(`service:${crypto.randomUUID()}:${name}`),
-      name,
-    } satisfies ServiceMeta;
+    target[MetaKey] = createToken(`service:${target.name ?? "Anonymous"}`);
   };
 }
 
-export namespace provide {
-  export function getMeta(target: object | Function): ServiceMeta | undefined {
-    const ctor: any =
-      typeof target === "function" ? target : target.constructor;
-    return ctor[ServiceMetaKey];
-  }
+function tokenOf<T>(ctor: new (...args: any[]) => T): Token<T> | undefined {
+  return (ctor as any)[MetaKey];
 }
 
-/**
- * Get singleton instance.
- * Works for both @provide() decorated classes and services registered via plugins.
- */
-export function inject<T>(ctor: new (...args: any[]) => T): T {
-  const meta = provide.getMeta(ctor);
+type Ctor<T> = new (...args: any[]) => T;
 
-  if (!meta?.token) {
-    throw new Error(
-      `No service metadata found for ${ctor.name || "unknown constructor"}. ` +
-        `Did you forget @provide() or register it via plugin?`,
-    );
+export function inject<T>(ctor: Ctor<T>): T;
+export function inject<T>(token: Token<T>): T;
+export function inject<T>(target: Ctor<T> | Token<T>): T {
+  if (typeof target === "function") {
+    const token = tokenOf(target);
+    if (!token) throw new Error(`@provide() missing on "${target.name}"`);
+    if (!Registry.has(token)) Registry.set(token, new target());
+    return Registry.get(token) as T;
   }
-
-  if (ServiceRegistry.has(meta.token)) {
-    return ServiceRegistry.get(meta.token) as T;
-  }
-
-  const instance = new ctor();
-  ServiceRegistry.set(meta.token, instance);
-  return instance;
+  if (!Registry.has(target))
+    throw new Error(`No value for token "${target.description}"`);
+  return Registry.get(target) as T;
 }
 
-/**
- * Always create a fresh instance (never cached)
- */
-export function injectNew<T>(ctor: new (...args: any[]) => T): T {
-  const meta = provide.getMeta(ctor);
-  if (!meta?.token) {
-    throw new Error(
-      `No service metadata found for ${ctor.name || "unknown constructor"}. ` +
-        `Did you forget @provide() or register it via plugin?`,
-    );
-  }
+export const injectNew = <T>(ctor: Ctor<T>): T => new ctor();
 
-  // For plugin-registered services, we always respect the pre-created singleton,
-  // but since injectNew wants fresh, we still instantiate new here.
-  // (If you want plugin factories to be re-run, we can adjust later)
-  return new ctor();
-}
+export const register = <T>(token: Token<T>, value: T) =>
+  Registry.set(token, value);
