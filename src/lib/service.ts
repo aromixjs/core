@@ -1,5 +1,8 @@
+
 const MetaKey = Symbol("aromix:meta");
+
 const Registry = new Map<symbol, unknown>();
+
 export type Token<T> = symbol & { readonly __type: T };
 export const createToken = <T>(name: string) => Symbol(name) as Token<T>;
 

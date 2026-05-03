@@ -17,8 +17,5 @@
   "devDependencies": {
     "@types/bun": "^1.1.13",
     "typescript": "^5.7.2"
-  },
-  "dependencies": {
-    "mongo": "^0.1.0"
   }
 }
