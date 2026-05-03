@@ -1,12 +1,27 @@
 import { program } from "./lib/program";
+import { inject, provide } from "./lib/service";
 
-const user=program({
-   name:'user',
+
+@provide()
+class UserService {
+
+
+   doS(){}
+ }
+
+
+
+
+
+
+const user = program({
+   name: 'user',
+   services: [UserService]
 })
 
 
 
-user.command('getAll', [], ()=>{
+user.command('getAll', [], () => {
 
 
 
@@ -14,10 +29,12 @@ user.command('getAll', [], ()=>{
 
 
 
-user.stream('stream',()=>{
+user.stream('stream', () => {
 
 
 
 })
+
+
 
 
