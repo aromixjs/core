@@ -1,4 +1,4 @@
-import { CommandCtx, SocketCtx, StreamCtx } from "./context";
+import { CommandCtx } from "./context";
 import { Hook } from "./hooks";
 import { Service } from "./service";
 
@@ -17,8 +17,6 @@ interface RouteEntry {
 interface ProgramMeta {
   config: ProgramConfig;
   commands: RouteEntry[];
-  streams: RouteEntry[];
-  sockets: RouteEntry[];
 }
 
 
@@ -29,17 +27,6 @@ export interface Program {
     hooks: Hook[],
     handler: (ctx: CommandCtx) => unknown,
   ): void;
-
-  stream(name: string, handler: (ctx: StreamCtx) => unknown): void;
-  stream(
-    name: string,
-    hooks: Hook[],
-    handler: (ctx: StreamCtx) => unknown,
-  ): void;
-
-  socket(name: string, handler: (ctx: SocketCtx) => void): void;
-  socket(name: string, hooks: Hook[], handler: (ctx: SocketCtx) => void): void;
-
 
   /** @internal */
   meta: ProgramMeta
@@ -54,8 +41,6 @@ export function program(config: ProgramConfig): Program {
       hooks: config.hooks ?? [],
     },
     commands: [],
-    streams: [],
-    sockets: [],
   };
 
 
@@ -76,12 +61,6 @@ export function program(config: ProgramConfig): Program {
         name,
         ...resolve(hookOrHandler, handler)
       })
-    },
-    stream(name: string, hookOrHandler: any, handler?: any) {
-      meta.streams.push({ name, ...resolve(hookOrHandler, handler) })
-    },
-    socket(name: string, hookOrHandler: any, handler?: any) {
-      meta.sockets.push({ name, ...resolve(hookOrHandler, handler) });
     },
   };
 }

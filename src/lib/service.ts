@@ -10,7 +10,7 @@ export function provide(): ClassDecorator {
 }
 
 export function inject<T>(service: Service<T>): T {
-   const token = (service as any)[MetaKey] as symbol | undefined;
+   const token = (service as any)[MetaKey];
    if (!token) throw new Error('No Token Found in' + service.name);
    if (!Registry.has(token)) Registry.set(token, new service());
    return Registry.get(token) as T;
