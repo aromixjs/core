@@ -1,4 +1,5 @@
-import { Hook, make, program, serve } from "./index";
+import { Hook, make, program } from "@aromix/core";
+import { serve } from "@aromix/bun";
 
 const users = program({
    name: 'users'

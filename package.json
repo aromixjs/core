@@ -1,18 +1,13 @@
 {
-  "name": "aromix",
-  "version": "0.0.3",
-  "type": "module",
-  "main": "./dist/index.js",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "files": [
-    "dist"
+  "name": "@aromix/root",
+  "private": true,
+  "workspaces": [
+    "packages/*"
   ],
   "scripts": {
-    "build": "bun run build.ts && tsc --emitDeclarationOnly",
-    "dev": "bun --watch src/index.ts",
-    "typecheck": "tsc --noEmit",
-    "clean": "rm -rf dist"
+    "typecheck": "bun x tsc --build",
+    "build": "bun run build.ts && bun x tsc --build",
+    "dev": "bun --watch packages/playground/src/index.ts"
   },
   "devDependencies": {
     "@types/bun": "^1.1.13",

@@ -11,12 +11,7 @@
     "forceConsistentCasingInFileNames": true,
     "declaration": true,
     "experimentalDecorators": true,
-    "declarationMap": false,
-    "emitDeclarationOnly": true,
-    "composite": false,
-    "rootDir": "src",
-    "outDir": "dist"
-  },
-  "include": ["src/**/*.ts"],
-  "exclude": ["node_modules", "dist"]
+    "composite": true,
+    "declarationMap": true
+  }
 }

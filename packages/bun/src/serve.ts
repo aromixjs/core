@@ -1,5 +1,4 @@
-import { ResolvedApp } from "./make/types";
-import { CommandCtx } from "./context";
+import { ResolvedApp, CommandCtx } from "@aromix/core";
 
 
 export interface ServeConfig {
