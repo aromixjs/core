@@ -1,44 +1,40 @@
-import { Hook, make, program } from "@aromix/core";
 import { serve } from "@aromix/bun";
+import { Hook, make, program } from "@aromix/core";
 
-const users = program({
-   name: 'users'
+
+
+
+const user = program({
+   name: 'user'
 })
 
 
 
-users.command('GetAll', (ctx) => {
-   console.log(ctx);
+user.command('test', () => {
 
 
    return {
-      test: 'data',
-      data: ctx.payload
+      data: "demo"
    }
 
 })
 
 
+const test: Hook = {
 
-
-const appStart: Hook = {
    on: 'Ready',
    run() {
-      console.log('App Started');
+      console.log('app is running in port 3000');
 
    },
 }
 
 
 
-
-
 const app = make({
-   programs: [users],
-   hooks: [appStart]
+   programs: [user],
+   hooks: [test]
 })
-
-
 
 
 
