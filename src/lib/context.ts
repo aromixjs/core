@@ -1,6 +1,6 @@
 export interface BaseCtx {
   id: string;
-  args<T>(defaults: T): T;
+  payload: unknown
 }
 
-export interface CommandCtx extends BaseCtx {}
+export interface CommandCtx extends BaseCtx { }
