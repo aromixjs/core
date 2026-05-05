@@ -5,7 +5,7 @@ import { resolve } from "./util";
 
 
 
-export function program(programConfig: Program['meta']['programConfig']) {
+export function program(programConfig: Program['meta']['programConfig']):Program {
 
   const meta: Program['meta'] = {
     programConfig,
