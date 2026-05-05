@@ -1,4 +1,5 @@
 export * from './context';
+export * from './fetch';
 export * from './hooks';
 export * from './make/impl';
 export * from './make/types';
@@ -6,4 +7,6 @@ export * from './make/util';
 export * from './program/impl';
 export * from './program/types';
 export * from './program/util';
+export * from './router/impl';
 export * from './service';
+

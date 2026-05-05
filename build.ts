@@ -2,7 +2,7 @@ import { build } from "bun";
 import { join } from "node:path";
 import { $ } from "bun";
 
-const packages = ["core", "bun"];
+const packages = ["core", "bun", "cloudflare"];
 
 for (const pkg of packages) {
   await build({
