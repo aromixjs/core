@@ -1,7 +1,7 @@
-import { ResolvedApp } from "@aromix/core";
+import { Config, ResolvedApp } from "@aromix/core";
 import { toFetchHandler } from "@aromix/core";
 
-export function serve(app: ResolvedApp) {
+export function serve(app: ResolvedApp, config: Config) {
     const handler = toFetchHandler(app);
 
     let ready = false;
@@ -10,7 +10,7 @@ export function serve(app: ResolvedApp) {
         if (!ready) {
             ready = true;
             for (const fn of app.onReady) {
-                await fn();
+                await fn(config);
             }
         }
     }

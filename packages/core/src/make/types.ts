@@ -1,4 +1,4 @@
-import { Hook } from "../hooks";
+import { Hook } from "../hook";
 import { CommandHandler, Program } from "../program/types";
 import { Service } from "../service";
 

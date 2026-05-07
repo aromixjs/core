@@ -1,4 +1,3 @@
-import { Hook } from "../hooks";
 import { Program } from "./types";
 import { resolve } from "./util";
 

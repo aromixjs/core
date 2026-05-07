@@ -1,4 +1,4 @@
-import { Hook } from "../hooks";
+import { Hook } from "../hook";
 
 export function filter<T extends Hook["on"]>(hooks: Hook[], on: T) {
    return hooks

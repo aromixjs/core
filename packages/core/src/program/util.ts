@@ -1,4 +1,4 @@
-import { Hook } from "../hooks"
+import { Hook } from "../hook"
 import { CommandHandler } from "./types"
 
 export const resolve = (hookOrHandler: Hook[] | CommandHandler, handler?: CommandHandler) => {

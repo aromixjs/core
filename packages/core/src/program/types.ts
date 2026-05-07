@@ -1,5 +1,5 @@
 import { CommandCtx } from "../context";
-import { Hook } from "../hooks";
+import { Hook } from "../hook";
 import { Service } from "../service";
 
 

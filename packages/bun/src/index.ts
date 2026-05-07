@@ -1,13 +1,18 @@
-import { ResolvedApp, toFetchHandler, } from "@aromix/core";
-export interface ServeConfig {
-   port: number;
-   host: string;
+import { Config, ResolvedApp, toFetchHandler, } from "@aromix/core";
+
+declare module "@aromix/core" {
+   interface Config {
+      server: {
+         port: number
+         host: string
+      }
+   }
 }
 
-export async function serve(app: ResolvedApp, config: ServeConfig) {
+export async function serve(app: ResolvedApp, config: Config) {
    const { onReady } = app;
-   const { port, host } = config;
-   for (const fn of onReady) await fn();
+   const { port, host } = config.server;
+   for (const fn of onReady) await fn(config);
    const handler = toFetchHandler(app);
    const server = Bun.serve({
       port,
