@@ -6,8 +6,7 @@
   ],
   "scripts": {
     "typecheck": "bun x tsc --build",
-    "build": "bun run build.ts",
-    "dev": "bun --watch packages/playground/src/index.ts"
+    "build": "bun run build.ts"
   },
   "devDependencies": {
     "@types/bun": "^1.1.13",

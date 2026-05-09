@@ -6,7 +6,5 @@
   "dependencies": {
     "@aromix/core": "workspace:*",
     "@aromix/bun": "workspace:*"
-  },
-  "devDependencies": {
   }
 }
