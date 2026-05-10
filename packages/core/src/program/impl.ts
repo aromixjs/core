@@ -1,23 +1,31 @@
-import { Program } from "./types";
+import { Program, programMeta, ProgramMeta } from "./types";
 import { resolve } from "./util";
 
 
 
 
-export function program(programConfig: Program['meta']['programConfig']):Program {
+export function program(programConfig: Program[ProgramMeta]['programConfig']
+): Program {
 
-  const meta: Program['meta'] = {
+  const meta: Program[ProgramMeta] = {
     programConfig,
-    commands: [],
+    routes: [],
   };
 
   return {
-    meta,
+
+    [programMeta]: meta,
+
     command(name: string, hookOrHandler: any, handler?: any) {
-      meta.commands.push({
-        name,
-        ...resolve(hookOrHandler, handler)
-      })
+      meta.routes.push({ type: 'command', name, ...resolve(hookOrHandler, handler) });
+    },
+
+    stream(name: string, hookOrHandler: any, handler?: any) {
+      meta.routes.push({ type: 'stream', name, ...resolve(hookOrHandler, handler) });
+    },
+
+    socket(name: string, hookOrHandler: any, handler?: any) {
+      meta.routes.push({ type: 'socket', name, ...resolve(hookOrHandler, handler) });
     },
   };
 }

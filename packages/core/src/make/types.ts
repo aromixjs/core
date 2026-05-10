@@ -5,7 +5,6 @@ import { CommandHandler, Program } from "../program/types";
 export interface MakeConfig {
    programs?: Array<Program>,
    hooks?: Array<Hook>,
-
 }
 
 

@@ -1,10 +1,10 @@
 import { Hook } from "../hook"
-import { CommandHandler } from "./types"
 
-export const resolve = (hookOrHandler: Hook[] | CommandHandler, handler?: CommandHandler) => {
+type AnyHandler = (...args: any[]) => any;
+
+export function resolve<H extends AnyHandler>(hookOrHandler: Hook[] | H, handler?: H) {
    if (Array.isArray(hookOrHandler)) {
-      return { hooks: hookOrHandler, handler: handler! }
-   } else {
-      return { hooks: [], handler: hookOrHandler }
+      return { hooks: hookOrHandler, handler: handler! };
    }
+   return { hooks: [], handler: hookOrHandler };
 }
