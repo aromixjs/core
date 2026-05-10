@@ -3,24 +3,19 @@
  * @returns {import('typescript/lib/tsserverlibrary').server.PluginModule}
  */
 function init(modules) {
-  const ts = modules.typescript
+  const ts = modules.typescript;
 
   return {
     create(info) {
-      info.project.projectService.logger.info('[Aromix] ts-plugin loaded')
+      info.project.projectService.logger.info("[Aromix] ts-plugin loaded");
+      const raw = info.languageService;
 
-      const raw = info.languageService
-      const proxy = Object.create(null)
 
-      for (const k of Object.keys(raw)) {
-        proxy[k] = (...args) => raw[k](...args)
-      }
-
-      return proxy
+      return raw;
     },
 
-    onConfigurationChanged(config) {}
-  }
+    onConfigurationChanged(config) {},
+  };
 }
 
-module.exports = init
+module.exports = init;

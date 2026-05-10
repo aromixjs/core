@@ -9,4 +9,5 @@ export * from './plugin';
 export * from './program/impl';
 export * from './program/types';
 export * from './program/util';
+export * from './service';
 
