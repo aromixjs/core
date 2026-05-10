@@ -1,3 +1,4 @@
+import { programMeta } from "../program/types";
 import { MakeConfig, ResolvedApp } from "./types";
 import { filter } from "./util";
 
@@ -7,9 +8,8 @@ export function make(makeConfig: MakeConfig): ResolvedApp {
    const { hooks: globalHooks = [], programs = [] } = makeConfig;
 
    const routes: ResolvedApp['routes'] = new Map();
-
-   const onReady: ResolvedApp["onReady"] = [];
-   const onClose: ResolvedApp["onClose"] = [];
+   const onReady: ResolvedApp['onReady'] = [];
+   const onClose: ResolvedApp['onClose'] = [];
 
 
    onReady.push(...filter(globalHooks, "Ready"));
@@ -18,7 +18,7 @@ export function make(makeConfig: MakeConfig): ResolvedApp {
 
    for (const program of programs) {
 
-      const { programConfig, commands } = program.meta;
+      const { programConfig, routes: programRoutes } = program[programMeta];
       const programHooks = programConfig.hooks ?? [];
 
 
@@ -29,32 +29,34 @@ export function make(makeConfig: MakeConfig): ResolvedApp {
 
 
 
-      for (const command of commands) {
-         onReady.push(...filter(command.hooks, "Ready"));
-         onClose.push(...filter(command.hooks, "Close"));
+      for (const route of programRoutes) {
+         const key = `${programConfig.name}:${route.name}`;
 
-         routes.set(`${programConfig.name}:${command.name}`, {
-            key: `${programConfig.name}:${command.name}`,
-            handler: command.handler,
-            // make → program → command
+         onReady.push(...filter(route.hooks, "Ready"));
+         onClose.push(...filter(route.hooks, "Close"));
+
+
+         routes.set(key, {
+            key,
+            type: route.type,
+            handler: route.handler as any,
             onRequest: [
                ...filter(globalHooks, "Request"),
                ...filter(programHooks, "Request"),
-               ...filter(command.hooks, "Request"),
+               ...filter(route.hooks, "Request"),
             ],
-            // command → program → make
             onResponse: [
-               ...filter(command.hooks, "Response"),
+               ...filter(route.hooks, "Response"),
                ...filter(programHooks, "Response"),
                ...filter(globalHooks, "Response"),
             ],
-            // command → program → make
             onError: [
-               ...filter(command.hooks, "Error"),
+               ...filter(route.hooks, "Error"),
                ...filter(programHooks, "Error"),
                ...filter(globalHooks, "Error"),
             ],
          });
+
       }
    }
 

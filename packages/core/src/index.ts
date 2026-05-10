@@ -1,6 +1,6 @@
 export * from './config';
 export * from './context';
-export * from './fetch';
+export * from './fetch/fetch';
 export * from './hook';
 export * from './make/impl';
 export * from './make/types';

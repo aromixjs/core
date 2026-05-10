@@ -5,11 +5,14 @@ import { $ } from "bun";
 const packages = ["core", "bun", "cloudflare"];
 
 for (const pkg of packages) {
+  const pkgPath = join("packages", pkg);
+
+
 
   await build({
-    entrypoints: [join("packages", pkg, "src/index.ts")],
-    outdir: join("packages", pkg, "dist"),
-    target: "bun",
+    entrypoints: [join(pkgPath, "src/index.ts")],
+    outdir: join(pkgPath, "dist"),
+    target: "node",
     format: "esm",
     sourcemap: "none",
     external: ["@aromix/core", "@msgpack/msgpack"],
@@ -17,6 +20,7 @@ for (const pkg of packages) {
 
 
   await $`bun x tsc --project packages/${pkg}/tsconfig.json`;
+  await $`cd ${pkgPath} && bun link`;
 }
 
 console.log("Build complete.");

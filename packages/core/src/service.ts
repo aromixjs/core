@@ -16,13 +16,13 @@ type Strip<Public> = Omit<Public, typeof service.id | typeof service.lifecycle |
 export function service<Private extends Record<PropertyKey, unknown>, Public>(
    impl: {
       [service.id]: string
-      [service.lifecycle]: Lifecycle<Private, Public>
-      [service.internal]: Private
+      [service.lifecycle]?: Lifecycle<Private, Public>
+      [service.internal]?: Private
    } & Public & ThisType<Public & Context<Private>>
 ): Strip<Public> {
 
 
-   const store = impl[service.internal]
+ const store = (impl[service.internal] ?? {}) as Private
 
 
    const ctx: Context<Private> = {
