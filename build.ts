@@ -12,7 +12,7 @@ for (const pkg of packages) {
     target: "bun",
     format: "esm",
     sourcemap: "none",
-    external: ["@aromix/core"],
+    external: ["@aromix/core", "@msgpack/msgpack"],
   });
 
 

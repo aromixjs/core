@@ -5,7 +5,11 @@ export const programMeta = Symbol('aromix.program.meta');
 export type ProgramMeta = typeof programMeta;
 
 export type CommandHandler = (ctx: CommandCtx) => unknown | Promise<unknown>;
-export type StreamHandler = (ctx: StreamCtx) => AsyncIterable<unknown>;
+export type Push<T = unknown> = (data: T) => void;
+export type Done = () => void;
+export type Emitter<T = unknown> = (push: Push<T>, done: Done) => void | Promise<void>;
+
+export type StreamHandler = (ctx: StreamCtx) => Emitter;
 
 
 export type SocketHandler<

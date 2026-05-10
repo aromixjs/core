@@ -11,11 +11,11 @@ export interface Context<Private> {
    set<Key extends keyof Private>(key: Key, value: Private[Key] | ((prev: Private[Key]) => Private[Key])): void
 }
 
-type Strip<Public> = Omit<Public, typeof service.name | typeof service.lifecycle | typeof service.internal>
+type Strip<Public> = Omit<Public, typeof service.id | typeof service.lifecycle | typeof service.internal>
 
 export function service<Private extends Record<PropertyKey, unknown>, Public>(
    impl: {
-      [service.name]: string
+      [service.id]: string
       [service.lifecycle]: Lifecycle<Private, Public>
       [service.internal]: Private
    } & Public & ThisType<Public & Context<Private>>
@@ -51,7 +51,7 @@ export function service<Private extends Record<PropertyKey, unknown>, Public>(
 
 
 export namespace service {
-   export const name = Symbol('aromix.service.name')
+   export const id = Symbol('aromix.service.name')
    export const lifecycle = Symbol('aromix.service.lifecycle')
    export const internal = Symbol('aromix.service.internal')
 }
