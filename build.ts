@@ -12,7 +12,7 @@ for (const pkg of packages) {
   await build({
     entrypoints: [join(pkgPath, "src/index.ts")],
     outdir: join(pkgPath, "dist"),
-    target: "node",
+    target: "bun",
     format: "esm",
     sourcemap: "none",
     external: ["@aromix/core", "@msgpack/msgpack"],

@@ -1,31 +1,43 @@
-import { Program, programMeta, ProgramMeta } from "./types";
-import { resolve } from "./util";
+import { Program, ProgramConfig, programMeta } from "./types";
 
-
-
-
-export function program(programConfig: Program[ProgramMeta]['programConfig']
-): Program {
-
-  const meta: Program[ProgramMeta] = {
-    programConfig,
+/**
+ * Creates a new Aromix Program.
+ * Programs group commands, streams, and sockets under a common namespace
+ * and share dependencies and hooks.
+ */
+export function program<Deps>(config: ProgramConfig<Deps>): Program<Deps> {
+  const meta: Program<Deps>[typeof programMeta] = {
+    name: config.name,
+    deps: config.deps ?? ({} as Deps),
+    hooks: config.hooks ?? [],
     routes: [],
   };
 
   return {
-
     [programMeta]: meta,
 
-    command(name: string, hookOrHandler: any, handler?: any) {
-      meta.routes.push({ type: 'command', name, ...resolve(hookOrHandler, handler) });
+    command(options) {
+      meta.routes.push({ 
+        type: 'command', 
+        name: options.name, 
+        options 
+      });
     },
 
-    stream(name: string, hookOrHandler: any, handler?: any) {
-      meta.routes.push({ type: 'stream', name, ...resolve(hookOrHandler, handler) });
+    stream(options) {
+      meta.routes.push({ 
+        type: 'stream', 
+        name: options.name, 
+        options 
+      });
     },
 
-    socket(name: string, hookOrHandler: any, handler?: any) {
-      meta.routes.push({ type: 'socket', name, ...resolve(hookOrHandler, handler) });
+    socket(options) {
+      meta.routes.push({ 
+        type: 'socket', 
+        name: options.name, 
+        options 
+      });
     },
   };
 }

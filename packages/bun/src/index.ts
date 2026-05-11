@@ -14,11 +14,11 @@ export async function serve(app: ResolvedApp, config: Config) {
    const { port, host } = config.server;
    for (const fn of onReady) await fn(config);
    const handler = toFetchHandler(app);
-   const server = Bun.serve({
-      port,
-      hostname: host,
-      fetch: handler
-   });
-   return server
+   // const server = Bun.serve({
+   //    port,
+   //    hostname: host,
+   //    fetch: handler
+   // });
+   // return server
 }
 

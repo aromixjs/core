@@ -1,64 +1,26 @@
-import { hook, program } from "@aromix/core";
+import { inject, provide } from "@aromix/core";
 
-const users = program({
-   name: 'users',
-   hooks: [
-
+@provide()
+class Test {
 
 
-
-   ]
-})
+   readonly data = 10;
 
 
 
+   get Test() {
 
-users.command('GetAll', (ctx) => {
-
-
-
-
-
-
-})
-
-
-
-users.command('Insert', (ctx) => {
-
-   console.log(ctx);
-
-
-
-})
-
-users.stream('StreamData', (ctx) => {
-
-
-
-
-   return async (push, done) => {
-
-      push(10)
-
-      push(20)
-
-
-      done()
-
+      return this.data
 
    }
-})
+
+
+}
 
 
 
-users.socket('Chats', (ctx) => {
+const testService = inject(Test)
 
-   ctx.send('start', 'hello')
+console.log(testService.data);
+console.log(testService.Test);
 
-
-})
-
-
-
-console.dir(users);

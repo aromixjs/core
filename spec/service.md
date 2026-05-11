@@ -90,11 +90,11 @@ class UserService {
 - `@provide()` marks the class as injectable
 - `inject()` in class fields resolves dependencies
 
-Services with async init must declare `setup()`:
+
 
 ```ts
 @provide()
-class MailService extends Service {
+class MailService {
   private client: SMTPClient
 
   async setup() {

@@ -16,9 +16,9 @@ export function serve(app: ResolvedApp, config: Config) {
     }
 
     return {
-        async fetch(req: Request): Promise<Response> {
+        async fetch(req: Request){
             await runReadyOnce();
-            return handler(req);
+            // return handler(req);
         }
     };
 }
