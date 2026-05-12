@@ -1,5 +1,5 @@
 import { StandardSchemaV1 } from "@standard-schema/spec";
-import { Hook } from "../hook";
+import { Hook } from "../hook/impl";
 
 export const programMeta = Symbol('aromix.program.meta');
 export type ProgramMeta = typeof programMeta;

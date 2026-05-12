@@ -2,7 +2,7 @@ export * from './config';
 export * from './context';
 export * from './fetch/codec';
 export * from './fetch/fetch';
-export * from './hook';
+export * from './hook/impl';
 export * from './make/impl';
 export * from './make/types';
 export * from './make/util';

@@ -1,4 +1,3 @@
-import { Hook } from "../hook";
 
 // export interface MakeConfig {
 //    programs?: Array<Program>,
