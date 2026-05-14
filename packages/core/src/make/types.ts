@@ -22,3 +22,5 @@
 //    onReady: Extract<Hook, { on: "Ready" }>["run"][];
 //    onClose: Extract<Hook, { on: "Close" }>["run"][];
 // }
+
+export {};

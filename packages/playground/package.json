@@ -3,9 +3,19 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit"
+  },
   "dependencies": {
     "@aromix/bun": "workspace:*",
     "@aromix/core": "workspace:*",
-    "valibot": "^1.4.0"
+    "valibot": "catalog:"
+  },
+  "devDependencies": {
+    "tsup": "catalog:",
+    "typescript": "catalog:",
+    "@types/bun": "^1.1.13"
   }
 }

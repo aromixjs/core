@@ -1,15 +1,27 @@
 {
   "name": "@aromix/root",
   "private": true,
-  "workspaces": [
-    "packages/*"
-  ],
+  "type": "module",
   "scripts": {
-    "typecheck": "bun x tsc --build",
-    "build": "bun run build.ts"
+    "i:all": "pnpm --recursive install",
+    "build": "pnpm -r build",
+    "dev": "pnpm -r dev",
+    "typecheck": "tsc --build",
+    "clean": "pnpm -r exec rm -rf dist",
+    "core:build": "pnpm --filter @aromix/core build",
+    "core:dev": "pnpm --filter @aromix/core dev",
+    "bun:build": "pnpm --filter @aromix/bun build",
+    "bun:dev": "pnpm --filter @aromix/bun dev",
+    "cloudflare:build": "pnpm --filter @aromix/cloudflare build",
+    "cloudflare:dev": "pnpm --filter @aromix/cloudflare dev",
+    "cli:build": "pnpm --filter @aromix/cli build",
+    "cli:dev": "pnpm --filter @aromix/cli dev",
+    "playground:build": "pnpm --filter playground build",
+    "playground:dev": "pnpm --filter playground dev"
   },
   "devDependencies": {
-    "@types/bun": "^1.1.13",
-    "typescript": "^5.7.2"
+    "typescript": "catalog:",
+    "tsup": "catalog:",
+    "@types/node": "catalog:"
   }
 }

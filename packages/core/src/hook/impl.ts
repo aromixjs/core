@@ -1,6 +1,6 @@
 import { Hook } from "./type";
 
-
+export { Hook };
 
 export function hook<T extends Hook["on"]>(
   on: T,
