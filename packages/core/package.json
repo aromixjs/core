@@ -1,26 +1,26 @@
 {
-  "name": "@aromix/core",
-  "version": "0.0.3",
-  "type": "module",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
-    }
-  },
-  "scripts": {
-    "build": "tsup",
-    "dev": "tsup --watch",
-    "typecheck": "tsc --noEmit"
-  },
-  "dependencies": {
-    "@msgpack/msgpack": "catalog:",
-    "@standard-schema/spec": "catalog:"
-  },
-  "devDependencies": {
-    "tsup": "catalog:",
-    "typescript": "catalog:",
-    "@types/node": "catalog:"
-  }
+	"name": "@aromix/core",
+	"version": "0.0.3",
+	"type": "module",
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"import": "./dist/index.js",
+			"require": "./dist/index.cjs"
+		}
+	},
+	"scripts": {
+		"build": "tsup",
+		"dev": "tsup --watch",
+		"typecheck": "tsc --noEmit"
+	},
+	"dependencies": {
+		"@msgpack/msgpack": "catalog:",
+		"@standard-schema/spec": "catalog:"
+	},
+	"devDependencies": {
+		"tsup": "catalog:",
+		"typescript": "catalog:",
+		"@types/node": "catalog:"
+	}
 }

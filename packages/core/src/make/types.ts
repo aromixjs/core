@@ -1,9 +1,7 @@
-
 // export interface MakeConfig {
 //    programs?: Array<Program>,
 //    hooks?: Array<Hook>,
 // }
-
 
 // type ResolvedRoute = {
 //    key: string;
@@ -15,7 +13,6 @@
 //       | { type: 'stream'; handler: () => Emitter }
 //       | { type: 'socket'; handler: SocketHandler }
 //    );
-
 
 // export interface ResolvedApp {
 //    routes: Map<string, ResolvedRoute>;

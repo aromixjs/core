@@ -1,27 +1,28 @@
 {
-  "name": "@aromix/root",
-  "private": true,
-  "type": "module",
-  "scripts": {
-    "i:all": "pnpm --recursive install",
-    "build": "pnpm -r build",
-    "dev": "pnpm -r dev",
-    "typecheck": "tsc --build",
-    "clean": "pnpm -r exec rm -rf dist",
-    "core:build": "pnpm --filter @aromix/core build",
-    "core:dev": "pnpm --filter @aromix/core dev",
-    "bun:build": "pnpm --filter @aromix/bun build",
-    "bun:dev": "pnpm --filter @aromix/bun dev",
-    "cloudflare:build": "pnpm --filter @aromix/cloudflare build",
-    "cloudflare:dev": "pnpm --filter @aromix/cloudflare dev",
-    "cli:build": "pnpm --filter @aromix/cli build",
-    "cli:dev": "pnpm --filter @aromix/cli dev",
-    "playground:build": "pnpm --filter playground build",
-    "playground:dev": "pnpm --filter playground dev"
-  },
-  "devDependencies": {
-    "typescript": "catalog:",
-    "tsup": "catalog:",
-    "@types/node": "catalog:"
-  }
+	"name": "@aromix/root",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"build": "pnpm -r build",
+		"dev": "pnpm -r dev",
+		"typecheck": "tsc --build",
+		"clean": "pnpm -r exec rm -rf dist",
+		"core:build": "pnpm --filter @aromix/core build",
+		"core:dev": "pnpm --filter @aromix/core dev",
+		"bun:build": "pnpm --filter @aromix/bun build",
+		"bun:dev": "pnpm --filter @aromix/bun dev",
+		"cloudflare:build": "pnpm --filter @aromix/cloudflare build",
+		"cloudflare:dev": "pnpm --filter @aromix/cloudflare dev",
+		"cli:build": "pnpm --filter @aromix/cli build",
+		"cli:dev": "pnpm --filter @aromix/cli dev",
+		"playground:build": "pnpm --filter playground build",
+		"playground:dev": "pnpm --filter playground dev",
+		"format": "prettier --write '**/*.{ts,js,json,md,cjs}'"
+	},
+	"devDependencies": {
+		"typescript": "catalog:",
+		"tsup": "catalog:",
+		"@types/node": "catalog:",
+		"prettier": "catalog:"
+	}
 }

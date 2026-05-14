@@ -1,3 +1,1 @@
-export function plugin() {
-   
-}
+export function plugin() {}

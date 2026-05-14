@@ -4,11 +4,11 @@
 import { program } from "aromix";
 
 const user = program({
-  name: "user",
-  deps: {
-    user: inject(UserModel),
-  },
-  hooks: [authHook],
+	name: "user",
+	deps: {
+		user: inject(UserModel),
+	},
+	hooks: [authHook],
 });
 ```
 
@@ -18,12 +18,12 @@ const user = program({
 
 ```ts
 user.command({
-  name: "create",
-  input: v.object({ name: v.string(), email: v.string() }),
-  output: userSchema,
-  run(input, deps) {
-    return deps.user.create(input);
-  },
+	name: "create",
+	input: v.object({ name: v.string(), email: v.string() }),
+	output: userSchema,
+	run(input, deps) {
+		return deps.user.create(input);
+	},
 });
 ```
 
@@ -31,8 +31,8 @@ user.command({
 
 ```ts
 const result = await client.program("user").run("create", {
-  name: "Alice",
-  email: "alice@example.com",
+	name: "Alice",
+	email: "alice@example.com",
 });
 ```
 
@@ -42,25 +42,25 @@ const result = await client.program("user").run("create", {
 
 ```ts
 user.stream({
-  name: "feed",
-  input: v.object({ cursor: v.string().optional() }),
-  events: v.object({
-    data: v.array(userSchema),
-    cursor: v.object({ next: v.string() }),
-    error: v.object({ code: v.string(), message: v.string() }),
-  }),
-  run(input, stream, deps) {
-    const { items, nextCursor } = await deps.db.getFeed(input);
-    stream.emit("data", items);
-    stream.emit("cursor", { next: nextCursor });
-    // Server can close the stream
-    if (noMoreData) stream.close();
+	name: "feed",
+	input: v.object({ cursor: v.string().optional() }),
+	events: v.object({
+		data: v.array(userSchema),
+		cursor: v.object({ next: v.string() }),
+		error: v.object({ code: v.string(), message: v.string() }),
+	}),
+	run(input, stream, deps) {
+		const { items, nextCursor } = await deps.db.getFeed(input);
+		stream.emit("data", items);
+		stream.emit("cursor", { next: nextCursor });
+		// Server can close the stream
+		if (noMoreData) stream.close();
 
-    // Optional: cleanup when stream closes (any side)
-    stream.onClose(() => {
-      console.log("Stream closed");
-    });
-  },
+		// Optional: cleanup when stream closes (any side)
+		stream.onClose(() => {
+			console.log("Stream closed");
+		});
+	},
 });
 ```
 
@@ -84,32 +84,32 @@ listener.onClose(() => console.log("Listener closed"));
 
 ```ts
 user.socket({
-  name: "presence",
-  receive: v.object({
-    join: v.object({ userId: v.string(), room: v.string() }),
-    leave: v.object({ userId: v.string() }),
-  }),
-  send: v.object({
-    joined: v.object({
-      userId: v.string(),
-      room: v.string(),
-      time: v.number(),
-    }),
-    left: v.object({ userId: v.string(), time: v.number() }),
-  }),
-  run(socket, deps) {
-    socket.on("join", (data) => {});
+	name: "presence",
+	receive: v.object({
+		join: v.object({ userId: v.string(), room: v.string() }),
+		leave: v.object({ userId: v.string() }),
+	}),
+	send: v.object({
+		joined: v.object({
+			userId: v.string(),
+			room: v.string(),
+			time: v.number(),
+		}),
+		left: v.object({ userId: v.string(), time: v.number() }),
+	}),
+	run(socket, deps) {
+		socket.on("join", (data) => {});
 
-    socket.emit("joined", {
-      userId: data.userId,
-      room: data.room,
-      time: Date.now(),
-    });
+		socket.emit("joined", {
+			userId: data.userId,
+			room: data.room,
+			time: Date.now(),
+		});
 
-    socket.on("leave", (data) => {});
+		socket.on("leave", (data) => {});
 
-    socket.emit("left", { userId: data.userId, time: Date.now() });
-  },
+		socket.emit("left", { userId: data.userId, time: Date.now() });
+	},
 });
 ```
 

@@ -1,26 +1,26 @@
 {
-  "name": "@aromix/cloudflare",
-  "version": "0.0.1",
-  "type": "module",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
-    }
-  },
-  "scripts": {
-    "build": "tsup",
-    "dev": "tsup --watch",
-    "typecheck": "tsc --noEmit"
-  },
-  "peerDependencies": {
-    "@aromix/core": "workspace:*"
-  },
-  "devDependencies": {
-    "tsup": "catalog:",
-    "typescript": "catalog:",
-    "@aromix/core": "workspace:*",
-    "@cloudflare/workers-types": "^4.20241218.0"
-  }
+	"name": "@aromix/cloudflare",
+	"version": "0.0.1",
+	"type": "module",
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"import": "./dist/index.js",
+			"require": "./dist/index.cjs"
+		}
+	},
+	"scripts": {
+		"build": "tsup",
+		"dev": "tsup --watch",
+		"typecheck": "tsc --noEmit"
+	},
+	"peerDependencies": {
+		"@aromix/core": "workspace:*"
+	},
+	"devDependencies": {
+		"tsup": "catalog:",
+		"typescript": "catalog:",
+		"@aromix/core": "workspace:*",
+		"@cloudflare/workers-types": "^4.20241218.0"
+	}
 }

@@ -6,35 +6,35 @@ import { Program, ProgramConfig, programMeta } from "./types";
  * and share dependencies and hooks.
  */
 export function program<Deps>(config: ProgramConfig<Deps>): Program<Deps> {
-  const meta: Program<Deps>[typeof programMeta] = {
-    name: config.name,
-    deps: config.deps ?? ({} as Deps),
-    hooks: config.hooks ?? [],
-    routes: [],
-  };
+	const meta: Program<Deps>[typeof programMeta] = {
+		name: config.name,
+		deps: config.deps ?? ({} as Deps),
+		hooks: config.hooks ?? [],
+		routes: [],
+	};
 
-  return {
-    [programMeta]: meta,
+	return {
+		[programMeta]: meta,
 
-    command(options) {
-      meta.routes.push({
-        type: 'command',
-        options
-      });
-    },
+		command(options) {
+			meta.routes.push({
+				type: "command",
+				options,
+			});
+		},
 
-    stream(options) {
-      meta.routes.push({
-        type: 'stream',
-        options
-      });
-    },
+		stream(options) {
+			meta.routes.push({
+				type: "stream",
+				options,
+			});
+		},
 
-    socket(options) {
-      meta.routes.push({
-        type: 'socket',
-        options
-      });
-    },
-  };
+		socket(options) {
+			meta.routes.push({
+				type: "socket",
+				options,
+			});
+		},
+	};
 }

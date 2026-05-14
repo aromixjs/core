@@ -1,11 +1,3 @@
-interface Entity {
+interface Entity {}
 
-
-}
-
-
-export function entity(options: Entity) {
-
-
-
-}
+export function entity(options: Entity) {}

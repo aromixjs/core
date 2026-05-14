@@ -1,28 +1,32 @@
 {
-  "name": "@aromix/cli",
-  "version": "0.0.1",
-  "type": "module",
-  "bin": {
-    "aromix": "./dist/index.js"
-  },
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
-    }
-  },
-  "scripts": {
-    "build": "tsup",
-    "dev": "tsup --watch",
-    "typecheck": "tsc --noEmit",
-    "link": "pnpm link --global"
-  },
-  "dependencies": {
-    "@aromix/core": "workspace:*"
-  },
-  "devDependencies": {
-    "tsup": "catalog:",
-    "typescript": "catalog:",
-    "@types/node": "catalog:"
-  }
+	"name": "@aromix/cli",
+	"version": "0.0.1",
+	"type": "module",
+	"bin": {
+		"aromix": "./dist/index.js"
+	},
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"import": "./dist/index.js"
+		}
+	},
+	"scripts": {
+		"build": "tsup",
+		"dev": "tsup --watch",
+		"typecheck": "tsc --noEmit",
+		"link": "pnpm link --global"
+	},
+	"dependencies": {
+		"esbuild": "^0.28.0"
+	},
+	"peerDependencies": {
+		"@aromix/core": "workspace:*"
+	},
+	"devDependencies": {
+		"@types/node": "catalog:",
+		"tsup": "catalog:",
+		"typescript": "catalog:",
+		"@aromix/core": "workspace:*"
+	}
 }
