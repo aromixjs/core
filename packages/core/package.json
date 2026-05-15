@@ -1,26 +1,55 @@
 {
-	"name": "@aromix/core",
-	"version": "0.0.3",
-	"type": "module",
-	"exports": {
-		".": {
-			"types": "./dist/index.d.ts",
-			"import": "./dist/index.js",
-			"require": "./dist/index.cjs"
-		}
-	},
-	"scripts": {
-		"build": "tsup",
-		"dev": "tsup --watch",
-		"typecheck": "tsc --noEmit"
-	},
-	"dependencies": {
-		"@msgpack/msgpack": "catalog:",
-		"@standard-schema/spec": "catalog:"
-	},
-	"devDependencies": {
-		"tsup": "catalog:",
-		"typescript": "catalog:",
-		"@types/node": "catalog:"
-	}
+  "name": "@aromix/core",
+  "version": "0.0.0",
+  "description": "Core runtime-agnostic framework for Aromix",
+  "type": "module",
+  "license": "MIT",
+  "homepage": "https://aromixjs.github.io/aromix",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/aromixjs/aromix.git",
+    "directory": "packages/core"
+  },
+  "bugs": {
+    "url": "https://github.com/aromixjs/aromix/issues"
+  },
+  "keywords": [
+    "aromix",
+    "core",
+    "server",
+    "framework",
+    "runtime-agnostic",
+    "bun",
+    "deno",
+    "cloudflare",
+    "node"
+  ],
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org"
+  },
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@msgpack/msgpack": "catalog:",
+    "@standard-schema/spec": "catalog:"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "tsup": "catalog:",
+    "typescript": "catalog:"
+  }
 }

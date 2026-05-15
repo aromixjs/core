@@ -1,10 +1,16 @@
 import { Platform } from "@aromix/core";
 import * as p from "@clack/prompts";
-import { join, resolve } from "path";
-import { existsSync, mkdirSync, readFileSync, writeFileSync, readdirSync, rmSync } from "fs";
+import { join, resolve, basename } from "path";
+import { existsSync, mkdirSync, readFileSync, writeFileSync, readdirSync, rmSync, statSync } from "fs";
 import Handlebars from "handlebars";
 import { execSync } from "child_process";
 import { tmpdir } from "os";
+
+interface RuntimeConfig {
+   runtimeAdapter: string;
+   typesPackage: string;
+   typesArray: string;
+}
 
 export class Init {
    async run() {
@@ -87,6 +93,28 @@ export class Init {
    }
 
    private generateProject(dir: string, templateDir: string, answers: any) {
+      const projectName = answers.name === "." ? basename(process.cwd()) : answers.name;
+
+      const runtimeMap: Record<Platform, RuntimeConfig> = {
+         node: { 
+            runtimeAdapter: "@aromix/node", 
+            typesPackage: "@types/node", 
+            typesArray: '["node"]' 
+         },
+         bun: { 
+            runtimeAdapter: "@aromix/bun", 
+            typesPackage: "@types/bun", 
+            typesArray: '["bun"]' 
+         },
+         "cloudflare:worker": { 
+            runtimeAdapter: "@aromix/cloudflare", 
+            typesPackage: "@cloudflare/workers-types", 
+            typesArray: '["@cloudflare/workers-types"]' 
+         }
+      };
+
+      const config = runtimeMap[answers.platform as Platform];
+
       const walk = (currentDir: string, targetDir: string) => {
          const files = readdirSync(currentDir);
          files.forEach((file) => {
@@ -94,8 +122,8 @@ export class Init {
             if (file === ".git" || file === "README.md") return;
 
             const templatePath = join(currentDir, file);
-            const stats = require('fs').statSync(templatePath);
-            
+            const stats = statSync(templatePath);
+
             if (stats.isDirectory()) {
                const newTarget = join(targetDir, file);
                mkdirSync(newTarget, { recursive: true });
@@ -103,15 +131,16 @@ export class Init {
             } else {
                const content = readFileSync(templatePath, "utf8");
                const template = Handlebars.compile(content);
-               
+
                const fileName = file.replace(".hbs", "");
                const outputPath = join(targetDir, fileName);
-               
+
                writeFileSync(outputPath, template({
-                  name: answers.name === "." ? "my-project" : answers.name,
+                  name: projectName,
                   description: answers.description,
                   platform: answers.platform,
-                  format: answers.format
+                  format: answers.format,
+                  ...config
                }));
             }
          });

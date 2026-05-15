@@ -2,8 +2,18 @@
 	"name": "@aromix/root",
 	"private": true,
 	"type": "module",
+	"license": "MIT",
+	"homepage": "https://aromixjs.github.io/aromix",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/aromixjs/aromix.git"
+	},
+	"bugs": {
+		"url": "https://github.com/aromixjs/aromix/issues"
+	},
+	"packageManager": "pnpm@10.18.0",
 	"scripts": {
-		"i:all":"pnpm -r install",
+		"i:all": "pnpm -r install",
 		"build": "pnpm -r build",
 		"dev": "pnpm -r dev",
 		"typecheck": "tsc --build",
@@ -22,9 +32,11 @@
 		"format": "prettier --write '**/*.{ts,js,json,md,cjs}'"
 	},
 	"devDependencies": {
-		"typescript": "catalog:",
-		"tsup": "catalog:",
+		"@changesets/changelog-github": "^0.7.0",
+		"@changesets/cli": "^2.31.0",
 		"@types/node": "catalog:",
-		"prettier": "^3.8.3"
+		"prettier": "^3.8.3",
+		"tsup": "catalog:",
+		"typescript": "catalog:"
 	}
 }
