@@ -2,11 +2,10 @@ import { sep } from "node:path";
 import { Project, SyntaxKind, type CallExpression, type SourceFile } from "ts-morph";
 import { Glob } from "./glob";
 
-
 export class Transformer {
 	private project = new Project({ skipAddingFilesFromTsConfig: true });
 
-	constructor(private resolver: Glob) { }
+	constructor(private resolver: Glob) {}
 
 	/**
 	 * Rewrites all load() call sites in a file, replacing each call with
@@ -30,9 +29,7 @@ export class Transformer {
 	}
 
 	private findLoadCalls(file: SourceFile): CallExpression[] {
-		return file
-			.getDescendantsOfKind(SyntaxKind.CallExpression)
-			.filter((call) => call.getExpression().getText() === "load");
+		return file.getDescendantsOfKind(SyntaxKind.CallExpression).filter((call) => call.getExpression().getText() === "load");
 	}
 
 	private extractPatterns(call: CallExpression): string[] {
@@ -51,8 +48,8 @@ export class Transformer {
 
 		throw new Error(
 			`load() argument must be a string literal or array of string literals.\n` +
-			`  Got: ${arg.getText()}\n` +
-			`  At:  ${call.getSourceFile().getFilePath()}:${call.getStartLineNumber()}`
+				`  Got: ${arg.getText()}\n` +
+				`  At:  ${call.getSourceFile().getFilePath()}:${call.getStartLineNumber()}`
 		);
 	}
 }
