@@ -14,19 +14,13 @@ export class Build {
    readonly PlatformMap: Record<Platform, esbuild.Platform> = {
       node: "node",
       bun: "node",
-      deno: "neutral",
-      edge: "neutral",
+      "cloudflare:worker": "neutral",
    }
 
    readonly FormatMap: Record<Format, esbuild.Format> = {
       esm: "esm",
       cjs: "cjs",
    };
-
-
-
-
-
 
    async run() {
       const config = new Config(this.root);
@@ -40,47 +34,42 @@ export class Build {
       const transformer = new Transformer(glob);
 
       console.log(
-         `Building  ${opts.entry.map((e) => relative(this.root, e)).join(", ")}\n` +
+         `Building  ${relative(this.root, opts.entry)}\n` +
          `       →  ${relative(this.root, opts.outDir)}\n` +
-         `  format   ${opts.formats.join(", ")}  platform  ${opts.platform}`
+         `  format   ${opts.format}  platform  ${opts.platform}`
       );
 
-      await Promise.all(
-         opts.formats.map((format) =>
-            esbuild.build({
-               entryPoints: opts.entry,
-               outdir: opts.outDir,
-               bundle: true,
-               format,
-               platform: opts.platform,
-               sourcemap: opts.sourcemap,
-               minify: opts.minify,
-               packages: "external",
-               plugins: [this.makeLoadPlugin(transformer)],
-               outExtension: format === "cjs" ? { ".js": ".cjs" } : {},
-            })
-         )
-      );
+      await esbuild.build({
+         entryPoints: [opts.entry],
+         outdir: opts.outDir,
+         bundle: true,
+         format: opts.format,
+         platform: opts.platform,
+         sourcemap: opts.sourcemap,
+         minify: opts.minify,
+         packages: "external",
+         plugins: [this.makeLoadPlugin(transformer)],
+         outExtension: opts.format === "cjs" ? { ".js": ".cjs" } : {},
+      });
 
       console.log("Done.");
    }
 
    private resolveOptions(config: AromixBuildConfig, tsConfig: TsConfig): ResolvedBuildOptions {
-      const entry = config.entry.map((e) => resolve(this.root, e));
+      const entry = resolve(this.root, config.entry);
 
-      for (const e of entry) {
-         if (!existsSync(e)) throw new Error(`Entry point not found: ${e}`);
-      }
+      if (!existsSync(entry)) throw new Error(`Entry point not found: ${entry}`);
 
       return {
          entry,
          outDir: config.outDir ? resolve(this.root, config.outDir) : tsConfig.outDir,
          platform: this.PlatformMap[config.platform],
-         formats: config.format.map((f) => this.FormatMap[f]),
+         format: this.FormatMap[config.format],
          sourcemap: config.sourcemap,
          minify: config.minify,
       };
    }
+
 
    private makeLoadPlugin(transformer: Transformer): esbuild.Plugin {
       return {

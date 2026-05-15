@@ -7,10 +7,10 @@ export interface TsConfig {
 }
 
 export interface ResolvedBuildOptions {
-	entry:     string[];
+	entry:     string;
 	outDir:    string;
 	platform:  esbuild.Platform;
-	formats:   esbuild.Format[];
+	format:    esbuild.Format;
 	sourcemap: boolean;
 	minify:    boolean;
 }

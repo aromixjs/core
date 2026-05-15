@@ -3,6 +3,7 @@
 	"private": true,
 	"type": "module",
 	"scripts": {
+		"i:all":"pnpm -r install",
 		"build": "pnpm -r build",
 		"dev": "pnpm -r dev",
 		"typecheck": "tsc --build",
@@ -15,7 +16,7 @@
 		"cloudflare:dev": "pnpm --filter @aromix/cloudflare dev",
 		"cli:build": "pnpm --filter @aromix/cli build",
 		"cli:dev": "pnpm --filter @aromix/cli dev",
-		"cli:link": "pnpm --dir packages/cli link --global",
+		"cli:link": "cd packages/cli && pnpm link --global",
 		"playground:build": "pnpm --filter playground build",
 		"playground:dev": "pnpm --filter playground dev",
 		"format": "prettier --write '**/*.{ts,js,json,md,cjs}'"
