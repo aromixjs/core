@@ -1,6 +1,3 @@
-import { Codec } from "./codec";
-import { BaseCtx, CommandCtx } from "../context";
-
 export function toFetchHandler() {
 	// const { routes } = app;
 	// async function runResponseHooks(
