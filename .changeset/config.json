@@ -10,5 +10,3 @@
 	"ignore": [
 		"playground"
 	]
-}
-add Aromix macro system with build-time load() glob resolution
