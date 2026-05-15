@@ -8,7 +8,7 @@ switch (command) {
 		break;
 
 	case "build":
-		import("./commands/build").then((m) => new m.Build().run());
+		import("./commands/build/orchestrator").then((m) => new m.Build().run());
 		break;
 
 	default:

@@ -1,7 +1,7 @@
 import { Dirent, readdirSync } from "node:fs";
-import { resolve, sep } from "node:path";
+import { resolve } from "node:path";
 import micromatch from "micromatch";
-import type { TsConfig } from "./types";
+import type { TsConfig } from "../types";
 
 export class Glob {
 	constructor(private tsConfig: TsConfig) {}

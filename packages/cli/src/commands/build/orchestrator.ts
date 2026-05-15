@@ -1,11 +1,10 @@
-import { existsSync, readFileSync } from "node:fs";
-import { relative, resolve, join } from "node:path";
+import { type AromixBuildConfig, type Format, type Platform } from "@aromix/core";
 import esbuild from "esbuild";
-import { build, type AromixBuildConfig, type Format, type Platform } from "@aromix/core";
-import type { TsConfig, ResolvedBuildOptions } from "./types";
+import { existsSync } from "node:fs";
+import { relative, resolve } from "node:path";
 import { Config } from "./config";
-import { Glob } from "./glob";
-import { Transformer } from "./transformer";
+import { MacroResolver } from "./macro.resolver";
+import type { ResolvedBuildOptions, TsConfig } from "./types";
 
 export class Build {
 	readonly root = process.cwd();
@@ -23,14 +22,12 @@ export class Build {
 
 	async run() {
 		const config = new Config(this.root);
-
 		const buildConfig = await config.buildConfig();
 		const tsConfig = config.tsConfig(buildConfig.tsconfig);
-
 		const opts = this.resolveOptions(buildConfig, tsConfig);
 
-		const glob = new Glob(tsConfig);
-		const transformer = new Transformer(glob);
+		const resolver = new MacroResolver({ root: this.root, buildConfig, tsConfig });
+		this.registerMacros(resolver);
 
 		console.log(
 			`Building  ${relative(this.root, opts.entry)}\n` +
@@ -47,16 +44,21 @@ export class Build {
 			sourcemap: opts.sourcemap,
 			minify: opts.minify,
 			packages: "external",
-			plugins: [this.makeLoadPlugin(transformer)],
+			plugins: [resolver.build()],
 			outExtension: opts.format === "cjs" ? { ".js": ".cjs" } : {},
 		});
 
 		console.log("Done.");
 	}
 
+	private registerMacros(resolver: MacroResolver): void {
+		// resolver.register({ name: 'load', ... })
+
+		// resolver.register({})
+	}
+
 	private resolveOptions(config: AromixBuildConfig, tsConfig: TsConfig): ResolvedBuildOptions {
 		const entry = resolve(this.root, config.entry);
-
 		if (!existsSync(entry)) throw new Error(`Entry point not found: ${entry}`);
 
 		return {
@@ -67,29 +69,5 @@ export class Build {
 			sourcemap: config.sourcemap,
 			minify: config.minify,
 		};
-	}
-
-	private makeLoadPlugin(transformer: Transformer): esbuild.Plugin {
-		return {
-			name: "Aromix:Load",
-			setup: (build) => {
-				build.onLoad({ filter: /\.[tj]sx?$/ }, (args) => {
-					const src = readFileSync(args.path, "utf8");
-					if (!src.includes("load(")) return undefined;
-
-					return {
-						contents: transformer.transform(args.path),
-						loader: this.inferLoader(args.path),
-					};
-				});
-			},
-		};
-	}
-
-	private inferLoader(filePath: string): esbuild.Loader {
-		if (filePath.endsWith(".tsx")) return "tsx";
-		if (filePath.endsWith(".ts")) return "ts";
-		if (filePath.endsWith(".jsx")) return "jsx";
-		return "js";
 	}
 }
