@@ -1,7 +1,3 @@
-import { programMeta } from "../program/types";
-
-import { filter } from "./util";
-
 export function make() {
 	// const { hooks: globalHooks = [], programs = [] } = makeConfig;
 	// const routes: ResolvedApp['routes'] = new Map();

@@ -6,7 +6,7 @@ export * from "./fetch/codec";
 export * from "./fetch/fetch";
 export * from "./hook/impl";
 export * from "./hook/type";
-export * from "./load";
+export * from "./macro";
 export * from "./make/impl";
 export * from "./make/types";
 export * from "./make/util";

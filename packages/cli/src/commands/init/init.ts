@@ -1,10 +1,11 @@
-import { Platform } from "@aromix/core";
+import { Format, Platform } from "@aromix/core";
 import * as p from "@clack/prompts";
 import { join, resolve, basename } from "path";
 import { existsSync, mkdirSync, readFileSync, writeFileSync, readdirSync, rmSync, statSync } from "fs";
 import Handlebars from "handlebars";
 import { execSync } from "child_process";
 import { tmpdir } from "os";
+import { Answers } from "./types";
 
 interface RuntimeConfig {
 	runtimeAdapter: string;
@@ -13,10 +14,20 @@ interface RuntimeConfig {
 }
 
 export class Init {
+	private async fetchVersion(pkg: string) {
+		try {
+			const res = await fetch(`https://registry.npmjs.org/${pkg}/latest`);
+			const data = (await res.json()) as { version: string };
+			return `^${data.version}`;
+		} catch {
+			return "latest";
+		}
+	}
+
 	async run() {
 		p.intro("Initialize a new Aromix project");
 
-		const tempDir = join(tmpdir(), `aromix-tpl-${Date.now()}`);
+		const tempDir = join(tmpdir(), `aromix-template-${Date.now()}`);
 
 		try {
 			const answers = await p.group(
@@ -27,25 +38,21 @@ export class Init {
 							placeholder: "my-app",
 							validate: (v) => (!v?.trim() ? "Name is required" : undefined),
 						}),
-
 					description: () =>
 						p.text({
 							message: "Project description (optional)",
 							placeholder: "My awesome project",
 						}),
-
 					platform: () =>
 						p.select<Platform>({
 							message: "Target runtime",
 							options: [
-								{ value: "node", label: "Node.js" },
 								{ value: "bun", label: "Bun" },
 								{ value: "cloudflare:worker", label: "Cloudflare Workers" },
 							],
 						}),
-
 					format: () =>
-						p.select({
+						p.select<Format>({
 							message: "Output format",
 							options: [
 								{ value: "esm", label: "ESM" },
@@ -62,9 +69,32 @@ export class Init {
 			);
 
 			const spinner = p.spinner();
-			spinner.start("Fetching templates...");
+			spinner.start("Fetching latest versions...");
 
-			// Clone remote templates
+			const runtimeMap: Record<string, RuntimeConfig> = {
+				bun: {
+					runtimeAdapter: "@aromix/bun",
+					typesPackage: "@types/bun",
+					typesArray: '["bun"]',
+				},
+				"cloudflare:worker": {
+					runtimeAdapter: "@aromix/cloudflare",
+					typesPackage: "@cloudflare/workers-types",
+					typesArray: '["@cloudflare/workers-types"]',
+				},
+			};
+
+			const config = runtimeMap[answers.platform];
+
+			const [coreVersion, cliVersion, runtimeVersion, typesVersion] = await Promise.all([
+				this.fetchVersion("@aromix/core"),
+				this.fetchVersion("@aromix/cli"),
+				this.fetchVersion(config.runtimeAdapter),
+				this.fetchVersion(config.typesPackage),
+			]);
+
+			spinner.message("Cloning templates...");
+
 			execSync(`git clone https://github.com/aromixjs/template ${tempDir} --quiet`, { stdio: "ignore" });
 
 			const dir = resolve(process.cwd(), answers.name === "." ? "" : answers.name);
@@ -75,15 +105,18 @@ export class Init {
 			}
 
 			mkdirSync(dir, { recursive: true });
-
 			spinner.message("Generating project files...");
 
-			this.generateProject(dir, tempDir, answers);
+			this.generateProject(dir, tempDir, answers, {
+				...config,
+				coreVersion,
+				cliVersion,
+				runtimeVersion,
+				typesVersion,
+			});
 
 			spinner.stop("Project created");
-			p.outro(
-				`Done. Get started:\n\n  cd ${answers.name === "." ? "." : answers.name}\n  <your-package-manager> install\n  aromix build`
-			);
+			p.outro(`Done. Get started:\n\n  cd ${answers.name === "." ? "." : answers.name}\n  npm install\n  aromix build`);
 		} catch (err: any) {
 			p.cancel(`Initialization failed: ${err.message || err}`);
 			process.exit(1);
@@ -94,33 +127,13 @@ export class Init {
 		}
 	}
 
-	private generateProject(dir: string, templateDir: string, answers: any) {
+	private generateProject(dir: string, templateDir: string, answers: Answers, config: any) {
 		const projectName = answers.name === "." ? basename(process.cwd()) : answers.name;
-
-		const runtimeMap: Record<Platform, RuntimeConfig> = {
-			node: {
-				runtimeAdapter: "@aromix/node",
-				typesPackage: "@types/node",
-				typesArray: '["node"]',
-			},
-			bun: {
-				runtimeAdapter: "@aromix/bun",
-				typesPackage: "@types/bun",
-				typesArray: '["bun"]',
-			},
-			"cloudflare:worker": {
-				runtimeAdapter: "@aromix/cloudflare",
-				typesPackage: "@cloudflare/workers-types",
-				typesArray: '["@cloudflare/workers-types"]',
-			},
-		};
-
-		const config = runtimeMap[answers.platform as Platform];
 
 		const walk = (currentDir: string, targetDir: string) => {
 			const files = readdirSync(currentDir);
+
 			files.forEach((file) => {
-				// Skip git metadata and the template readme
 				if (file === ".git" || file === "README.md") return;
 
 				const templatePath = join(currentDir, file);
@@ -141,7 +154,7 @@ export class Init {
 						outputPath,
 						template({
 							name: projectName,
-							description: answers.description,
+							description: answers,
 							platform: answers.platform,
 							format: answers.format,
 							...config,
