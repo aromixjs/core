@@ -3,7 +3,8 @@ import type esbuild from "esbuild";
 import { readFileSync } from "fs";
 import { dirname } from "path";
 import { MacroFinder } from "./macro.finder";
-import { TsConfig } from "./types";
+import { TsConfigJson } from "get-tsconfig";
+import { ResolvedBuildOptions } from "./types";
 
 // Context passed to every macro's run()
 export interface MacroRunContext<TInput = unknown[]> {
@@ -12,54 +13,61 @@ export interface MacroRunContext<TInput = unknown[]> {
 	fileDir: string;
 	root: string;
 	buildConfig: AromixBuildConfig;
-	tsConfig: TsConfig;
+	tsConfigPath: string;
+	tsConfigDir: string;
+	tsConfig: TsConfigJson;
 }
 
 export interface MacroDefinition<TInput = unknown[]> {
 	name: string;
-	/** Optional — transforms raw extracted args into the typed shape run() expects. */
 	input?: (args: unknown[]) => TInput;
-	/** Returns the string that surgically replaces the Aromix.xxx() call. */
 	run: (ctx: MacroRunContext<TInput>) => string;
 }
 
 interface ResolverOptions {
 	root: string;
 	buildConfig: AromixBuildConfig;
-	tsConfig: TsConfig;
+	opts: ResolvedBuildOptions;
 }
 
 export class MacroResolver {
 	private macros = new Map<string, MacroDefinition<any>>();
 	private finder = new MacroFinder();
 
-	constructor(private options: ResolverOptions) {}
+	constructor(private options: ResolverOptions) { }
 
 	register<TInput>(definition: MacroDefinition<TInput>) {
 		this.macros.set(definition.name, definition);
 	}
+
+
 
 	build(): esbuild.Plugin {
 		return {
 			name: "Aromix:Macros",
 			setup: (build) => {
 				build.onLoad({ filter: /\.[tj]sx?$/ }, (args) => {
+
 					const src = readFileSync(args.path, "utf8");
 
 					if (!src.includes("Aromix.")) return undefined;
 
 					const calls = this.finder.find(src, args.path);
-
 					if (calls.length === 0) return undefined;
 
 					for (const call of calls) {
 						if (!this.macros.has(call.macro)) {
-							throw new Error(`Unknown Macro: Aromix.${call.macro}\n` + ` At: ${args.path}:${call.line}\n`);
+							throw new Error(
+								`Unknown Macro: Aromix.${call.macro}\n` +
+								` At: ${args.path}:${call.line}\n`,
+							);
 						}
 					}
 
-					// replace end-to-start so earlier positions stay valid
+
+					const { opts } = this.options;
 					let result = src;
+
 					for (const call of calls.sort((a, b) => b.start - a.start)) {
 						const macro = this.macros.get(call.macro)!;
 
@@ -69,11 +77,15 @@ export class MacroResolver {
 							fileDir: dirname(args.path),
 							root: this.options.root,
 							buildConfig: this.options.buildConfig,
-							tsConfig: this.options.tsConfig,
+							tsConfigPath: opts.tsConfigPath,
+							tsConfigDir: opts.tsConfigDir,
+							tsConfig: opts.tsConfig,
 						};
 
-						const replacement = macro.run(ctx);
-						result = result.slice(0, call.start) + replacement + result.slice(call.end);
+						result =
+							result.slice(0, call.start) +
+							macro.run(ctx) +
+							result.slice(call.end);
 					}
 
 					return { contents: result, loader: this.inferLoader(args.path) };

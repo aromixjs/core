@@ -43,7 +43,6 @@ export function make() {
 	// };
 }
 
-
 // export interface MakeConfig {
 //    programs?: Array<Program>,
 //    hooks?: Array<Hook>,
@@ -65,5 +64,3 @@ export function make() {
 //    onReady: Extract<Hook, { on: "Ready" }>["run"][];
 //    onClose: Extract<Hook, { on: "Close" }>["run"][];
 // }
-
-

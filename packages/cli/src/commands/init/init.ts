@@ -1,4 +1,4 @@
-import { Format, Platform } from "@aromix/core";
+import { Platform } from "@aromix/core";
 import * as p from "@clack/prompts";
 import { join, resolve, basename } from "path";
 import { existsSync, mkdirSync, readFileSync, writeFileSync, readdirSync, rmSync, statSync } from "fs";
@@ -47,16 +47,9 @@ export class Init {
 						p.select<Platform>({
 							message: "Target runtime",
 							options: [
+								{ value: "node", label: "Node.js" },
 								{ value: "bun", label: "Bun" },
 								{ value: "cloudflare:worker", label: "Cloudflare Workers" },
-							],
-						}),
-					format: () =>
-						p.select<Format>({
-							message: "Output format",
-							options: [
-								{ value: "esm", label: "ESM" },
-								{ value: "cjs", label: "CJS" },
 							],
 						}),
 				},
@@ -72,6 +65,11 @@ export class Init {
 			spinner.start("Fetching latest versions...");
 
 			const runtimeMap: Record<string, RuntimeConfig> = {
+				node: {
+					runtimeAdapter: "@aromix/node",
+					typesPackage: "@types/node",
+					typesArray: '["node"]',
+				},
 				bun: {
 					runtimeAdapter: "@aromix/bun",
 					typesPackage: "@types/bun",
@@ -95,6 +93,7 @@ export class Init {
 
 			spinner.message("Cloning templates...");
 
+
 			execSync(`git clone https://github.com/aromixjs/template ${tempDir} --quiet`, { stdio: "ignore" });
 
 			const dir = resolve(process.cwd(), answers.name === "." ? "" : answers.name);
@@ -103,6 +102,7 @@ export class Init {
 				p.cancel(`Directory "${dir}" already contains a project.`);
 				process.exit(1);
 			}
+
 
 			mkdirSync(dir, { recursive: true });
 			spinner.message("Generating project files...");
@@ -115,8 +115,10 @@ export class Init {
 				typesVersion,
 			});
 
+
 			spinner.stop("Project created");
-			p.outro(`Done. Get started:\n\n  cd ${answers.name === "." ? "." : answers.name}\n  npm install\n  aromix build`);
+			p.outro(`Done. Get started:\n\n  cd ${answers.name === "." ? "." : answers.name}\n  npm install\n  aromix dev`);
+
 		} catch (err: any) {
 			p.cancel(`Initialization failed: ${err.message || err}`);
 			process.exit(1);
@@ -154,9 +156,8 @@ export class Init {
 						outputPath,
 						template({
 							name: projectName,
-							description: answers,
+							description: answers.description || "",
 							platform: answers.platform,
-							format: answers.format,
 							...config,
 						})
 					);

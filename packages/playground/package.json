@@ -9,8 +9,8 @@
 		"typecheck": "tsc --noEmit"
 	},
 	"dependencies": {
-		"@aromix/bun": "workspace:*",
-		"@aromix/core": "workspace:*"
+		"@aromix/bun": "workspace:^",
+		"@aromix/core": "workspace:^"
 	},
 	"devDependencies": {
 		"tsup": "catalog:",

@@ -9,10 +9,10 @@ export type GlobPattern = string | string[];
  * load(['@entity/*', './x/*']) // string[]
  */
 export function load(pattern: GlobPattern): string[] {
-  throw new Error(
-    "load() is a build-time macro and must not be called at runtime. " +
-    "Ensure your project is compiled with the Aromix build pipeline."
-  );
+	throw new Error(
+		"load() is a build-time macro and must not be called at runtime. " +
+			"Ensure your project is compiled with the Aromix build pipeline."
+	);
 }
 
 // ---------------------------------------------------------------------------
@@ -21,13 +21,13 @@ export function load(pattern: GlobPattern): string[] {
 // ---------------------------------------------------------------------------
 
 declare global {
-  namespace Aromix {
-    /**
-     * Resolves glob patterns to absolute file paths at build time.
-     * @example
-     * Aromix.load('@config/*')
-     * Aromix.load(['@entity/*', './extra/*.ts'])
-     */
-    function load(pattern: GlobPattern): string[];
-  }
+	namespace Aromix {
+		/**
+		 * Resolves glob patterns to absolute file paths at build time.
+		 * @example
+		 * Aromix.load('@config/*')
+		 * Aromix.load(['@entity/*', './extra/*.ts'])
+		 */
+		function load(pattern: GlobPattern): string[];
+	}
 }
