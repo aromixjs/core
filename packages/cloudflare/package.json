@@ -42,10 +42,10 @@
 		"typecheck": "tsc --noEmit"
 	},
 	"peerDependencies": {
-		"@aromix/core": "workspace:*"
+		"@aromix/core": "workspace:^"
 	},
 	"devDependencies": {
-		"@aromix/core": "workspace:*",
+		"@aromix/core": "workspace:^",
 		"@cloudflare/workers-types": "^4.20241218.0",
 		"tsup": "catalog:",
 		"typescript": "catalog:"

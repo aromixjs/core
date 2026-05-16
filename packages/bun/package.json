@@ -41,10 +41,10 @@
 		"typecheck": "tsc --noEmit"
 	},
 	"peerDependencies": {
-		"@aromix/core": "workspace:*"
+		"@aromix/core": "workspace:^"
 	},
 	"devDependencies": {
-		"@aromix/core": "workspace:*",
+		"@aromix/core": "workspace:^",
 		"@types/bun": "^1.1.13",
 		"tsup": "catalog:",
 		"typescript": "catalog:"
