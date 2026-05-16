@@ -11,7 +11,7 @@
 	"bugs": {
 		"url": "https://github.com/aromixjs/aromix/issues"
 	},
-	"packageManager": "pnpm@10.18.0",
+	"packageManager": "pnpm@11.1.2",
 	"scripts": {
 		"i:all": "pnpm -r install",
 		"build": "pnpm -r build",

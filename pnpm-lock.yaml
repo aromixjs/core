@@ -48,7 +48,7 @@ importers:
   packages/bun:
     devDependencies:
       '@aromix/core':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../core
       '@types/bun':
         specifier: ^1.1.13
@@ -82,7 +82,7 @@ importers:
         version: 28.0.0
     devDependencies:
       '@aromix/core':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../core
       '@types/micromatch':
         specifier: ^4.0.10
@@ -100,7 +100,7 @@ importers:
   packages/cloudflare:
     devDependencies:
       '@aromix/core':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../core
       '@cloudflare/workers-types':
         specifier: ^4.20241218.0
@@ -134,10 +134,10 @@ importers:
   packages/playground:
     dependencies:
       '@aromix/bun':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../bun
       '@aromix/core':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../core
     devDependencies:
       '@types/bun':
