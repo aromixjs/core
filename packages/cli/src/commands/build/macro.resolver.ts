@@ -34,20 +34,17 @@ export class MacroResolver {
 	private macros = new Map<string, MacroDefinition<any>>();
 	private finder = new MacroFinder();
 
-	constructor(private options: ResolverOptions) { }
+	constructor(private options: ResolverOptions) {}
 
 	register<TInput>(definition: MacroDefinition<TInput>) {
 		this.macros.set(definition.name, definition);
 	}
-
-
 
 	build(): esbuild.Plugin {
 		return {
 			name: "Aromix:Macros",
 			setup: (build) => {
 				build.onLoad({ filter: /\.[tj]sx?$/ }, (args) => {
-
 					const src = readFileSync(args.path, "utf8");
 
 					if (!src.includes("Aromix.")) return undefined;
@@ -57,13 +54,9 @@ export class MacroResolver {
 
 					for (const call of calls) {
 						if (!this.macros.has(call.macro)) {
-							throw new Error(
-								`Unknown Macro: Aromix.${call.macro}\n` +
-								` At: ${args.path}:${call.line}\n`,
-							);
+							throw new Error(`Unknown Macro: Aromix.${call.macro}\n` + ` At: ${args.path}:${call.line}\n`);
 						}
 					}
-
 
 					const { opts } = this.options;
 					let result = src;
@@ -82,10 +75,7 @@ export class MacroResolver {
 							tsConfig: opts.tsConfig,
 						};
 
-						result =
-							result.slice(0, call.start) +
-							macro.run(ctx) +
-							result.slice(call.end);
+						result = result.slice(0, call.start) + macro.run(ctx) + result.slice(call.end);
 					}
 
 					return { contents: result, loader: this.inferLoader(args.path) };

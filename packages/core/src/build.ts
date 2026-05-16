@@ -1,6 +1,5 @@
 export type Platform = "node" | "bun" | "cloudflare:worker";
 
-
 export interface AromixBuildConfig {
 	entry: string;
 	outDir: string;

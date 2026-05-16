@@ -1,3 +1,9 @@
-import { make } from "@aromix/core"
+import { entity } from "@aromix/core";
 
-Aromix.load('test')
+entity({
+	schema: (builder) => {
+		builder.integer("id").primary();
+		builder.string("username").notNullable().unique();
+		builder.string("passwordHash").notNullable();
+	},
+});

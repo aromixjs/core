@@ -93,7 +93,6 @@ export class Init {
 
 			spinner.message("Cloning templates...");
 
-
 			execSync(`git clone https://github.com/aromixjs/template ${tempDir} --quiet`, { stdio: "ignore" });
 
 			const dir = resolve(process.cwd(), answers.name === "." ? "" : answers.name);
@@ -102,7 +101,6 @@ export class Init {
 				p.cancel(`Directory "${dir}" already contains a project.`);
 				process.exit(1);
 			}
-
 
 			mkdirSync(dir, { recursive: true });
 			spinner.message("Generating project files...");
@@ -115,10 +113,8 @@ export class Init {
 				typesVersion,
 			});
 
-
 			spinner.stop("Project created");
 			p.outro(`Done. Get started:\n\n  cd ${answers.name === "." ? "." : answers.name}\n  npm install\n  aromix dev`);
-
 		} catch (err: any) {
 			p.cancel(`Initialization failed: ${err.message || err}`);
 			process.exit(1);

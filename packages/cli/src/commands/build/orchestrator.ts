@@ -19,16 +19,12 @@ export class Build {
 	};
 
 	async run() {
-const config = new Config(this.root);
+		const config = new Config(this.root);
 		const buildConfig = await config.buildConfig();
 		const opts = this.resolveOptions(buildConfig);
 
-
-const resolver = new MacroResolver({ root: this.root, buildConfig, opts });
+		const resolver = new MacroResolver({ root: this.root, buildConfig, opts });
 		resolver.register(loadMacro);
-
-
-
 
 		const srcDir = dirname(opts.entry);
 		const sourceFiles = await fg("**/*.{ts,tsx}", {
@@ -36,7 +32,6 @@ const resolver = new MacroResolver({ root: this.root, buildConfig, opts });
 			absolute: true,
 			ignore: ["**/*.d.ts"],
 		});
-
 
 		await esbuild.build({
 			entryPoints: sourceFiles,
@@ -50,7 +45,7 @@ const resolver = new MacroResolver({ root: this.root, buildConfig, opts });
 			tsconfig: opts.tsConfigPath,
 			plugins: [resolver.build()],
 		});
- 
+
 		await this.copyAssets(srcDir, opts.outDir);
 		console.log("Done.");
 	}
@@ -58,14 +53,13 @@ const resolver = new MacroResolver({ root: this.root, buildConfig, opts });
 	private resolveOptions(config: AromixBuildConfig): ResolvedBuildOptions {
 		const entry = resolve(this.root, config.entry);
 		if (!existsSync(entry)) throw new Error(`Entry point not found: ${entry}`);
- 
+
 		const tsConfigPath = resolve(this.root, config.tsConfig);
-		if (!existsSync(tsConfigPath))
-			throw new Error(`tsconfig not found: ${tsConfigPath}`);
- 
+		if (!existsSync(tsConfigPath)) throw new Error(`tsconfig not found: ${tsConfigPath}`);
+
 		const parsed = getTsconfig(tsConfigPath);
 		if (!parsed) throw new Error(`Failed to parse tsconfig: ${tsConfigPath}`);
- 
+
 		return {
 			entry,
 			outDir: resolve(this.root, config.outDir),
@@ -85,14 +79,14 @@ const resolver = new MacroResolver({ root: this.root, buildConfig, opts });
 			onlyFiles: true,
 			ignore: ["**/*.ts", "**/*.tsx"],
 		});
- 
+
 		await Promise.all(
 			files.map(async (file) => {
 				const src = join(srcDir, file);
 				const dest = join(outDir, file);
 				await mkdir(dirname(dest), { recursive: true });
 				await copyFile(src, dest);
-			}),
+			})
 		);
 	}
 }
