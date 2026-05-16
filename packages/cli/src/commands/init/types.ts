@@ -1,8 +1,7 @@
-import { Format, Platform } from "@aromix/core";
+import { Platform } from "@aromix/core";
 
 export interface Answers {
 	name: string;
 	description: string;
 	platform: Platform;
-	format: Format;
 }
