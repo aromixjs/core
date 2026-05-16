@@ -1,7 +1,107 @@
-import { Builder } from "./builder";
+import { DatabaseSync } from "node:sqlite";
+import { Builder, getFields } from "../builder/table.builder";
+import { FieldMeta } from "../builder/table.types";
 
-interface Entity {
+export type Storage = "sqlite";
+export type Filter = Record<string, unknown | unknown[]>;
+export type Row = Record<string, unknown>;
+type SQLValue = null | number | bigint | string | Uint8Array;
+export interface EntityOptions {
+	name: string;
+	storage: Storage;
+	db: string;
 	schema: (builder: Builder) => void;
 }
 
-export function entity(options: Entity) {}
+export const $meta = Symbol("meta");
+
+export interface EntitySymbols {
+	[$meta]: { name: string; storage: Storage; fields: FieldMeta[] };
+}
+
+class EntityBuilder {
+	private buildWhere(filter: Filter): { clause: string; params: SQLValue[] } {
+		const entries = Object.entries(filter);
+		if (!entries.length) return { clause: "", params: [] };
+
+		const parts: string[] = [];
+		const params: SQLValue[] = [];
+
+		for (const [col, val] of entries) {
+			if (Array.isArray(val)) {
+				parts.push(`"${col}" IN (${val.map(() => "?").join(", ")})`);
+				params.push(...(val as SQLValue[]));
+			} else {
+				parts.push(`"${col}" = ?`);
+				params.push(val as SQLValue);
+			}
+		}
+
+		return { clause: `WHERE ${parts.join(" AND ")}`, params };
+	}
+
+	define(options: EntityOptions) {
+		const builder = new Builder();
+		options.schema(builder);
+
+		const fields = getFields(builder);
+		const db = new DatabaseSync(options.db);
+		const pk = () => fields.find((f) => f.primary)?.name ?? "id";
+
+		const buildWhere = this.buildWhere.bind(this);
+
+		const self = {
+			[$meta]: { name: options.name, storage: options.storage, fields },
+
+			getAll(filter: Filter = {}): Row[] {
+				const { clause, params } = buildWhere(filter);
+				return db.prepare(`SELECT * FROM "${options.name}" ${clause}`).all(...params) as Row[];
+			},
+
+			getOne(filter: Filter): Row | null {
+				const { clause, params } = buildWhere(filter);
+				return (db.prepare(`SELECT * FROM "${options.name}" ${clause} LIMIT 1`).get(...params) as Row | null) ?? null;
+			},
+
+			insert(data: Row): Row {
+				const cols = Object.keys(data)
+					.map((c) => `"${c}"`)
+					.join(", ");
+				const slots = Object.keys(data)
+					.map(() => "?")
+					.join(", ");
+				db.prepare(`INSERT INTO "${options.name}" (${cols}) VALUES (${slots})`).run(...(Object.values(data) as SQLValue[]));
+				return data;
+			},
+
+			update(id: SQLValue, data: Row): Row {
+				const sets = Object.keys(data)
+					.map((c) => `"${c}" = ?`)
+					.join(", ");
+				db.prepare(`UPDATE "${options.name}" SET ${sets} WHERE "${pk()}" = ?`).run(
+					...(Object.values(data) as SQLValue[]),
+					id
+				);
+				return self.getOne({ [pk()]: id })!;
+			},
+
+			delete(id: SQLValue): void {
+				db.prepare(`DELETE FROM "${options.name}" WHERE "${pk()}" = ?`).run(id);
+			},
+
+			count(filter: Filter = {}): number {
+				const { clause, params } = buildWhere(filter);
+				const row = db.prepare(`SELECT COUNT(*) as count FROM "${options.name}" ${clause}`).get(...params) as {
+					count: number;
+				};
+				return row.count;
+			},
+		};
+
+		return self;
+	}
+}
+
+export function entity(options: EntityOptions) {
+	return new EntityBuilder().define(options);
+}
