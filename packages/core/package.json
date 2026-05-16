@@ -1,6 +1,6 @@
 {
 	"name": "@aromix/core",
-"version": "0.1.0",
+	"version": "0.1.0",
 	"description": "Core runtime-agnostic framework for Aromix",
 	"type": "module",
 	"license": "MIT",
@@ -27,6 +27,7 @@
 	"files": [
 		"dist"
 	],
+	"types": "./dist/index.d.ts",
 	"exports": {
 		".": {
 			"types": "./dist/index.d.ts",
