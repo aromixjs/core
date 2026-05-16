@@ -1,7 +1,7 @@
 declare global {
     namespace Aromix {
         type GlobPattern = string | string[];
-        function load(pattern: GlobPattern): string[];
+        function load<T>(pattern: GlobPattern): T
     }
 }
 
