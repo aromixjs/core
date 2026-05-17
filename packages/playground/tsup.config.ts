@@ -10,5 +10,6 @@ export default defineConfig({
 	minify: false,
 	target: "es2022",
 	outDir: "dist",
-	external: ["@aromix/core", "@aromix/bun"],
+	platform: "node",
+	external: ["@aromix/core", "@aromix/bun", "node:sqlite"],
 });

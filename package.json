@@ -29,14 +29,10 @@
 		"cli:link": "cd packages/cli && pnpm link --global",
 		"playground:build": "pnpm --filter playground build",
 		"playground:dev": "pnpm --filter playground dev",
-		"format": "prettier --write '**/*.{ts,js,json,md,cjs}'",
-		"change": "beachball change",
-		"bump": "beachball bump",
-		"release": "beachball publish"
+		"format": "prettier --write '**/*.{ts,js,json,md,cjs}'"
 	},
 	"devDependencies": {
 		"@types/node": "catalog:",
-		"beachball": "^2.65.4",
 		"prettier": "^3.8.3",
 		"tsup": "catalog:",
 		"typescript": "catalog:"

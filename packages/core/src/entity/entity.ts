@@ -29,7 +29,6 @@ const SQL_TYPE: Record<FieldType, string> = {
 	json: "TEXT",
 };
 
-
 class EntityBuilder {
 	private buildWhere(filter: Filter): { clause: string; params: SQLValue[] } {
 		const entries = Object.entries(filter);
@@ -58,14 +57,16 @@ class EntityBuilder {
 		const fields = getFields(builder);
 
 		const push = () => {
-			const colDefs = fields.map(f => {
-				const parts: string[] = [`"${f.name}" ${SQL_TYPE[f.type]}`];
-				if (f.primary) parts.push("PRIMARY KEY");
-				if (f.notNullable) parts.push("NOT NULL");
-				if (f.unique) parts.push("UNIQUE");
-				if (f.default !== undefined) parts.push(`DEFAULT ${JSON.stringify(f.default)}`);
-				return parts.join(" ");
-			}).join(", ");
+			const colDefs = fields
+				.map((f) => {
+					const parts: string[] = [`"${f.name}" ${SQL_TYPE[f.type]}`];
+					if (f.primary) parts.push("PRIMARY KEY");
+					if (f.notNullable) parts.push("NOT NULL");
+					if (f.unique) parts.push("UNIQUE");
+					if (f.default !== undefined) parts.push(`DEFAULT ${JSON.stringify(f.default)}`);
+					return parts.join(" ");
+				})
+				.join(", ");
 
 			db.exec(`CREATE TABLE IF NOT EXISTS "${options.name}" (${colDefs})`);
 		};
@@ -73,7 +74,7 @@ class EntityBuilder {
 		push();
 
 		const pk = () => {
-			const field = fields.find(f => f.primary);
+			const field = fields.find((f) => f.primary);
 			if (!field) throw new Error(`Entity "${options.name}" has no primary key defined`);
 			return field.name;
 		};
@@ -95,14 +96,20 @@ class EntityBuilder {
 			},
 
 			insert(data: Row): Row {
-				const cols = Object.keys(data).map(c => `"${c}"`).join(", ");
-				const slots = Object.keys(data).map(() => "?").join(", ");
+				const cols = Object.keys(data)
+					.map((c) => `"${c}"`)
+					.join(", ");
+				const slots = Object.keys(data)
+					.map(() => "?")
+					.join(", ");
 				db.prepare(`INSERT INTO "${options.name}" (${cols}) VALUES (${slots})`).run(...(Object.values(data) as SQLValue[]));
 				return data;
 			},
 
 			update(id: SQLValue, data: Row): Row {
-				const sets = Object.keys(data).map(c => `"${c}" = ?`).join(", ");
+				const sets = Object.keys(data)
+					.map((c) => `"${c}" = ?`)
+					.join(", ");
 				db.prepare(`UPDATE "${options.name}" SET ${sets} WHERE "${pk()}" = ?`).run(
 					...(Object.values(data) as SQLValue[]),
 					id
@@ -116,7 +123,9 @@ class EntityBuilder {
 
 			count(filter: Filter = {}): number {
 				const { clause, params } = buildWhere(filter);
-				const row = db.prepare(`SELECT COUNT(*) as count FROM "${options.name}" ${clause}`).get(...params) as { count: number };
+				const row = db.prepare(`SELECT COUNT(*) as count FROM "${options.name}" ${clause}`).get(...params) as {
+					count: number;
+				};
 				return row.count;
 			},
 		};
