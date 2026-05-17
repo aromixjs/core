@@ -1,3 +1,1 @@
-export function provider() {
-   
-}
+export function provider() {}
