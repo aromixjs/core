@@ -1,45 +1,70 @@
 import * as v from "valibot";
-import { KvStorage } from "../../storage/kv/types";
-import type { KvSchemaMeta, Schema } from "./kv.types";
+import type { BaseShape, Entries } from "./kv.types";
+import { KvStorage } from "../../storage/kv";
 
-export class KvEntity {
+export class KvEntity<Shape extends BaseShape> {
 	private storage: KvStorage;
-	private schema: KvSchemaMeta;
-	private inputSchema: Schema;
+	private key: string;
+	private inputSchema: v.ObjectSchema<Entries<Shape>, undefined>;
+	private internalFields: string[];
+	private extendFn?: (record: Record<string, unknown>) => Record<string, unknown>;
 
-	constructor(storage: KvStorage, schema: KvSchemaMeta) {
-		this.storage = storage;
-		this.schema = schema;
-		this.inputSchema = this.buildInputSchema();
-	}
-
-	private buildInputSchema(): Schema {
-		const entries: Record<string, Schema> = {};
-
-		for (const field of this.schema.fields) {
-			entries[field.name] = field.schema;
-		}
-
-		return v.object(entries);
+	constructor(
+		key: string,
+		storage: KvStorage,
+		inputSchema: v.ObjectSchema<Entries<Shape>, undefined>,
+		internalFields: string[],
+		extendFn?: (record: Record<string, unknown>) => Record<string, unknown>,
+	) {
+		this.key            = key;
+		this.storage        = storage;
+		this.inputSchema    = inputSchema;
+		this.internalFields = internalFields;
+		this.extendFn       = extendFn;
 	}
 
 	private serializeKey(key: unknown): string {
-		return `${this.schema.key}:${String(key)}`;
+		return `${this.key}:${String(key)}`;
 	}
 
-	private validate(data: Record<string, unknown>): void {
-		v.parse(this.inputSchema, data);
+	private validate(data: unknown): v.InferOutput<v.ObjectSchema<Entries<Shape>, undefined>> {
+		return v.parse(this.inputSchema, data);
 	}
 
-	async get(key: unknown): Promise<unknown> {
+	private present(raw: Record<string, unknown>): Record<string, unknown> {
+		const result: Record<string, unknown> = { ...raw };
+
+		for (const field of this.internalFields) {
+			delete result[field];
+		}
+
+		if (this.extendFn) {
+			const extended = this.extendFn(result);
+
+			for (const [key, val] of Object.entries(extended)) {
+				result[key] = val;
+			}
+		}
+
+		return result;
+	}
+
+	async get(key: unknown): Promise<v.InferOutput<v.ObjectSchema<Entries<Shape>, undefined>> | null> {
 		const serialized = this.serializeKey(key);
-		return this.storage.adapter.get(serialized);
+		const raw        = await this.storage.adapter.get(serialized);
+
+		if (raw === null || raw === undefined) {
+			return null;
+		}
+
+		const validated = this.validate(raw);
+		return this.present(validated as Record<string, unknown>) as v.InferOutput<v.ObjectSchema<Entries<Shape>, undefined>>;
 	}
 
-	async set(key: unknown, value: Record<string, unknown>): Promise<void> {
+	async set(key: unknown, value: v.InferOutput<v.ObjectSchema<Entries<Shape>, undefined>>): Promise<void> {
 		const serialized = this.serializeKey(key);
-		this.validate(value);
-		await this.storage.adapter.set(serialized, value);
+		const validated  = this.validate(value);
+		await this.storage.adapter.set(serialized, validated);
 	}
 
 	async has(key: unknown): Promise<boolean> {

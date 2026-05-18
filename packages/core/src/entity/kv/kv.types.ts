@@ -1,12 +1,22 @@
-import type * as v from "valibot";
+import * as v from "valibot";
+
 
 export type Schema = v.BaseSchema<unknown, unknown, v.BaseIssue<unknown>>;
-export interface KvFieldMeta {
-	name: string;
-	schema: Schema;
+
+export const $schema = Symbol("schema");
+export const $internal = Symbol("internal");
+
+export interface KvField {
+   [$schema]: Schema;
+   [$internal]?: boolean;
 }
 
-export interface KvSchemaMeta {
-	key: string;
-	fields: KvFieldMeta[];
-}
+export type BaseShape = Record<string, KvField>;
+
+export type Entries<Shape extends BaseShape> = {
+	[K in keyof Shape]: Shape[K][typeof $schema];
+};
+
+export type InferShape<Shape extends BaseShape> = {
+	[K in keyof Shape]: v.InferOutput<Shape[K][typeof $schema]>;
+};
