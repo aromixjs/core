@@ -45,7 +45,6 @@
 	},
 	"dependencies": {
 		"@msgpack/msgpack": "catalog:",
-		"@standard-schema/spec": "catalog:",
 		"valibot": "^1.4.0"
 	},
 	"devDependencies": {
