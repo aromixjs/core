@@ -2,10 +2,7 @@ import { Config, toFetchHandler } from "@aromix/core";
 
 declare module "@aromix/core" {
 	interface Config {
-		server: {
-			port: number;
-			host: string;
-		};
+		server: { port: number; host: string };
 	}
 }
 

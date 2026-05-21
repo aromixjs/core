@@ -5,9 +5,7 @@ import { program } from "aromix";
 
 const user = program({
 	name: "user",
-	deps: {
-		user: inject(UserModel),
-	},
+	deps: { user: inject(UserModel) },
 	hooks: [authHook],
 });
 ```
@@ -54,7 +52,9 @@ user.stream({
 		stream.emit("data", items);
 		stream.emit("cursor", { next: nextCursor });
 		// Server can close the stream
-		if (noMoreData) stream.close();
+		if (noMoreData) {
+			stream.close();
+		}
 
 		// Optional: cleanup when stream closes (any side)
 		stream.onClose(() => {

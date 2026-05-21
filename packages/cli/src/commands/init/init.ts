@@ -1,10 +1,10 @@
 import { Platform } from "@aromix/core";
 import * as p from "@clack/prompts";
-import { join, resolve, basename } from "path";
-import { existsSync, mkdirSync, readFileSync, writeFileSync, readdirSync, rmSync, statSync } from "fs";
-import Handlebars from "handlebars";
 import { execSync } from "child_process";
+import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from "fs";
+import Handlebars from "handlebars";
 import { tmpdir } from "os";
+import { basename, join, resolve } from "path";
 import { Answers } from "./types";
 
 interface RuntimeConfig {
@@ -19,7 +19,8 @@ export class Init {
 			const res = await fetch(`https://registry.npmjs.org/${pkg}/latest`);
 			const data = (await res.json()) as { version: string };
 			return `^${data.version}`;
-		} catch {
+		}
+		catch {
 			return "latest";
 		}
 	}
@@ -30,55 +31,40 @@ export class Init {
 		const tempDir = join(tmpdir(), `aromix-template-${Date.now()}`);
 
 		try {
-			const answers = await p.group(
-				{
-					name: () =>
-						p.text({
-							message: "Project name (use . for current directory)",
-							placeholder: "my-app",
-							validate: (v) => (!v?.trim() ? "Name is required" : undefined),
-						}),
-					description: () =>
-						p.text({
-							message: "Project description (optional)",
-							placeholder: "My awesome project",
-						}),
-					platform: () =>
-						p.select<Platform>({
-							message: "Target runtime",
-							options: [
-								{ value: "node", label: "Node.js" },
-								{ value: "bun", label: "Bun" },
-								{ value: "cloudflare:worker", label: "Cloudflare Workers" },
-							],
-						}),
+			const answers = await p.group({
+				name: () =>
+					p.text({
+						message: "Project name (use . for current directory)",
+						placeholder: "my-app",
+						validate: (v) => (!v?.trim() ? "Name is required" : undefined),
+					}),
+				description: () =>
+					p.text({ message: "Project description (optional)", placeholder: "My awesome project" }),
+				platform: () =>
+					p.select<Platform>({
+						message: "Target runtime",
+						options: [{ value: "node", label: "Node.js" }, { value: "bun", label: "Bun" }, {
+							value: "cloudflare:worker",
+							label: "Cloudflare Workers",
+						}],
+					}),
+			}, {
+				onCancel: () => {
+					p.cancel("Cancelled.");
+					process.exit(0);
 				},
-				{
-					onCancel: () => {
-						p.cancel("Cancelled.");
-						process.exit(0);
-					},
-				}
-			);
+			});
 
 			const spinner = p.spinner();
 			spinner.start("Fetching latest versions...");
 
 			const runtimeMap: Record<string, RuntimeConfig> = {
-				node: {
-					runtimeAdapter: "@aromix/node",
-					typesPackage: "@types/node",
-					typesArray: '["node"]',
-				},
-				bun: {
-					runtimeAdapter: "@aromix/bun",
-					typesPackage: "@types/bun",
-					typesArray: '["bun"]',
-				},
+				node: { runtimeAdapter: "@aromix/node", typesPackage: "@types/node", typesArray: "[\"node\"]" },
+				bun: { runtimeAdapter: "@aromix/bun", typesPackage: "@types/bun", typesArray: "[\"bun\"]" },
 				"cloudflare:worker": {
 					runtimeAdapter: "@aromix/cloudflare",
 					typesPackage: "@cloudflare/workers-types",
-					typesArray: '["@cloudflare/workers-types"]',
+					typesArray: "[\"@cloudflare/workers-types\"]",
 				},
 			};
 
@@ -114,11 +100,17 @@ export class Init {
 			});
 
 			spinner.stop("Project created");
-			p.outro(`Done. Get started:\n\n  cd ${answers.name === "." ? "." : answers.name}\n  npm install\n  aromix dev`);
-		} catch (err: any) {
+			p.outro(
+				`Done. Get started:\n\n  cd ${
+					answers.name === "." ? "." : answers.name
+				}\n  npm install\n  aromix dev`,
+			);
+		}
+		catch (err: any) {
 			p.cancel(`Initialization failed: ${err.message || err}`);
 			process.exit(1);
-		} finally {
+		}
+		finally {
 			if (existsSync(tempDir)) {
 				rmSync(tempDir, { recursive: true, force: true });
 			}
@@ -132,7 +124,9 @@ export class Init {
 			const files = readdirSync(currentDir);
 
 			files.forEach((file) => {
-				if (file === ".git" || file === "README.md") return;
+				if (file === ".git" || file === "README.md") {
+					return;
+				}
 
 				const templatePath = join(currentDir, file);
 				const stats = statSync(templatePath);
@@ -141,7 +135,8 @@ export class Init {
 					const newTarget = join(targetDir, file);
 					mkdirSync(newTarget, { recursive: true });
 					walk(templatePath, newTarget);
-				} else {
+				}
+				else {
 					const content = readFileSync(templatePath, "utf8");
 					const template = Handlebars.compile(content);
 
@@ -155,7 +150,7 @@ export class Init {
 							description: answers.description || "",
 							platform: answers.platform,
 							...config,
-						})
+						}),
 					);
 				}
 			});

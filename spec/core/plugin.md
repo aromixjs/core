@@ -10,17 +10,9 @@ export default {
 		dbName: env("MONGO_DB", "myapp"),
 		poolSize: 10,
 	},
-	queue: {
-		redis: env("REDIS_URL"),
-		concurrency: 20,
-	},
-	auth: {
-		secret: env("JWT_SECRET"),
-		expires: "7d",
-	},
-	server: {
-		port: 3000,
-	},
+	queue: { redis: env("REDIS_URL"), concurrency: 20 },
+	auth: { secret: env("JWT_SECRET"), expires: "7d" },
+	server: { port: 3000 },
 };
 
 // factory form — when values depend on each other
@@ -75,7 +67,9 @@ export const MongoPlugin = plugin((app) => {
 		run: async () => {
 			const { uri, dbName } = app.config("db"); // reads from global config
 			const db = await createConnection(uri, dbName);
-			for (const model of _models) model.bindDb(db);
+			for (const model of _models) {
+				model.bindDb(db);
+			}
 		},
 	});
 });
@@ -110,11 +104,7 @@ app.config("queue");
 // ============================================================
 
 // make() — core app, unchanged
-const app = make({
-	programs: [],
-	services: [],
-	hooks: [],
-});
+const app = make({ programs: [], services: [], hooks: [] });
 
 // app.use — register a plugin
 app.use(ValidateEnv, schema); // with options

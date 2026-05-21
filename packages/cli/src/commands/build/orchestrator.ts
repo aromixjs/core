@@ -1,14 +1,14 @@
 import { type AromixBuildConfig, type Platform } from "@aromix/core";
 import esbuild from "esbuild";
+import fg from "fast-glob";
+import { getTsconfig } from "get-tsconfig";
+import { existsSync } from "node:fs";
+import { copyFile, mkdir } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
 import { Config } from "./config";
 import { MacroResolver } from "./macro.resolver";
-import type { ResolvedBuildOptions } from "./types";
 import { loadMacro } from "./macro/load";
-import fg from "fast-glob";
-import { copyFile, mkdir } from "node:fs/promises";
-import { existsSync } from "node:fs";
-import { getTsconfig } from "get-tsconfig";
+import type { ResolvedBuildOptions } from "./types";
 export class Build {
 	readonly root = process.cwd();
 
@@ -27,11 +27,7 @@ export class Build {
 		resolver.register(loadMacro);
 
 		const srcDir = dirname(opts.entry);
-		const sourceFiles = await fg("**/*.{ts,tsx}", {
-			cwd: srcDir,
-			absolute: true,
-			ignore: ["**/*.d.ts"],
-		});
+		const sourceFiles = await fg("**/*.{ts,tsx}", { cwd: srcDir, absolute: true, ignore: ["**/*.d.ts"] });
 
 		await esbuild.build({
 			entryPoints: sourceFiles,
@@ -52,13 +48,19 @@ export class Build {
 
 	private resolveOptions(config: AromixBuildConfig): ResolvedBuildOptions {
 		const entry = resolve(this.root, config.entry);
-		if (!existsSync(entry)) throw new Error(`Entry point not found: ${entry}`);
+		if (!existsSync(entry)) {
+			throw new Error(`Entry point not found: ${entry}`);
+		}
 
 		const tsConfigPath = resolve(this.root, config.tsConfig);
-		if (!existsSync(tsConfigPath)) throw new Error(`tsconfig not found: ${tsConfigPath}`);
+		if (!existsSync(tsConfigPath)) {
+			throw new Error(`tsconfig not found: ${tsConfigPath}`);
+		}
 
 		const parsed = getTsconfig(tsConfigPath);
-		if (!parsed) throw new Error(`Failed to parse tsconfig: ${tsConfigPath}`);
+		if (!parsed) {
+			throw new Error(`Failed to parse tsconfig: ${tsConfigPath}`);
+		}
 
 		return {
 			entry,
@@ -80,13 +82,11 @@ export class Build {
 			ignore: ["**/*.ts", "**/*.tsx"],
 		});
 
-		await Promise.all(
-			files.map(async (file) => {
-				const src = join(srcDir, file);
-				const dest = join(outDir, file);
-				await mkdir(dirname(dest), { recursive: true });
-				await copyFile(src, dest);
-			})
-		);
+		await Promise.all(files.map(async (file) => {
+			const src = join(srcDir, file);
+			const dest = join(outDir, file);
+			await mkdir(dirname(dest), { recursive: true });
+			await copyFile(src, dest);
+		}));
 	}
 }

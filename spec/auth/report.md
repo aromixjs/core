@@ -1,6 +1,6 @@
 # Evaluation of Web Authentication Models for Aromix Platform
 
-**Date:** 2026-05-14  
+**Date:** 2026-05-14\
 **Status:** Research & Design Phase
 
 ---
@@ -124,13 +124,13 @@ We are stuck at a **fundamental limitation of the web platform**:
 
 ### Remaining Unsolved Risks
 
-1. **Replay of dropped requests:**  
+1. **Replay of dropped requests:**\
    A request that never reaches the server (due to network drop or intentional interception) can be replayed by the attacker before the client retries, and the server cannot distinguish it from a legitimate first attempt without an idempotency key. Idempotency keys solve duplicate processing but not the authentication of the request itself.
 
-2. **Extractable client‑side keys:**  
+2. **Extractable client‑side keys:**\
    Even with `extractable: false` in Web Crypto, the key material is stored unencrypted in the browser’s IndexedDB and can be read by malware with filesystem access. True hardware protection is required.
 
-3. **Session token after WebAuthn:**  
+3. **Session token after WebAuthn:**\
    After a strong WebAuthn login, we must issue a session token (cookie) for subsequent requests. That token is again a bearer credential, vulnerable to theft. Shortening its lifetime reduces risk but does not eliminate it.
 
 ---

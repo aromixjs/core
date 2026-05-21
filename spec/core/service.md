@@ -203,10 +203,7 @@ Dispatching:
 ```ts
 await SendEmailJob.dispatch({ to: "a@b.com", subject: "Hi", body: "..." });
 
-await SendEmailJob.dispatch(payload, {
-	delay: "10m",
-	priority: "high",
-});
+await SendEmailJob.dispatch(payload, { delay: "10m", priority: "high" });
 ```
 
 Plugin registration:
@@ -336,10 +333,10 @@ const OnboardingWorkflow = Workflow.define({
 	name: "onboarding",
 	input: v.object({ userId: v.string() }),
 
-	steps: (wire) => [
-		wire(FetchUser, {
-			input: (ctx) => ({ userId: ctx.input.userId }),
-		}),
+	steps: (
+		wire,
+	) => [
+		wire(FetchUser, { input: (ctx) => ({ userId: ctx.input.userId }) }),
 
 		wire(GenerateImage, {
 			input: (ctx) => ({ prompt: ctx.steps.FetchUser.name }),
@@ -417,10 +414,7 @@ resolved at program level are shared across all commands.
 ```ts
 const userProgram = program({
 	name: "users",
-	deps: {
-		users: inject(UserService),
-		mail: inject(MailService),
-	},
+	deps: { users: inject(UserService), mail: inject(MailService) },
 });
 
 userProgram.command("Register", async (ctx) => {
@@ -428,7 +422,9 @@ userProgram.command("Register", async (ctx) => {
 });
 
 userProgram.command("Deactivate", async (ctx) => {
-	await ctx.deps.users.deactivate(ctx.args(v.object({ id: v.string() })).id);
+	await ctx.deps.users.deactivate(
+		ctx.args(v.object({ id: v.string() })).id,
+	);
 });
 
 userProgram.stream("GetAll", async (ctx) => {

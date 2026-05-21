@@ -1,9 +1,0 @@
-{
-	"tabWidth": 6,
-	"semi": true,
-	"singleQuote": false,
-	"printWidth": 140,
-	"trailingComma": "es5",
-	"useTabs": true,
-	"plugins": []
-}

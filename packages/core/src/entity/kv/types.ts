@@ -12,11 +12,7 @@ export interface FieldDef {
 	valibotSchema: AnySchema;
 	notNull: boolean;
 	default: FieldDefault;
-	client: {
-		read: boolean;
-		insert: boolean;
-		update: boolean;
-	};
+	client: { read: boolean; insert: boolean; update: boolean };
 	computeFn: ((row: Record<string, unknown>) => unknown) | undefined;
 }
 

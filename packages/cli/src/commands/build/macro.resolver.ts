@@ -1,9 +1,9 @@
 import { AromixBuildConfig } from "@aromix/core";
 import type esbuild from "esbuild";
 import { readFileSync } from "fs";
+import { TsConfigJson } from "get-tsconfig";
 import { dirname } from "path";
 import { MacroFinder } from "./macro.finder";
-import { TsConfigJson } from "get-tsconfig";
 import { ResolvedBuildOptions } from "./types";
 
 // Context passed to every macro's run()
@@ -47,14 +47,21 @@ export class MacroResolver {
 				build.onLoad({ filter: /\.[tj]sx?$/ }, (args) => {
 					const src = readFileSync(args.path, "utf8");
 
-					if (!src.includes("Aromix.")) return undefined;
+					if (!src.includes("Aromix.")) {
+						return undefined;
+					}
 
 					const calls = this.finder.find(src, args.path);
-					if (calls.length === 0) return undefined;
+					if (calls.length === 0) {
+						return undefined;
+					}
 
 					for (const call of calls) {
 						if (!this.macros.has(call.macro)) {
-							throw new Error(`Unknown Macro: Aromix.${call.macro}\n` + ` At: ${args.path}:${call.line}\n`);
+							throw new Error(
+								`Unknown Macro: Aromix.${call.macro}\n`
+									+ ` At: ${args.path}:${call.line}\n`,
+							);
 						}
 					}
 
@@ -85,9 +92,15 @@ export class MacroResolver {
 	}
 
 	private inferLoader(filePath: string): esbuild.Loader {
-		if (filePath.endsWith(".tsx")) return "tsx";
-		if (filePath.endsWith(".ts")) return "ts";
-		if (filePath.endsWith(".jsx")) return "jsx";
+		if (filePath.endsWith(".tsx")) {
+			return "tsx";
+		}
+		if (filePath.endsWith(".ts")) {
+			return "ts";
+		}
+		if (filePath.endsWith(".jsx")) {
+			return "jsx";
+		}
 		return "js";
 	}
 }

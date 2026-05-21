@@ -1,4 +1,4 @@
-import { encode, decode } from "@msgpack/msgpack";
+import { decode, encode } from "@msgpack/msgpack";
 
 export const Codec = {
 	encode(data: unknown): Uint8Array {
@@ -16,15 +16,14 @@ export const Codec = {
 		}
 
 		const buf = await req.arrayBuffer();
-		if (buf.byteLength === 0) return undefined;
+		if (buf.byteLength === 0) {
+			return undefined;
+		}
 
 		return decode(new Uint8Array(buf));
 	},
 
 	response(data: unknown): Response {
-		return new Response(encode(data), {
-			status: 200,
-			headers: { "Content-Type": "application/x-msgpack" },
-		});
+		return new Response(encode(data), { status: 200, headers: { "Content-Type": "application/x-msgpack" } });
 	},
 };

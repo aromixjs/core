@@ -12,7 +12,9 @@ export class Config {
 	async buildConfig(): Promise<AromixBuildConfig> {
 		const configPath = this.ConfigFileName.map((file) => join(this.root, file)).find(existsSync);
 
-		if (!configPath) throw new Error(`No aromix.build.ts found in ${this.root}`);
+		if (!configPath) {
+			throw new Error(`No aromix.build.ts found in ${this.root}`);
+		}
 
 		const tmp = join(this.root, ".aromix", "build", `tmp.${Date.now()}.mjs`);
 
@@ -30,8 +32,11 @@ export class Config {
 			const mod = await import(pathToFileURL(tmp).href);
 			console.log(`Loaded config from ${relative(this.root, configPath)}`);
 			return mod.default as AromixBuildConfig;
-		} finally {
-			if (existsSync(tmp)) unlinkSync(tmp);
+		}
+		finally {
+			if (existsSync(tmp)) {
+				unlinkSync(tmp);
+			}
 		}
 	}
 }

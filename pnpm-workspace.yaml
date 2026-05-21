@@ -2,6 +2,7 @@ packages:
   - "packages/*"
 
 allowBuilds:
+  dprint: set this to true or false
   esbuild: true
 
 catalog:

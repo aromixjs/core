@@ -1,91 +1,142 @@
-// Resolves Omit<>, Pick<>, Record<> and any other mapped types into
-// a clean plain object type. Applied at value() so intermediate chain
-// types stay cheap but the final result is always readable.
-type Resolve<T> = { [K in keyof T]: T[K] } & {}
-
-
-
-
+type Prettify<T> = { [K in keyof T]: T[K] } & {};
+type DeepPartial<T> = T extends object ? { [K in keyof T]?: DeepPartial<T[K]> } : T;
+type MapValues<T, U> = { [K in keyof T]: U };
+type MapKeys<T, K extends PropertyKey> = Record<K, T[keyof T]>;
 
 class ObjectBuilder<T extends object> {
-   constructor(private readonly initialObject: T) { }
+	private constructor(private readonly data: T) {}
 
-   // Shallow partial update — keys you pass override, rest untouched.
-   patch(changes: Partial<T>): ObjectBuilder<T> {
-      return new ObjectBuilder<T>({ ...this.initialObject, ...changes })
-   }
+	patch(changes: DeepPartial<T>) {
+		const merged = ObjectBuilder.deepMerge(this.data, changes);
+		const builder = new ObjectBuilder(merged);
+		return builder;
+	}
 
-   // Remove keys. Type shrinks accordingly.
-   omit<K extends keyof T>(keys: readonly K[]): ObjectBuilder<Omit<T, K>> {
-      const result = { ...this.initialObject }
-      for (const key of keys) delete result[key]
-      return new ObjectBuilder(result as Omit<T, K>)
-   }
+	omit<K extends keyof T>(keys: readonly K[]) {
+		const result = structuredClone(this.data);
 
-   // Keep only the named keys.
-   pick<K extends keyof T>(keys: readonly K[]): ObjectBuilder<Pick<T, K>> {
-      const result = {} as Pick<T, K>
-      for (const key of keys) result[key] = this.initialObject[key]
-      return new ObjectBuilder(result)
-   }
+		for (const key of keys) {
+			delete result[key];
+		}
 
-   // Fill keys that are undefined. Existing values are never overwritten.
-   defaults(fallbacks: Partial<T>): ObjectBuilder<T> {
-      const result = { ...this.initialObject }
-      for (const key in fallbacks)
-         if ((result as Record<string, unknown>)[key] === undefined)
-            (result as Record<string, unknown>)[key] = fallbacks[key]
-      return new ObjectBuilder<T>(result)
-   }
+		const builder = new ObjectBuilder<Omit<T, K>>(result);
+		return builder;
+	}
 
-   // Transform every value with fn.
-   mapValues<U>(fn: (val: T[keyof T], key: keyof T) => U): ObjectBuilder<{ [K in keyof T]: U }> {
-      const result = {} as { [K in keyof T]: U }
-      for (const key in this.initialObject) result[key] = fn(this.initialObject[key] as T[keyof T], key)
-      return new ObjectBuilder(result)
-   }
+	pick<K extends keyof T>(keys: readonly K[]) {
+		const result = this.cast<Pick<T, K>>({});
 
-   // Rename every key with fn.
-   mapKeys<K extends PropertyKey>(fn: (key: keyof T) => K): ObjectBuilder<Record<K, T[keyof T]>> {
-      const result = {} as Record<K, T[keyof T]>
-      for (const key in this.initialObject) result[fn(key)] = this.initialObject[key] as T[keyof T]
-      return new ObjectBuilder(result)
-   }
+		for (const key of keys) {
+			result[key] = this.data[key];
+		}
 
-   // Keep only entries where fn returns true.
-   filter(fn: (val: T[keyof T], key: keyof T) => boolean): ObjectBuilder<Partial<T>> {
-      const result = {} as Partial<T>
-      for (const key in this.initialObject)
-         if (fn(this.initialObject[key] as T[keyof T], key)) result[key] = this.initialObject[key]
-      return new ObjectBuilder(result)
-   }
+		const builder = new ObjectBuilder<Pick<T, K>>(result);
+		return builder;
+	}
 
-   // Deep clone. Same type.
-   clone(): ObjectBuilder<T> {
-      return new ObjectBuilder<T>(structuredClone(this.initialObject))
-   }
+	defaults(fallbacks: Partial<T>) {
+		const result = structuredClone(this.data);
 
-   // Exit the chain. Returns a clean resolved plain object type — no Omit<>, Pick<>, etc.
-   value(): Resolve<T> {
-      return this.initialObject as Resolve<T>
-   }
+		for (const key in fallbacks) {
+			const value = fallbacks[key];
+
+			if (result[key] === undefined && value !== undefined) {
+				result[key] = value;
+			}
+		}
+
+		const builder = new ObjectBuilder(result);
+		return builder;
+	}
+
+	mapValues<U>(fn: (val: T[keyof T], key: keyof T) => U) {
+		const result = this.cast<MapValues<T, U>>({});
+		const keys = this.cast<Array<keyof T>>(Object.keys(this.data));
+
+		for (const key of keys) {
+			result[key] = fn(this.data[key], key);
+		}
+
+		const builder = new ObjectBuilder<MapValues<T, U>>(result);
+		return builder;
+	}
+
+	mapKeys<K extends PropertyKey>(fn: (key: keyof T) => K) {
+		const result = this.cast<MapKeys<T, K>>({});
+		const keys = this.cast<Array<keyof T>>(Object.keys(this.data));
+
+		for (const key of keys) {
+			result[fn(key)] = this.data[key];
+		}
+
+		const builder = new ObjectBuilder<MapKeys<T, K>>(result);
+		return builder;
+	}
+
+	filter(fn: (val: T[keyof T], key: keyof T) => boolean) {
+		const result = this.cast<Partial<T>>({});
+		const keys = this.cast<Array<keyof T>>(Object.keys(this.data));
+
+		for (const key of keys) {
+			const val = this.data[key];
+
+			if (fn(val, key)) {
+				result[key] = val;
+			}
+		}
+
+		const builder = new ObjectBuilder<Partial<T>>(result);
+		return builder;
+	}
+
+	clone() {
+		const copy = structuredClone(this.data);
+		const builder = new ObjectBuilder(copy);
+		return builder;
+	}
+
+	value() {
+		const result = this.cast<Prettify<T>>(this.data);
+		return result;
+	}
+
+	static create<T extends object>(val: T) {
+		const builder = new ObjectBuilder(val);
+		return builder;
+	}
+
+	private cast<U>(value: unknown): U {
+		return value as U;
+	}
+
+	private static deepMerge<T extends object>(base: T, changes: DeepPartial<T>) {
+		const result = ObjectBuilder.castStatic<Record<string, unknown>>(structuredClone(base));
+
+		for (const key in changes) {
+			const change = changes[key];
+			const existing = result[key];
+
+			if (
+				change && typeof change === "object" && !Array.isArray(change) && existing
+				&& typeof existing === "object" && !Array.isArray(existing)
+			) {
+				result[key] = ObjectBuilder.deepMerge(existing, change);
+			}
+			else if (change !== undefined) {
+				result[key] = change;
+			}
+		}
+
+		const output = ObjectBuilder.castStatic<T>(result);
+		return output;
+	}
+
+	private static castStatic<U>(value: unknown): U {
+		return value as U;
+	}
 }
 
-export function object<T extends object>(val: T): ObjectBuilder<T> {
-   return new ObjectBuilder(val)
+export function object<T extends object>(val: T) {
+	const builder = ObjectBuilder.create(val);
+	return builder;
 }
-
-
-const data = object({
-
-
-   user: 'test',
-   name: 'demo'
-
-})
-
-
-const obj = data.omit(['name']).patch({ user: 'fast' }).value()
-
-
-console.log(obj);

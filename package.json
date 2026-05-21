@@ -18,8 +18,11 @@
 		"dev": "pnpm -r dev",
 		"typecheck": "tsc --build",
 		"clean": "pnpm -r exec rm -rf dist",
+		"test": "vitest run",
+		"test:watch": "vitest",
 		"core:build": "pnpm --filter @aromix/core build",
 		"core:dev": "pnpm --filter @aromix/core dev",
+		"core:test": "vitest run --dir packages/core",
 		"bun:build": "pnpm --filter @aromix/bun build",
 		"bun:dev": "pnpm --filter @aromix/bun dev",
 		"cloudflare:build": "pnpm --filter @aromix/cloudflare build",
@@ -29,13 +32,13 @@
 		"cli:link": "cd packages/cli && pnpm link --global",
 		"playground:build": "pnpm --filter playground build",
 		"playground:dev": "pnpm --filter playground dev",
-		"format": "prettier --write '**/*.{ts,js,json,md,cjs}'"
+		"format": "dprint fmt"
 	},
 	"devDependencies": {
 		"@types/node": "catalog:",
-		"prettier": "^3.8.3",
 		"tsup": "catalog:",
-		"typescript": "catalog:"
+		"typescript": "catalog:",
+		"vitest": "^4.1.6"
 	},
 	"pnpm": {
 		"onlyBuiltDependencies": [

@@ -22,25 +22,27 @@ export class MacroFinder {
 	private project = new Project({
 		useInMemoryFileSystem: true,
 		skipAddingFilesFromTsConfig: true,
-		compilerOptions: {
-			allowJs: true,
-		},
+		compilerOptions: { allowJs: true },
 	});
 
 	find(source: string, filePath: string): MacroCall[] {
-		const file = this.project.createSourceFile(filePath, source, {
-			overwrite: true,
-		});
+		const file = this.project.createSourceFile(filePath, source, { overwrite: true });
 
 		const results: MacroCall[] = [];
 
 		for (const call of file.getDescendantsOfKind(SyntaxKind.CallExpression)) {
 			const expr = call.getExpression();
-			if (!expr.isKind(SyntaxKind.PropertyAccessExpression)) continue;
+			if (!expr.isKind(SyntaxKind.PropertyAccessExpression)) {
+				continue;
+			}
 
 			const obj = expr.getExpression();
-			if (!obj.isKind(SyntaxKind.Identifier)) continue;
-			if (obj.getText() !== "Aromix") continue;
+			if (!obj.isKind(SyntaxKind.Identifier)) {
+				continue;
+			}
+			if (obj.getText() !== "Aromix") {
+				continue;
+			}
 
 			results.push({
 				macro: expr.getName(),
@@ -67,9 +69,15 @@ export class MacroFinder {
 			return node.getLiteralValue();
 		}
 
-		if (node.isKind(SyntaxKind.TrueKeyword)) return true;
-		if (node.isKind(SyntaxKind.FalseKeyword)) return false;
-		if (node.isKind(SyntaxKind.NullKeyword)) return null;
+		if (node.isKind(SyntaxKind.TrueKeyword)) {
+			return true;
+		}
+		if (node.isKind(SyntaxKind.FalseKeyword)) {
+			return false;
+		}
+		if (node.isKind(SyntaxKind.NullKeyword)) {
+			return null;
+		}
 
 		if (node.isKind(SyntaxKind.NoSubstitutionTemplateLiteral)) {
 			return node.getLiteralValue();

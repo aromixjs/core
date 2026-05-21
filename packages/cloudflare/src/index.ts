@@ -1,5 +1,4 @@
-import { Config } from "@aromix/core";
-import { toFetchHandler } from "@aromix/core";
+import { Config, toFetchHandler } from "@aromix/core";
 
 export function serve(config: Config) {
 	// const handler = toFetchHandler(app);

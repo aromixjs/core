@@ -1,5 +1,5 @@
-import type { TsConfigJson } from "get-tsconfig";
 import type esbuild from "esbuild";
+import type { TsConfigJson } from "get-tsconfig";
 
 export interface ResolvedBuildOptions {
 	entry: string;
