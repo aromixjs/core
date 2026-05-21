@@ -1,7 +1,23 @@
+import { extname } from "path";
+
 type Prettify<T> = { [K in keyof T]: T[K] } & {};
 type DeepPartial<T> = T extends object ? { [K in keyof T]?: DeepPartial<T[K]> } : T;
 type MapValues<T, U> = { [K in keyof T]: U };
 type MapKeys<T, K extends PropertyKey> = Record<K, T[keyof T]>;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 class ObjectBuilder<T extends object> {
 	private constructor(private readonly data: T) {}
