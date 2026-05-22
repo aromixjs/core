@@ -1,4 +1,4 @@
-import { kv, Model, Storage } from "@aromix/core";
+import { kv, KvField, Model, Storage } from "@aromix/core";
 
 const redis = Storage.kv({
    async get(key) {
@@ -15,16 +15,13 @@ const redis = Storage.kv({
 
 
 
-Model.kv({
-   base: {
-      user: kv.string(),
-      address: kv.boolean(),
-      verified: kv.boolean().default(false),
-      group: kv.object({
-         name: kv.string().default('test')
-      }),
-      permissions: kv.array(kv.string())
-   },
+const md = Model.kv({
+
+   base: kv.object({
+      name: kv.string()
+   })
 
 
 })
+
+

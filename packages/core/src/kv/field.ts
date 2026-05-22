@@ -36,25 +36,33 @@ export namespace KvField {
 
 
 
-   /// this is the type of the underlying meta data that will be used to derive all the stuff later
+
+
+
+
+
+   /**
+    * This is the type for the underlying meta data object that all the kv field chains generates.
+    * This is the main source of the truth it will hold all the necessary information that will derive the sdk generation,
+    * type generation, validation schema generation and all other necessary work
+    */
    export interface Meta<FieldType extends Type = Type> {
       type: FieldType;
       default: KvField.TypeMap[FieldType] | undefined;
-      shape: Record<string, Meta> | Meta | undefined
+      shape: Meta | Record<string, Meta> | undefined
    }
-
 
 
    /**
     * Represents Any Type of Field
     * This Broader Type Used For getting the field meta only 
     */
-   export type Any = { [$meta]: Meta }
+   export type Any = { [$meta]: Meta<Type> }
 
 
 
 
-   export const $meta = Symbol("Kv Field Meta");
+   export const $meta = Symbol("KV:Field:Meta");
 
 
 

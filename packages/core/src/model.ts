@@ -5,11 +5,15 @@ export namespace Model {
 
 
 
-   interface KvInput {
-      base: Record<string, KvField.Any>
+   interface KvInput<T extends KvField.Any> {
+      base: T
    }
 
-   export function kv(input: KvInput) { }
+   export function kv<T extends KvField.Any>(input: KvInput<T>) {
+      return input
+   }
+
+
 
 
 }

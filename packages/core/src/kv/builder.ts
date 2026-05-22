@@ -1,48 +1,45 @@
 import { KvField } from "./field";
 
-class KV {
-   string() {
+export namespace kv {
+
+   export function string() {
       return new KvField.Builder("string");
    }
-   number() {
+
+   export function number() {
       return new KvField.Builder("number");
    }
-   bigint() {
+
+   export function bigint() {
       return new KvField.Builder("bigint");
    }
-   boolean() {
+
+   export function boolean() {
       return new KvField.Builder("boolean");
    }
-   date() {
+
+   export function date() {
       return new KvField.Builder("date");
    }
-   buffer() {
+
+   export function buffer() {
       return new KvField.Builder("buffer");
    }
 
-   object(shape?: Record<string, KvField.Any>) {
-      if (shape) {
+   export function object<Shape extends Record<string, KvField.Any>>(
+      shapeSchema: Shape,
+   ) {
+      const entries = Object.entries(shapeSchema).map(([k, v]) => [k, v[KvField.$meta]])
+      const metaShape = Object.fromEntries(entries)
+      return new KvField.Builder('object', metaShape)
 
-         const entries = Object.entries(shape).map(([key, value]) => [
-            key,
-            value[KvField.$meta],
-         ]);
-
-         const metaShape = Object.fromEntries(entries);
-         return new KvField.Builder("object", metaShape);
-      }
-
-      return new KvField.Builder("object");
    }
 
-   array(shape?: KvField.Any) {
-      const builder = new KvField.Builder("array", shape?.[KvField.$meta]);
-      return builder;
+   export function array<Shape extends KvField.Any>(shapeSchema: Shape) {
+      return new KvField.Builder("array", shapeSchema[KvField.$meta]);
    }
 
-   any() {
+   export function any() {
       return new KvField.Builder("any");
    }
 }
-
-export const kv = new KV();
