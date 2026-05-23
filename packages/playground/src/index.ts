@@ -1,45 +1,33 @@
-import { kv, Storage, KvField } from "@aromix/core";
+import { kv, KvField } from "@aromix/core";
 
 const schema = {
-   id: kv.bigint(),
+   // Both directions — client can read and write (full public API)
+   id: kv.bigint().public(),
+   name: kv.string().public(),
+   email: kv.string().public(),
 
-   name: kv.string().default("test"),
+   // Output only — client sees it but can't write
+   createdAt: kv.date().default(() => new Date()).readable(),
+   role: kv.string().default("user").readable(),
 
-   age: kv.number().default(18),
+   // Input only — client provides it but never gets it back
+   password: kv.string().writable(),
+   confirmToken: kv.string().writable(),
 
-   active: kv.boolean().default(true),
-
-   createdAt: kv.date().default(new Date()),
-
-   avatar: kv.buffer(),
-
-   metadata: kv.object().default({
-      theme: "dark",
-      language: "en",
-   }),
-
-   tags: kv.array().default([]),
-
-   anything: kv.any(),
+   // Server only — not in any open SDK type
+   passwordHash: kv.string(),
+   sdkKey: kv.string().default(() => crypto.randomUUID()),
 };
 
 
 
 function resolve() {
-
-
    const resolvedMeta: any = {}
 
    for (const key in schema) {
       //@ts-ignore
       resolvedMeta[key] = schema[key][KvField.$def]
    }
-
-   console.log(resolvedMeta);
-
-
-
 }
-
 
 resolve()

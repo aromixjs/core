@@ -1,3 +1,4 @@
+import { returnsAsync } from "valibot";
 import { Obj } from "../utils";
 
 export namespace KvField {
@@ -31,6 +32,10 @@ export namespace KvField {
       any: any;
    }
 
+
+
+
+
    /**
     * This is the type for the underlying meta data object that all the kv field chains generates.
     * This is the main source of the truth it will hold all the necessary information that will derive the sdk generation,
@@ -38,7 +43,9 @@ export namespace KvField {
     */
    export interface Meta<FieldType extends Type = Type> {
       type: FieldType;
-      default: KvField.TypeMap[FieldType] | undefined;
+      default: KvField.TypeMap[FieldType] | undefined | (()=> KvField.TypeMap[FieldType]) ;
+      readable: boolean,
+      writable: boolean
    }
 
    /**
@@ -53,13 +60,33 @@ export namespace KvField {
       const meta: Meta<FieldType> = {
          type,
          default: undefined,
+         readable: false,
+         writable: false
       };
 
       const modifiers = {
-         default(data: TypeMap[FieldType]) {
+         default(data: TypeMap[FieldType] | (()=> TypeMap[FieldType])) {
             meta.default = data;
             return new Obj(this).omit(["default"]);
          },
+
+         readable() {
+            meta.readable = true;
+            return new Obj(this).omit(['readable', 'public'])
+         },
+
+         writable() {
+            meta.writable = true
+            return new Obj(this).omit(['writable', 'public'])
+         },
+
+
+         public() {
+            meta.writable = true
+            meta.readable = true
+            return new Obj(this).omit(['public', 'readable', 'writable'])
+         },
+
          get [KvField.$def]() {
             return meta
          }
