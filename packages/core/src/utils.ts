@@ -12,7 +12,7 @@
  */
 export type PrettifyObj<T> = { [K in keyof T]: T[K] } & {};
 
-
+export type Optional<T> = T | undefined;
 
 
 export class Obj<T extends object> {
@@ -24,7 +24,8 @@ export class Obj<T extends object> {
     */
    omit<Keys extends keyof T>(remove: Keys[]): PrettifyObj<Omit<T, Keys>> {
 
-      const clone = { ...this.data };
+      const clone = Object.create(Object.getPrototypeOf(this.data));
+      Object.assign(clone, this.data);
       for (const key of remove) {
          delete clone[key];
       }

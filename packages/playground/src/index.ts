@@ -1,33 +1,89 @@
-import { kv, KvField } from "@aromix/core";
+import { $meta, kv } from "@aromix/core";
 
 const schema = {
-   // Both directions — client can read and write (full public API)
    id: kv.bigint().public(),
-   name: kv.string().public(),
-   email: kv.string().public(),
 
-   // Output only — client sees it but can't write
-   createdAt: kv.date().default(() => new Date()).readable(),
+   name: kv.string().default("test").public(),
+
+
+   metadata: kv.object({
+      theme: kv.string().default("dark").public(),
+      language: kv.string().default("en").public(),
+      nested: kv.object({
+         key: kv.string().public(),
+         deeper: kv.object({
+            value: kv.number().public(),
+         }).public(),
+      }).public(),
+   }).public(),
+
+   // Array of objects — items is a single Any builder
+   tags: kv.array(
+      kv.object({
+         label: kv.string().public(),
+         value: kv.string().public(),
+      }).public(),
+   ).readable(),
+
+   // Array of primitives
+   scores: kv.array(kv.number().public()).readable(),
+
+   createdAt: kv.date().defaultFn(() => new Date()).readable(),
    role: kv.string().default("user").readable(),
 
-   // Input only — client provides it but never gets it back
    password: kv.string().writable(),
-   confirmToken: kv.string().writable(),
 
-   // Server only — not in any open SDK type
    passwordHash: kv.string(),
-   sdkKey: kv.string().default(() => crypto.randomUUID()),
+   sdkKey: kv.string().defaultFn(() => crypto.randomUUID()),
 };
 
 
 
+
+
+
+const sessions = kv.object({
+   name: kv.string().default('user').public(),
+   age: kv.number().readable()
+})
+
+
+
+
+
+
+function resolveMeta(meta: any): any {
+   const result: any = {
+      type: meta.type,
+      readable: meta.readable,
+      writable: meta.writable,
+      default: meta.default ?? meta.defaultFn?.() ?? undefined,
+   }
+
+   if (meta.fields) {
+      result.fields = {}
+
+      for (const key of Object.keys(meta.fields)) {
+         result.fields[key] = resolveMeta(meta.fields[key])
+      }
+   }
+
+   if (meta.item) {
+      result.item = resolveMeta(meta.item)
+   }
+
+   return result
+}
+
 function resolve() {
-   const resolvedMeta: any = {}
+   const resolved: any = {}
 
    for (const key in schema) {
       //@ts-ignore
-      resolvedMeta[key] = schema[key][KvField.$def]
+      resolved[key] = resolveMeta(schema[key][$meta])
    }
+
+   console.log(JSON.stringify(resolved, null, 2))
 }
 
 resolve()
