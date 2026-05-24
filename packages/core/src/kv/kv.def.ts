@@ -1,9 +1,9 @@
-import { Type, TypeMap, Meta } from "./kv.type";
 import { Obj, Optional } from "../utils";
+import { InferShape, KvField, KvShape, Meta, Type, TypeMap } from "./kv.type";
 
 export const $meta = Symbol('kv:meta')
 
-export class kv<FieldType extends Type = Type> {
+export class kv<FieldType extends Type = Type, Infer = TypeMap[FieldType]> {
 
    [$meta]: Meta<FieldType>;
 
@@ -34,6 +34,12 @@ export class kv<FieldType extends Type = Type> {
       };
    }
 
+
+
+   get $infer(): Infer {
+      return this[$meta] as Infer
+   }
+
    // Modifier methods
    default(data: TypeMap[FieldType]) {
       this[$meta].default = data;
@@ -50,20 +56,20 @@ export class kv<FieldType extends Type = Type> {
    readable() {
       this[$meta].readable = true;
 
-      return new Obj(this).omit(["readable"]);
+      return new Obj(this).omit(["readable", "public"]);
    }
 
    writable() {
       this[$meta].writable = true;
 
-      return new Obj(this).omit(["writable"]);
+      return new Obj(this).omit(["writable", "public"]);
    }
 
    public() {
       this[$meta].writable = true;
       this[$meta].readable = true;
 
-      return new Obj(this).omit(["readable", "writable"]);
+      return new Obj(this).omit(["readable", "writable", "public"]);
    }
 
 
@@ -92,12 +98,12 @@ export class kv<FieldType extends Type = Type> {
       return new kv({ type: "buffer" });
    }
 
-   static object(shape: Record<string, { [$meta]: Meta }>) {
-      return new kv({ type: "object", shape });
+   static object<S extends KvShape>(shape: S) {
+      return new kv<"object", InferShape<S>>({ type: "object", shape });
    }
 
-   static array(item: { [$meta]: Meta }) {
-      return new kv({ type: "array", item });
+   static array<I extends KvField>(item: I) {
+      return new kv<"array", I["$infer"][]>({ type: "array", item });
    }
 
    static any() {

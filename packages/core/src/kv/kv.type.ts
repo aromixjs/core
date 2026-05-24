@@ -1,4 +1,5 @@
-import { Optional } from "../utils";
+import { Optional, PrettifyObj } from "../utils";
+import { $meta } from "./kv.def";
 
 /**
  * Type of data that a kv schema is allowed to store
@@ -50,3 +51,8 @@ export interface Meta<FieldType extends Type = Type> {
    fields: Optional<Record<string, Meta>>;
    item: Optional<Meta>;
 }
+
+export type KvField = { [$meta]: Meta; $infer: any };
+export type KvShape = Record<string, KvField>;
+export type InferShape<S extends KvShape> = PrettifyObj<{ [K in keyof S]: S[K]["$infer"] }>;
+
