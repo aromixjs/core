@@ -1,9 +1,9 @@
 {
-	"extends": "../../tsconfig.base.json",
-	"compilerOptions": {
-		"rootDir": ".",
-		"outDir": "dist",
-		"types": ["node", "vitest/globals"]
-	},
-	"include": ["src/**/*.ts", "tests/**/*.ts", "../../archive/kv.def.ts", "../../archive/kv.type.ts", "../../archive/builder.ts"]
+      "extends": "../../tsconfig.base.json",
+      "compilerOptions": {
+            "rootDir": ".",
+            "outDir": "dist",
+            "types": ["node", "vitest/globals"]
+      },
+      "include": ["src/**/*.ts", "tests/**/*.ts", "../../archive/kv.def.ts", "../../archive/kv.type.ts", "../../archive/builder.ts"]
 }

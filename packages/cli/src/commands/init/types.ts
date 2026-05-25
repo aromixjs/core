@@ -1,7 +1,7 @@
-import { Platform } from "@aromix/core";
+import { Platform } from '@aromix/core'
 
 export interface Answers {
-	name: string;
-	description: string;
-	platform: Platform;
+      name: string
+      description: string
+      platform: Platform
 }

@@ -1,17 +1,17 @@
 {
-	"compilerOptions": {
-		"target": "ESNext",
-		"module": "ESNext",
-		"moduleResolution": "Bundler",
-		"lib": ["ESNext"],
-		"strict": true,
-		"esModuleInterop": true,
-		"skipLibCheck": true,
-		"forceConsistentCasingInFileNames": true,
-		"declaration": true,
-		"emitDeclarationOnly": true,
-		"declarationMap": false,
-		"experimentalDecorators": true,
-		"resolveJsonModule": true
-	}
+      "compilerOptions": {
+            "target": "ESNext",
+            "module": "ESNext",
+            "moduleResolution": "Bundler",
+            "lib": ["ESNext"],
+            "strict": true,
+            "esModuleInterop": true,
+            "skipLibCheck": true,
+            "forceConsistentCasingInFileNames": true,
+            "declaration": true,
+            "emitDeclarationOnly": true,
+            "declarationMap": false,
+            "experimentalDecorators": true,
+            "resolveJsonModule": true
+      }
 }

@@ -1,51 +1,97 @@
-import { entity, Storage } from "@aromix/core";
-import * as v from "valibot";
-declare module '@aromix/core' {
-  interface AromixRoles {
-    public: true
-    admin:  true
-  }
+import { Internals } from "@aromix/core"
+
+
+
+const config = {
+      app: {
+            name: 'Velvet UI',
+            version: '1.4.2',
+            env: {
+                  mode: 'production',
+                  debug: false,
+                  region: 'ap-south-1',
+            },
+      },
+
+      server: {
+            host: 'localhost',
+            port: 8080,
+
+            ssl: {
+                  enabled: true,
+                  cert: {
+                        path: '/etc/ssl/cert.pem',
+                        expires: new Date('2027-01-01'),
+                  },
+            },
+      },
+
+      database: {
+            primary: {
+                  client: 'postgres',
+                  host: 'db.internal',
+                  port: 5432,
+
+                  auth: {
+                        username: 'admin',
+                        password: 'secret',
+                  },
+
+                  pool: {
+                        min: 2,
+                        max: 20,
+                  },
+            },
+
+            redis: {
+                  host: 'redis.internal',
+                  port: 6379,
+            },
+      },
+
+      features: {
+            auth: {
+                  enabled: true,
+
+                  providers: {
+                        github: {
+                              clientId: 'gh_xxx',
+                              scopes: ['repo', 'user'],
+                        },
+
+                        google: {
+                              clientId: 'g_xxx',
+                        },
+                  },
+            },
+
+            uploads: {
+                  enabled: true,
+
+                  limits: {
+                        image: {
+                              maxSizeMb: 10,
+                              formats: ['png', 'jpg', 'webp'],
+                        },
+
+                        video: {
+                              maxSizeMb: 500,
+                        },
+                  },
+            },
+      },
+
+      analytics: {
+            enabled: true,
+
+            providers: {
+                  posthog: {
+                        apiKey: 'ph_test',
+                        endpoint: 'https://analytics.example.com',
+                  },
+            },
+      },
 }
 
-declare const kvStorage: Storage.KV
-
-entity({
-  name:    'post',
-  storage: kvStorage,
-  guards:  [],
-  effects: [],
-
-  model: v.object({
-    id:        v.string(),
-    title:     v.string(),
-    body:      v.string(),
-    status:    v.optional(v.string(), 'draft'),
-    createdAt: v.optional(v.date(), () => new Date()),
-
-    author: v.object({
-      id:     v.string(),
-      name:   v.string(),
-      avatar: v.optional(v.string()),
-    }),
-
-    internal: v.object({
-      flagged:  v.optional(v.boolean(), false),
-      sourceIp: v.optional(v.string()),
-    }),
-  }),
-
-}).access({
-
-  public(fields, can) {
-    can.read(['id', 'title', 'body', 'author', 'createdAt'])
-  },
-
-  admin(fields, can) {
-    can.read(['id', 'title', 'body', 'author', 'status', 'createdAt', 'internal'])
-    can.write(['title', 'body', 'status'])
-  },
-
-})
-
-
+const flatten = new Internals.Obj(config).crushKeys()
 

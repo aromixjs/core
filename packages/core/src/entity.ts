@@ -1,39 +1,73 @@
 import type { StandardSchemaV1 } from '@standard-schema/spec'
-import { Storage } from "./storage"
 
-export interface EntityConfig<Schema extends StandardSchemaV1> {
-  name: string
-  storage: Storage.KV
-  guards?: any[]
-  effects?: any[]
-  model: Schema
-}
-
+/**
+ * This is used to infer the resolved type from user inputted schema
+ */
 type Infer<S extends StandardSchemaV1> = NonNullable<S['~standard']['types']>['output']
 
+// ---- path generation ----
+// Recurses into plain objects only — Date/Array/Function are leaves
 
-interface KvCan<T> {
-  read(fields: (keyof T)[]): void
-  write(fields: (keyof T)[]): void
+type Paths<T> = T extends Date | Array<unknown> | Function | null | undefined ? never : T extends object ? { [K in keyof T & string]: K | `${K}.${Paths<T[K]>}` }[keyof T & string] : never
+
+// ---- can API ----
+
+type Op<T> = {
+      (fields: Paths<T>[]): void
+      omit(fields: Paths<T>[]): void
 }
 
+interface Can<T> {
+      read: Op<T>
+      write: Op<T>
+}
 
-export interface AromixRoles {}
+// ---- access callback ----
 
-export function entity<Schema extends StandardSchemaV1>(config: EntityConfig<Schema>) {
+type AccessFn<T> = (can: Can<T>) => void
 
+// ---- roles augmentation point ----
 
+export interface Access {}
 
-  type T = Infer<Schema>
+// ---- entity config ----
 
-  return {
+export interface EntityConfig<S extends StandardSchemaV1> {
+      name: string
+      guards?: unknown[]
+      effects?: unknown[]
+      model: S
+}
 
+// ---- internal helpers ----
 
-    access(map: { [K in keyof AromixRoles]: (fields: T, can: KvCan<T>) => void }) { }
+// AromixRoles is {} here at compile time (augmented by the consumer).
+// Keying into {} produces `never`, so we cast through Record for the runtime loop.
+type RoleMap<T> = Record<string, (can: Can<T>) => void>
 
+function makeOp<T>(): Op<T> {
+      return Object.assign(
+            (_fields: Paths<T>[]) => {
+                  void _fields
+            },
+            {
+                  omit(_fields: Paths<T>[]) {
+                        void _fields
+                  },
+            },
+      )
+}
 
+// ---- entity function ----
 
+export function entity<S extends StandardSchemaV1>(config: EntityConfig<S>) {
+      type T = Infer<S>
 
-
-  }
+      return {
+            access(map: { [K in keyof Access]: (can: Can<T>) => void }) {
+                  void config
+                  const can: Can<T> = { read: makeOp<T>(), write: makeOp<T>() }
+                  for (const fn of Object.values(map as RoleMap<T>)) fn(can)
+            },
+      }
 }
