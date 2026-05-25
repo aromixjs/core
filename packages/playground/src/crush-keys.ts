@@ -93,5 +93,9 @@ const config = {
       },
 }
 
-const flatten = new Internals.Obj(config).crushKeys()
+const flatten = new Internals.ObjectProcessor(config).crushKeys()
+
+
+
+
 

@@ -326,3 +326,34 @@ private cast<U>(value: unknown): U {
 ```
 
 This keeps the rest of the code clean. If the casting strategy ever needs to change, you only update one method.
+
+## 18. No Shorthands — Always Use Full Descriptive Names
+
+Never use abbreviated or shorthand variable names. Every identifier must clearly describe what it holds or represents. This applies to:
+
+- **Type parameters** — `Schema` not `S`, `Model` not `T`, `TargetType` not `T` or `Obj`
+- **Loop variables** — `entryKey` / `entryValue` not `k` / `v`, `index` not `i`
+- **Function parameters** — `handler` not `fn`, `accessors` not `map`, `configuration` not `config`
+- **Internal variables** — `current` not `cur`, `fieldPath` not `dot` or `p`, `target` not `obj`
+- **Types and interfaces** — `Operation` not `Op`, `PermissionSet` not `Can`, `OperationCapture` not `OpState`
+- **Class names** — `ObjectProcessor` not `Obj`
+
+```ts
+// BAD — shorthands everywhere
+type Op<T> = { (f: CrushKeys<T>[]): void }
+function makeOp<T>() {
+  const s: OpState<T> = { t: 'include', p: [] }
+  const fn = (f: CrushKeys<T>[]) => { s.t = 'include'; s.p = f }
+  return Object.assign(fn as any, { omit: fn.omit, s })
+}
+
+// GOOD — every name is descriptive
+type Operation<Model> = { (fields: CrushKeys<Model>[]): void }
+function createOperation<Model>() {
+  const captured: OperationCapture<Model> = { type: 'include', paths: [] }
+  const handler = (fields: CrushKeys<Model>[]) => { captured.type = 'include'; captured.paths = fields }
+  return Object.assign(handler as any, { omit: handler.omit, captured })
+}
+```
+
+**Exceptions:** Standard single-letter names that are universally understood in their context (e.g. `K` for key in mapped types, `T` in utility types like `Pick<T, K>`). When in doubt, spell it out.

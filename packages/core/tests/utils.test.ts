@@ -1,34 +1,34 @@
 import { describe, expect, it, expectTypeOf } from 'vitest'
 import { Internals } from '../src/utils'
 
-describe('Obj.crushKeys()', () => {
+describe('ObjectProcessor.crushKeys()', () => {
   it('returns top-level keys for a flat object', () => {
-    const obj = new Internals.Obj({ a: 1, b: 2, c: 3 })
-    const result = obj.crushKeys()
+    const instance = new Internals.ObjectProcessor({ a: 1, b: 2, c: 3 })
+    const result = instance.crushKeys()
     expect(result.sort()).toEqual(['a', 'b', 'c'].sort())
   })
 
   it('returns nested dot-joined keys', () => {
-    const obj = new Internals.Obj({ a: { b: 1, c: 2 }, d: 3 })
-    const result = obj.crushKeys()
+    const instance = new Internals.ObjectProcessor({ a: { b: 1, c: 2 }, d: 3 })
+    const result = instance.crushKeys()
     expect(result.sort()).toEqual(['a', 'a.b', 'a.c', 'd'].sort())
   })
 
   it('handles deeply nested objects', () => {
-    const obj = new Internals.Obj({ a: { b: { c: { d: 1 } } } })
-    const result = obj.crushKeys()
+    const instance = new Internals.ObjectProcessor({ a: { b: { c: { d: 1 } } } })
+    const result = instance.crushKeys()
     expect(result.sort()).toEqual(['a', 'a.b', 'a.b.c', 'a.b.c.d'].sort())
   })
 
   it('does not recurse into arrays', () => {
-    const obj = new Internals.Obj({ a: [1, 2], b: { c: 3 } })
-    const result = obj.crushKeys()
+    const instance = new Internals.ObjectProcessor({ a: [1, 2], b: { c: 3 } })
+    const result = instance.crushKeys()
     expect(result.sort()).toEqual(['a', 'b', 'b.c'].sort())
   })
 
   it('handles empty object', () => {
-    const obj = new Internals.Obj({})
-    const result = obj.crushKeys()
+    const instance = new Internals.ObjectProcessor({})
+    const result = instance.crushKeys()
     expect(result).toEqual([])
   })
 })
@@ -54,9 +54,9 @@ describe('CrushKeys type inference', () => {
     expectTypeOf<Result>().toEqualTypeOf<'a' | 'b' | 'b.c'>()
   })
 
-  it('Obj.crushKeys() returns CrushKeys<T>[]', () => {
-    const obj = new Internals.Obj({ a: { b: 1 }, c: 2 })
-    const result = obj.crushKeys()
+  it('ObjectProcessor.crushKeys() returns CrushKeys<T>[]', () => {
+    const instance = new Internals.ObjectProcessor({ a: { b: 1 }, c: 2 })
+    const result = instance.crushKeys()
     expectTypeOf(result).toEqualTypeOf<('a' | 'a.b' | 'c')[]>()
   })
 })

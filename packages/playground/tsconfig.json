@@ -3,6 +3,7 @@
       "compilerOptions": {
             "rootDir": "src",
             "outDir": "dist",
+            "tsBuildInfoFile": "../../node_modules/.cache/tsbuildinfo-playground",
             "types": ["bun"]
       },
       "include": ["src/**/*.ts"]

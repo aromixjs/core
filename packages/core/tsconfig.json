@@ -3,6 +3,7 @@
       "compilerOptions": {
             "rootDir": ".",
             "outDir": "dist",
+            "tsBuildInfoFile": "../../node_modules/.cache/tsbuildinfo-core",
             "types": ["node", "vitest/globals"]
       },
       "include": ["src/**/*.ts", "tests/**/*.ts", "../../archive/kv.def.ts", "../../archive/kv.type.ts", "../../archive/builder.ts"]
