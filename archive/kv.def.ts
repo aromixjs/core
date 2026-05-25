@@ -1,4 +1,4 @@
-import { Obj, Optional } from "../utils";
+import { Obj, Optional } from "../packages/core/src/utils";
 import { InferShape, KvField, KvShape, Meta, Type, TypeMap } from "./kv.type";
 
 export const $meta = Symbol('kv:meta')
@@ -26,8 +26,6 @@ export class kv<FieldType extends Type = Type, Infer = TypeMap[FieldType]> {
       this[$meta] = {
          type: config.type,
          default: undefined,
-         readable: false,
-         writable: false,
          defaultFn: undefined,
          fields,
          item: config.item?.[$meta],
@@ -52,26 +50,6 @@ export class kv<FieldType extends Type = Type, Infer = TypeMap[FieldType]> {
 
       return new Obj(this).omit(["default", "defaultFn"]);
    }
-
-   readable() {
-      this[$meta].readable = true;
-
-      return new Obj(this).omit(["readable", "public"]);
-   }
-
-   writable() {
-      this[$meta].writable = true;
-
-      return new Obj(this).omit(["writable", "public"]);
-   }
-
-   public() {
-      this[$meta].writable = true;
-      this[$meta].readable = true;
-
-      return new Obj(this).omit(["readable", "writable", "public"]);
-   }
-
 
    // Entry Point Methods
    static string() {

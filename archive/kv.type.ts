@@ -1,4 +1,4 @@
-import { Optional, PrettifyObj } from "../utils";
+import { Optional, PrettifyObj } from "../packages/core/src/utils";
 import { $meta } from "./kv.def";
 
 /**
@@ -45,8 +45,6 @@ export interface TypeMap {
 export interface Meta<FieldType extends Type = Type> {
    type: FieldType;
    default: Optional<TypeMap[FieldType]>;
-   readable: boolean,
-   writable: boolean,
    defaultFn: Optional<() => TypeMap[FieldType]>;
    fields: Optional<Record<string, Meta>>;
    item: Optional<Meta>;

@@ -10,11 +10,12 @@
 	},
 	"dependencies": {
 		"@aromix/bun": "workspace:^",
-		"@aromix/core": "workspace:^"
+		"@aromix/core": "workspace:^",
+		"valibot": "^1.4.0"
 	},
 	"devDependencies": {
+		"@types/bun": "^1.1.13",
 		"tsup": "catalog:",
-		"typescript": "catalog:",
-		"@types/bun": "^1.1.13"
+		"typescript": "catalog:"
 	}
 }
