@@ -1,21 +1,22 @@
 import type { StandardSchemaV1 } from '@standard-schema/spec'
-import type { Internals } from '../utils'
+import type { Storage } from '../storage'
+import { CrushKeys } from '../utils'
 
-export type InferSchema<Schema extends StandardSchemaV1> = NonNullable<Schema['~standard']['types']>['output']
-
+export type SchemaInput<Schema extends StandardSchemaV1> = NonNullable<Schema['~standard']['types']>['input']
+export type SchemaOutput<Schema extends StandardSchemaV1> = NonNullable<Schema['~standard']['types']>['output']
 
 export interface EntityConfig<Schema extends StandardSchemaV1> {
    name: string
-   storage?: unknown
+   storage: Storage.KV
    guards?: any[]
    effects?: any[]
    model: Schema
-   access: (can: PermissionSet<InferSchema<Schema>>) => void
+   access: (can: PermissionSet<SchemaOutput<Schema>>) => void
 }
 
 export interface Operation<Model> {
-   (fields: Internals.CrushKeys<Model>[]): void
-   omit(fields: Internals.CrushKeys<Model>[]): void
+   (fields: CrushKeys<Model>[]): void
+   omit(fields: CrushKeys<Model>[]): void
 }
 
 export interface PermissionSet<Model> {
