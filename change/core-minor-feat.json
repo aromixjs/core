@@ -1,0 +1,9 @@
+{
+  "type": "minor",
+  "dependentChangeType": "patch",
+  "comment": "feat: add entity query builder API",
+  "packageName": "@aromix/core",
+  "email": "dev@aromix.dev",
+  "commit": "test",
+  "date": "2026-05-26T00:00:00.000Z"
+}
