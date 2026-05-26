@@ -1,7 +1,0 @@
-{
-      "type": "minor",
-      "comment": "refactor(build): simplify build process and remove macros",
-      "packageName": "@aromix/core",
-      "email": "istiuak.0@gmail.com",
-      "dependentChangeType": "patch"
-}
