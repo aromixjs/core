@@ -3,12 +3,19 @@ name: Publish
 on:
   push:
     branches: [main]
+    paths:
+      - 'packages/**/package.json'
+      - 'packages/**/CHANGELOG.json'
 
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
 jobs:
   publish:
+    if: hashFiles('change/**') == ''
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
     steps:
       - uses: actions/checkout@v4
         with:
