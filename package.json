@@ -30,8 +30,6 @@
             "cli:build": "pnpm --filter @aromix/cli build",
             "cli:dev": "pnpm --filter @aromix/cli dev",
             "cli:link": "cd packages/cli && pnpm link --global",
-            "playground:build": "pnpm --filter playground build",
-            "playground:dev": "pnpm --filter playground dev",
             "format": "prettier --write .",
             "change": "beachball change",
             "bump": "beachball bump",

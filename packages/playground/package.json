@@ -3,12 +3,6 @@
       "version": "0.0.0",
       "private": true,
       "type": "module",
-      "scripts": {
-            "build": "tsup",
-            "dev": "tsup --watch",
-            "typecheck": "tsc --noEmit",
-            "test:entity": "npx tsx src/entity/entity-test.ts"
-      },
       "dependencies": {
             "@aromix/bun": "workspace:^",
             "@aromix/core": "workspace:^",
