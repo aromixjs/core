@@ -1,6 +1,4 @@
-import { Internals } from "@aromix/core"
-
-
+import { ObjectProcessor } from "@aromix/core"
 
 const config = {
       app: {
@@ -93,9 +91,4 @@ const config = {
       },
 }
 
-const flatten = new Internals.ObjectProcessor(config).crushKeys()
-
-
-
-
-
+const flatten = new ObjectProcessor(config).crushKeys()

@@ -1,10 +1,9 @@
 import type { StandardSchemaV1 } from '@standard-schema/spec'
 import type { EntityConfig, Operation, SchemaInput, SchemaOutput } from './entity.types'
-import { CrushKeys } from '../utils'
-
-export const $meta = Symbol.for('entity:meta')
+import type { CrushKeys } from '../utils'
 
 export namespace Entity {
+  export const $meta = Symbol.for('entity:meta')
 
   export function kv<Schema extends StandardSchemaV1>(configuration: EntityConfig<Schema>) {
     const readOperation = createOperation<SchemaOutput<Schema>>()

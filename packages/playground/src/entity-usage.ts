@@ -1,10 +1,9 @@
-import { entity } from '@aromix/core'
-import { Storage } from '@aromix/core'
+import { Entity, Storage } from '@aromix/core'
 import * as v from 'valibot'
 
 declare const kvStorage: Storage.KV
 
-entity({
+Entity.kv({
   name: 'post',
   storage: kvStorage,
   guards: [],

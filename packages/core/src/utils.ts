@@ -23,7 +23,6 @@ export class ObjectProcessor<ModelType> {
     return clone
   }
 
-
   crushKeys() {
     const keys: string[] = []
 

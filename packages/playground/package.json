@@ -6,7 +6,8 @@
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test:entity": "npx tsx src/entity/entity-test.ts"
   },
   "dependencies": {
     "@aromix/bun": "workspace:^",
