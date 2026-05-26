@@ -30,10 +30,7 @@ jobs:
 
       - name: Check for change files
         id: check
-        shell: pwsh
-        run: |
-          $files = Get-ChildItem "change/*.json" -ErrorAction SilentlyContinue
-          if ($files.Count -gt 0) { "has=true" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append } else { "has=false" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append }
+        run: ./.github/scripts/check-change-files.sh
 
       - run: pnpm build
         if: steps.check.outputs.has == 'true'
