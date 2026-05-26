@@ -1,9 +1,21 @@
 export class lite {
 
-static table(){}
+
+   private constructor() { }
+
+
+   static table() { }
 
 
 
+
+
+   static integer() { }
+
+   static text() { }
+
+
+   static string() { }
 
 
 
