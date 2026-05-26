@@ -1,7 +1,7 @@
-import type { StandardSchemaV1 } from '@standard-schema/spec';
-import { Adapter } from '../storage/adapter';
-import type { CrushKeys } from '../utils';
-import { Entity } from './entity.def';
+import type { StandardSchemaV1 } from '@standard-schema/spec'
+import { Adapter } from '../storage/adapter'
+import type { CrushKeys } from '../utils'
+import { Entity } from './entity.def'
 
 export type SchemaInput<Schema extends StandardSchemaV1> = NonNullable<Schema['~standard']['types']>['input']
 export type SchemaOutput<Schema extends StandardSchemaV1> = NonNullable<Schema['~standard']['types']>['output']

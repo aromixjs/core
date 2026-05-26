@@ -1,7 +1,3 @@
-import { ComposeConfig } from "./compose.type";
+import { ComposeConfig } from './compose.type'
 
-export function compose(config: ComposeConfig) {
-
-
-
-}
+export function compose(config: ComposeConfig) {}
