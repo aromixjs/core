@@ -45,7 +45,7 @@ jobs:
 
       - name: Bump and write manifest
         if: steps.check.outputs.has == 'true'
-        run: ./scripts/bump-and-manifest.sh
+        run: node scripts/bump-and-manifest.mjs
 
       - uses: peter-evans/create-pull-request@v7
         if: steps.check.outputs.has == 'true'
