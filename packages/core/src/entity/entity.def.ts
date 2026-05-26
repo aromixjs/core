@@ -1,6 +1,6 @@
 import type { StandardSchemaV1 } from '@standard-schema/spec'
-import type { EntityConfig, Operation, SchemaInput, SchemaOutput } from './entity.types'
-import type { CrushKeys } from '../utils'
+import type { EntityConfig, SchemaInput, SchemaOutput } from './entity.type'
+import { createOperation, validate } from './entity.util'
 
 export namespace Entity {
       export const $meta = Symbol.for('entity:meta')
@@ -11,7 +11,7 @@ export namespace Entity {
 
             configuration.access({ read: readOperation, write: writeOperation })
 
-            const adapter = configuration.storage.adapter
+            const adapter = configuration.storage
 
             return {
                   async get(key: string): Promise<SchemaOutput<Schema>> {
@@ -39,32 +39,4 @@ export namespace Entity {
                   },
             }
       }
-}
-
-function createOperation<Model>(): Operation<Model> & { state: Record<string, boolean> } {
-      const state: Record<string, boolean> = {}
-
-      const handler = (fields: CrushKeys<Model>[]) => {
-            for (const field of fields) {
-                  state[field] = true
-            }
-      }
-
-      handler.omit = (fields: CrushKeys<Model>[]) => {
-            for (const field of fields) {
-                  state[field] = false
-            }
-      }
-
-      return Object.assign(handler, { omit: handler.omit, state })
-}
-
-async function validate<Schema extends StandardSchemaV1>(schema: Schema, value: unknown): Promise<SchemaOutput<Schema>> {
-      const result = await schema['~standard'].validate(value)
-
-      if ('issues' in result) {
-            throw new Error(`Validation failed: ${JSON.stringify(result.issues)}`)
-      }
-
-      return result.value
 }

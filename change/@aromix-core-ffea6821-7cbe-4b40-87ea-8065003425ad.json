@@ -1,6 +1,6 @@
 {
   "type": "minor",
-  "comment": "refactor(build): simplify build process and remove macros",
+  "comment": "refactor(core): restructure modules and introduce compose",
   "packageName": "@aromix/core",
   "email": "istiuak.0@gmail.com",
   "dependentChangeType": "patch"

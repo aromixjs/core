@@ -45,7 +45,7 @@ jobs:
                     if: steps.check.outputs.has == 'true'
                   - run: pnpm --filter @aromix/cli build
                     if: steps.check.outputs.has == 'true'
-                    
+
                   - run: npx beachball bump --yes
                     if: steps.check.outputs.has == 'true'
 

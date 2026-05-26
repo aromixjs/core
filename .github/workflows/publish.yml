@@ -46,7 +46,7 @@ jobs:
                     if: steps.check.outputs.ready == 'true'
                   - run: pnpm --filter @aromix/cli build
                     if: steps.check.outputs.ready == 'true'
-                    
+
                   - name: Read core version
                     if: steps.check.outputs.ready == 'true'
                     id: version
