@@ -37,7 +37,6 @@ jobs:
                           else
                             echo "has=false" >> "$GITHUB_OUTPUT"
                           fi
-
                   - run: pnpm --filter @aromix/core build
                     if: steps.check.outputs.has == 'true'
                   - run: pnpm --filter @aromix/bun build
@@ -46,7 +45,7 @@ jobs:
                     if: steps.check.outputs.has == 'true'
                   - run: pnpm --filter @aromix/cli build
                     if: steps.check.outputs.has == 'true'
-
+                    
                   - run: npx beachball bump --yes
                     if: steps.check.outputs.has == 'true'
 
