@@ -47,35 +47,8 @@ jobs:
                   - run: pnpm --filter @aromix/cli build
                     if: steps.check.outputs.ready == 'true'
 
-                  - name: Read core version
-                    if: steps.check.outputs.ready == 'true'
-                    id: version
-                    run: |
-                          version=$(jq -r '.version' packages/core/package.json)
-                          echo "version=$version" >> "$GITHUB_OUTPUT"
-
                   - name: Publish packages to npm
                     if: steps.check.outputs.ready == 'true'
                     run: pnpm -r publish --access public --no-git-checks
                     env:
                           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-                  - name: Tag and push versions
-                    if: steps.check.outputs.ready == 'true'
-                    env:
-                          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-                    run: |
-                      git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}"
-                      for pkg in packages/core packages/bun packages/cloudflare packages/cli; do
-                        name=$(jq -r '.name' "$pkg/package.json")
-                        version=$(jq -r '.version' "$pkg/package.json")
-                        git tag "${name}_v${version}"
-                      done
-                      git push --tags
-
-                  - name: Create GitHub Release
-                    if: steps.check.outputs.ready == 'true'
-                    uses: softprops/action-gh-release@v2
-                    with:
-                          tag_name: "@aromix/core_v${{ steps.version.outputs.version }}"
-                          generate_release_notes: true
