@@ -43,12 +43,3 @@ jobs:
           git config user.email "bot@aromix.dev"
           git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}"
           npx beachball publish --yes --access public
-
-      - name: Read core version
-        id: version
-        run: echo "version=$(jq -r '.version' packages/core/package.json)" >> "$GITHUB_OUTPUT"
-
-      - uses: softprops/action-gh-release@v2
-        with:
-          tag_name: "@aromix/core_v${{ steps.version.outputs.version }}"
-          generate_release_notes: true
