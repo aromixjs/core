@@ -1,3 +1,8 @@
+/**
+ *  DDL IMPLEMENTATION FOR SQL LITE
+ */
+
+
 export class lite {
 
 
