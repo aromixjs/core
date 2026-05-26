@@ -1,17 +1,17 @@
 import { StandardSchemaV1 } from '@standard-schema/spec'
-import { CrushKeys } from '../utils'
 import { Operation, SchemaOutput } from './entity.type'
+import { Type } from '../global/type'
 
 export function createOperation<Model>(): Operation<Model> & { state: Record<string, boolean> } {
       const state: Record<string, boolean> = {}
 
-      const handler = (fields: CrushKeys<Model>[]) => {
+      const handler = (fields: Type.CrushKeys<Model>[]) => {
             for (const field of fields) {
                   state[field] = true
             }
       }
 
-      handler.omit = (fields: CrushKeys<Model>[]) => {
+      handler.omit = (fields: Type.CrushKeys<Model>[]) => {
             for (const field of fields) {
                   state[field] = false
             }

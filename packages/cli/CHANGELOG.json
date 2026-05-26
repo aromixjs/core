@@ -1,35 +1,35 @@
 {
-  "name": "@aromix/cli",
-  "entries": [
-    {
-      "date": "Tue, 26 May 2026 05:39:31 GMT",
-      "version": "0.1.2",
-      "tag": "@aromix/cli_v0.1.2",
-      "comments": {
-        "patch": [
-          {
-            "author": "beachball",
-            "package": "@aromix/cli",
-            "comment": "Bump @aromix/core to v0.3.0",
-            "commit": "not available"
-          }
-        ]
-      }
-    },
-    {
-      "date": "Tue, 26 May 2026 02:10:27 GMT",
-      "version": "0.1.1",
-      "tag": "@aromix/cli_v0.1.1",
-      "comments": {
-        "patch": [
-          {
-            "author": "beachball",
-            "package": "@aromix/cli",
-            "comment": "Bump @aromix/core to v0.2.0",
-            "commit": "not available"
-          }
-        ]
-      }
-    }
-  ]
+      "name": "@aromix/cli",
+      "entries": [
+            {
+                  "date": "Tue, 26 May 2026 05:39:31 GMT",
+                  "version": "0.1.2",
+                  "tag": "@aromix/cli_v0.1.2",
+                  "comments": {
+                        "patch": [
+                              {
+                                    "author": "beachball",
+                                    "package": "@aromix/cli",
+                                    "comment": "Bump @aromix/core to v0.3.0",
+                                    "commit": "not available"
+                              }
+                        ]
+                  }
+            },
+            {
+                  "date": "Tue, 26 May 2026 02:10:27 GMT",
+                  "version": "0.1.1",
+                  "tag": "@aromix/cli_v0.1.1",
+                  "comments": {
+                        "patch": [
+                              {
+                                    "author": "beachball",
+                                    "package": "@aromix/cli",
+                                    "comment": "Bump @aromix/core to v0.2.0",
+                                    "commit": "not available"
+                              }
+                        ]
+                  }
+            }
+      ]
 }

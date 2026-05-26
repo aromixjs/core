@@ -1,52 +1,52 @@
 {
-  "name": "@aromix/bun",
-  "version": "0.1.2",
-  "description": "Bun runtime adapter for Aromix",
-  "type": "module",
-  "license": "MIT",
-  "homepage": "https://aromixjs.github.io/aromix",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/aromixjs/aromix.git",
-    "directory": "packages/bun"
-  },
-  "bugs": {
-    "url": "https://github.com/aromixjs/aromix/issues"
-  },
-  "keywords": [
-    "aromix",
-    "bun",
-    "runtime",
-    "adapter",
-    "server",
-    "framework"
-  ],
-  "files": [
-    "dist"
-  ],
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
-    }
-  },
-  "publishConfig": {
-    "access": "public",
-    "registry": "https://registry.npmjs.org"
-  },
-  "scripts": {
-    "build": "tsup",
-    "dev": "tsup --watch",
-    "typecheck": "tsc --noEmit"
-  },
-  "peerDependencies": {
-    "@aromix/core": "workspace:^"
-  },
-  "devDependencies": {
-    "@aromix/core": "workspace:^",
-    "@types/bun": "^1.1.13",
-    "tsup": "catalog:",
-    "typescript": "catalog:"
-  }
+      "name": "@aromix/bun",
+      "version": "0.1.2",
+      "description": "Bun runtime adapter for Aromix",
+      "type": "module",
+      "license": "MIT",
+      "homepage": "https://aromixjs.github.io/aromix",
+      "repository": {
+            "type": "git",
+            "url": "https://github.com/aromixjs/aromix.git",
+            "directory": "packages/bun"
+      },
+      "bugs": {
+            "url": "https://github.com/aromixjs/aromix/issues"
+      },
+      "keywords": [
+            "aromix",
+            "bun",
+            "runtime",
+            "adapter",
+            "server",
+            "framework"
+      ],
+      "files": [
+            "dist"
+      ],
+      "exports": {
+            ".": {
+                  "types": "./dist/index.d.ts",
+                  "import": "./dist/index.js",
+                  "require": "./dist/index.cjs"
+            }
+      },
+      "publishConfig": {
+            "access": "public",
+            "registry": "https://registry.npmjs.org"
+      },
+      "scripts": {
+            "build": "tsup",
+            "dev": "tsup --watch",
+            "typecheck": "tsc --noEmit"
+      },
+      "peerDependencies": {
+            "@aromix/core": "workspace:^"
+      },
+      "devDependencies": {
+            "@aromix/core": "workspace:^",
+            "@types/bun": "^1.1.13",
+            "tsup": "catalog:",
+            "typescript": "catalog:"
+      }
 }

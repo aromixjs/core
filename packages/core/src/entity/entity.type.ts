@@ -1,7 +1,7 @@
 import type { StandardSchemaV1 } from '@standard-schema/spec'
 import { Adapter } from '../storage/adapter'
-import type { CrushKeys } from '../utils'
 import { Entity } from './entity.def'
+import { Type } from '../global/type'
 
 export type SchemaInput<Schema extends StandardSchemaV1> = NonNullable<Schema['~standard']['types']>['input']
 export type SchemaOutput<Schema extends StandardSchemaV1> = NonNullable<Schema['~standard']['types']>['output']
@@ -16,8 +16,8 @@ export interface EntityConfig<Schema extends StandardSchemaV1> {
 }
 
 export interface Operation<Model> {
-      (fields: CrushKeys<Model>[]): void
-      omit(fields: CrushKeys<Model>[]): void
+      (fields: Type.CrushKeys<Model>[]): void
+      omit(fields: Type.CrushKeys<Model>[]): void
 }
 
 export interface PermissionSet<Model> {
