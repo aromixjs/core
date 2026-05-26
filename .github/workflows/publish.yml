@@ -11,7 +11,6 @@ concurrency: ${{ github.workflow }}-${{ github.ref }}
 
 jobs:
   publish:
-    if: hashFiles('change/**') == ''
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -30,9 +29,20 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
+      - name: Verify version merge
+        id: check
+        shell: pwsh
+        run: |
+          $msg = git log -1 --pretty=%B
+          $noChanges = @(Get-ChildItem "change/*.json" -ErrorAction SilentlyContinue).Count -eq 0
+          $isVersionMsg = $msg -like "chore: version packages*"
+          if ($noChanges -and $isVersionMsg) { "ready=true" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append } else { "ready=false" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append }
+
       - run: pnpm build
+        if: steps.check.outputs.ready == 'true'
 
       - name: Publish packages
+        if: steps.check.outputs.ready == 'true'
         run: npx beachball publish --yes --token ${{ secrets.NPM_TOKEN }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
