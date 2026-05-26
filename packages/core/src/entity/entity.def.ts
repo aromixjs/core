@@ -15,20 +15,25 @@ export namespace Entity {
 
             return {
                   async get(key: string): Promise<SchemaOutput<Schema>> {
-                        const raw = await adapter.get(key)
+                        const formattedKey = `${configuration.name}:${key}`
+                        const raw = await adapter.get(formattedKey)
                         const validated = await validate(configuration.model, raw)
-
                         return validated
                   },
 
                   async set(key: string, value: SchemaInput<Schema>): Promise<void> {
+                        const formattedKey = `${configuration.name}:${key}`
                         const validated = await validate(configuration.model, value)
-
-                        await adapter.set(key, validated)
+                        await adapter.set(formattedKey, validated)
                   },
 
                   async delete(key: string): Promise<void> {
-                        await adapter.delete(key)
+                        const formattedKey = `${configuration.name}:${key}`
+                        await adapter.delete(formattedKey)
+                  },
+                  async has(key: string) {
+                        const formattedKey = `${configuration.name}:${key}`
+                        return await adapter.has(formattedKey)
                   },
 
                   [$meta]: {
