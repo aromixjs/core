@@ -39,7 +39,13 @@ jobs:
                             echo "ready=false" >> "$GITHUB_OUTPUT"
                           fi
 
-                  - run: pnpm build
+                  - run: pnpm --filter @aromix/core build
+                    if: steps.check.outputs.ready == 'true'
+                  - run: pnpm --filter @aromix/bun build
+                    if: steps.check.outputs.ready == 'true'
+                  - run: pnpm --filter @aromix/cloudflare build
+                    if: steps.check.outputs.ready == 'true'
+                  - run: pnpm --filter @aromix/cli build
                     if: steps.check.outputs.ready == 'true'
 
                   - name: Read core version

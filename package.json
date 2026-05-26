@@ -14,7 +14,7 @@
       "packageManager": "pnpm@11.1.2",
       "scripts": {
             "i:all": "pnpm -r install",
-            "build": "pnpm -r --filter !playground build",
+            "build": "pnpm -r build",
             "dev": "pnpm -r dev",
             "typecheck": "tsc --build",
             "clean": "pnpm -r exec rm -rf dist",
