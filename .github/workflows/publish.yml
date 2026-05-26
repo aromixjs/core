@@ -30,24 +30,9 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
-      - name: Build bumped packages
-        run: |
-          while read -r name version; do
-            pnpm --filter "$name" build
-          done < .bumped
-
-      - name: Publish to npm
+      - uses: ./.github/actions/publish-bumped
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: |
-          while read -r name version; do
-            if npm view "$name@$version" version 2>/dev/null; then
-              echo "✓ $name@$version already published"
-            else
-              echo "→ Publishing $name@$version..."
-              pnpm --filter "$name" publish --access public --no-git-checks
-            fi
-          done < .bumped
 
       - name: Clean up manifest
         run: |
