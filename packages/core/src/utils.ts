@@ -8,40 +8,40 @@ type WalkKeys<Input> = Input extends object ? { [Key in keyof Input & string]: K
 export type CrushKeys<Input> = Input extends unknown[] | Date ? never : WalkKeys<Input>
 
 export class ObjectProcessor<ModelType> {
-  constructor(private readonly data: ModelType) { }
+      constructor(private readonly data: ModelType) {}
 
-  // Creates a new object with the specified keys removed, leaving the original untouched.
-  omit<Keys extends keyof ModelType>(remove: Keys[]): Prettify<Omit<ModelType, Keys>> {
-    const clone = Object.create(Object.getPrototypeOf(this.data))
+      // Creates a new object with the specified keys removed, leaving the original untouched.
+      omit<Keys extends keyof ModelType>(remove: Keys[]): Prettify<Omit<ModelType, Keys>> {
+            const clone = Object.create(Object.getPrototypeOf(this.data))
 
-    Object.assign(clone, this.data)
+            Object.assign(clone, this.data)
 
-    for (const key of remove) {
-      delete clone[key]
-    }
+            for (const key of remove) {
+                  delete clone[key]
+            }
 
-    return clone
-  }
-
-  crushKeys() {
-    const keys: string[] = []
-
-    const walk = (value: unknown, prefix: string) => {
-      if (prefix) {
-        keys.push(prefix)
+            return clone
       }
 
-      if (value !== null && typeof value === 'object' && value.constructor === Object) {
-        for (const [entryKey, entryValue] of Object.entries(value)) {
-          const path = prefix ? `${prefix}.${entryKey}` : entryKey
+      crushKeys() {
+            const keys: string[] = []
 
-          walk(entryValue, path)
-        }
+            const walk = (value: unknown, prefix: string) => {
+                  if (prefix) {
+                        keys.push(prefix)
+                  }
+
+                  if (value !== null && typeof value === 'object' && value.constructor === Object) {
+                        for (const [entryKey, entryValue] of Object.entries(value)) {
+                              const path = prefix ? `${prefix}.${entryKey}` : entryKey
+
+                              walk(entryValue, path)
+                        }
+                  }
+            }
+
+            walk(this.data, '')
+
+            return keys as CrushKeys<ModelType>[]
       }
-    }
-
-    walk(this.data, '')
-
-    return keys as CrushKeys<ModelType>[]
-  }
 }

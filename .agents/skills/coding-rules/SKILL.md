@@ -6,12 +6,12 @@ Never use `? :` ternary expressions. Always use `if/else` with an intermediate v
 
 ```ts
 // BAD
-let data = test ? "ok" : "not ok";
+let data = test ? 'ok' : 'not ok'
 
 // GOOD
-let data = "not ok";
+let data = 'not ok'
 if (test) {
-	data = "ok";
+      data = 'ok'
 }
 ```
 
@@ -22,12 +22,12 @@ Do not manually annotate return types or generic parameters when TypeScript can 
 ```ts
 // BAD — TS already knows this returns number
 function add(a: number, b: number): number {
-	return a + b;
+      return a + b
 }
 
 // GOOD
 function add(a: number, b: number) {
-	return a + b;
+      return a + b
 }
 ```
 
@@ -35,12 +35,12 @@ Only use type assertions (`as X`) when there is no alternative approach. Prefer 
 
 ```ts
 // BAD — unnecessary cast
-const value = obj[key] as string;
+const value = obj[key] as string
 
 // GOOD — check the key exists first
 if (key in obj) {
-	const value = obj[key];
-	// value is now properly typed
+      const value = obj[key]
+      // value is now properly typed
 }
 ```
 
@@ -50,19 +50,19 @@ Never pass computed expressions directly into function calls or `new` constructo
 
 ```ts
 // BAD
-return new ObjectBuilder(ObjectBuilder.deepMerge(this.data, changes));
+return new ObjectBuilder(ObjectBuilder.deepMerge(this.data, changes))
 
 // GOOD
-const merged = ObjectBuilder.deepMerge(this.data, changes);
-return new ObjectBuilder(merged);
+const merged = ObjectBuilder.deepMerge(this.data, changes)
+return new ObjectBuilder(merged)
 ```
 
 **Exception:** This rule does not apply to `if` block conditions. Complex boolean expressions inside `if (...)` are acceptable inline.
 
 ```ts
 // OK — condition inside if is fine
-if (change && typeof change === "object" && !Array.isArray(change)) {
-	// ...
+if (change && typeof change === 'object' && !Array.isArray(change)) {
+      // ...
 }
 ```
 
@@ -72,11 +72,11 @@ If a value needs a type cast, ask whether a runtime check can solve it instead. 
 
 ```ts
 // BAD
-(result as Record<string, unknown>)[key] = change;
+;(result as Record<string, unknown>)[key] = change
 
 // GOOD
 if (key in result) {
-	result[key] = change;
+      result[key] = change
 }
 ```
 
@@ -86,10 +86,10 @@ Never use `_` as a prefix for variables (e.g. `_data`, `_unused`). If a variable
 
 ```ts
 // BAD
-const _result = someFn();
+const _result = someFn()
 
 // GOOD
-const result = someFn();
+const result = someFn()
 ```
 
 ## 6. Naming Conventions
@@ -100,13 +100,13 @@ const result = someFn();
 
 ```ts
 // GOOD — app-wide constant
-const DatabaseUrl = "postgres://localhost";
+const DatabaseUrl = 'postgres://localhost'
 
 // GOOD — intermediate variable
-const merged = ObjectBuilder.deepMerge(base, changes);
+const merged = ObjectBuilder.deepMerge(base, changes)
 
 // BAD — intermediate should not be PascalCase
-const Merged = ObjectBuilder.deepMerge(base, changes);
+const Merged = ObjectBuilder.deepMerge(base, changes)
 ```
 
 Never use `ALL_CAPS` for variable names.
@@ -117,13 +117,13 @@ Never write single-line if statements without braces. Always open a scope.
 
 ```ts
 // BAD
-if (this[$def].kind === "computed") {
-	throw new Error("computed fields cannot be notNull");
+if (this[$def].kind === 'computed') {
+      throw new Error('computed fields cannot be notNull')
 }
 
 // GOOD
-if (this[$def].kind === "computed") {
-	throw new Error("computed fields cannot be notNull");
+if (this[$def].kind === 'computed') {
+      throw new Error('computed fields cannot be notNull')
 }
 ```
 
@@ -133,13 +133,13 @@ Use variable type annotations instead of `as` casts on the value. Never duplicat
 
 ```ts
 // BAD — duplicate
-const result: Pick<T, K> = {} as Pick<T, K>;
+const result: Pick<T, K> = {} as Pick<T, K>
 
 // BAD — cast when annotation works
-const result = {} as Pick<T, K>;
+const result = {} as Pick<T, K>
 
 // GOOD — annotation only
-const result: Pick<T, K> = {};
+const result: Pick<T, K> = {}
 ```
 
 ## 9. Pass Generics Explicitly, Do Not Cast the Value
@@ -148,16 +148,16 @@ When calling any function or constructor that accepts a generic type parameter, 
 
 ```ts
 // BAD — casting the value to satisfy the generic
-return new ObjectBuilder(result as Omit<T, K>);
+return new ObjectBuilder(result as Omit<T, K>)
 
 // BAD — same issue on a regular function call
-someFn(value as SomeType);
+someFn(value as SomeType)
 
 // GOOD — pass the generic explicitly
-return new ObjectBuilder<Omit<T, K>>(result);
+return new ObjectBuilder<Omit<T, K>>(result)
 
 // GOOD — same approach on a regular function call
-someFn<SomeType>(value);
+someFn<SomeType>(value)
 ```
 
 This applies everywhere — constructors, class methods, standalone functions, any call site where a generic is involved. If the value's type doesn't match what the generic expects, update the generic parameter, not the value.
@@ -168,11 +168,11 @@ If a type is verbose or complex, give it its own named type. Inline types should
 
 ```ts
 // BAD — big inline type
-const result = {} as { [K in keyof T]: U };
+const result = {} as { [K in keyof T]: U }
 
 // GOOD — extracted to a reusable utility type
-type MapValues<T, U> = { [K in keyof T]: U };
-const result: MapValues<T, U> = {};
+type MapValues<T, U> = { [K in keyof T]: U }
+const result: MapValues<T, U> = {}
 ```
 
 If the type is only used once and is short, inline is fine. If it spans multiple lines or looks verbose, extract it.
@@ -183,20 +183,15 @@ Do not pull boolean expressions out of an `if` statement into a separate variabl
 
 ```ts
 // BAD — extracted to a variable for no reason
-const bothPlainObjects = change && typeof change === "object"
-	&& !Array.isArray(change) && existing && typeof existing === "object"
-	&& !Array.isArray(existing);
+const bothPlainObjects = change && typeof change === 'object' && !Array.isArray(change) && existing && typeof existing === 'object' && !Array.isArray(existing)
 
 if (bothPlainObjects) {
-	// ...
+      // ...
 }
 
 // GOOD — condition lives inside the if
-if (
-	change && typeof change === "object" && !Array.isArray(change) && existing
-	&& typeof existing === "object" && !Array.isArray(existing)
-) {
-	// ...
+if (change && typeof change === 'object' && !Array.isArray(change) && existing && typeof existing === 'object' && !Array.isArray(existing)) {
+      // ...
 }
 ```
 
@@ -208,10 +203,10 @@ Never use the spread operator (`{ ...obj }`) to clone an object. Use `structured
 
 ```ts
 // BAD — shallow clone, noisy
-const copy = { ...data };
+const copy = { ...data }
 
 // GOOD — deep clone, clean
-const copy = structuredClone(data);
+const copy = structuredClone(data)
 ```
 
 ## 13. Write Code Sequentially — One Step Per Line
@@ -220,14 +215,12 @@ Do not chain multiple operations into a single expression. Each call, constructi
 
 ```ts
 // BAD — chained construction with inline computation
-return new ObjectBuilder<Omit<T, K>>(
-	ObjectBuilder.deepMerge(this.data, changes),
-);
+return new ObjectBuilder<Omit<T, K>>(ObjectBuilder.deepMerge(this.data, changes))
 
 // GOOD — each step is its own line
-const merged = ObjectBuilder.deepMerge(this.data, changes);
-const builder = new ObjectBuilder<Omit<T, K>>(merged);
-return builder;
+const merged = ObjectBuilder.deepMerge(this.data, changes)
+const builder = new ObjectBuilder<Omit<T, K>>(merged)
+return builder
 ```
 
 This applies to everything: function calls, constructor calls, method chains, any operation that does more than one thing. Write it out sequentially.
@@ -239,31 +232,31 @@ Always add an empty line after the opening brace and before the closing brace of
 ```ts
 // BAD — no breathing room
 function doSomething() {
-	const x = 1;
-	return x;
+      const x = 1
+      return x
 }
 
 if (condition) {
-	doWork();
+      doWork()
 }
 
 for (const key of keys) {
-	process(key);
+      process(key)
 }
 
 // GOOD — empty line after opening, empty line before closing
 function doSomething() {
-	const x = 1;
+      const x = 1
 
-	return x;
+      return x
 }
 
 if (condition) {
-	doWork();
+      doWork()
 }
 
 for (const key of keys) {
-	process(key);
+      process(key)
 }
 ```
 
@@ -275,19 +268,13 @@ A single expression or operation always stays on one line, no matter how long it
 
 ```ts
 // BAD — broken across lines
-if (
-	change && typeof change === "object" && !Array.isArray(change) && existing
-	&& typeof existing === "object" && !Array.isArray(existing)
-) {
-	result[key] = ObjectBuilder.deepMerge(existing, change);
+if (change && typeof change === 'object' && !Array.isArray(change) && existing && typeof existing === 'object' && !Array.isArray(existing)) {
+      result[key] = ObjectBuilder.deepMerge(existing, change)
 }
 
 // GOOD — single line, no matter the length
-if (
-	change && typeof change === "object" && !Array.isArray(change) && existing
-	&& typeof existing === "object" && !Array.isArray(existing)
-) {
-	result[key] = ObjectBuilder.deepMerge(existing, change);
+if (change && typeof change === 'object' && !Array.isArray(change) && existing && typeof existing === 'object' && !Array.isArray(existing)) {
+      result[key] = ObjectBuilder.deepMerge(existing, change)
 }
 ```
 
@@ -299,7 +286,7 @@ Set `printWidth` to `9999` in `.prettierrc.json`. This prevents Prettier from ev
 
 ```json
 {
-	"printWidth": 9999
+      "printWidth": 9999
 }
 ```
 
@@ -307,14 +294,14 @@ Never write inline type assertions (`value as SomeType`) scattered throughout th
 
 ```ts
 // BAD — inline casts everywhere
-const result = {} as Pick<T, K>;
-const keys = Object.keys(this.data) as Array<keyof T>;
-const copy = this.data as Prettify<T>;
+const result = {} as Pick<T, K>
+const keys = Object.keys(this.data) as Array<keyof T>
+const copy = this.data as Prettify<T>
 
 // GOOD — all casts go through cast<U>()
-const result = this.cast<Pick<T, K>>({});
-const keys = this.cast<Array<keyof T>>(Object.keys(this.data));
-const copy = this.cast<Prettify<T>>(this.data);
+const result = this.cast<Pick<T, K>>({})
+const keys = this.cast<Array<keyof T>>(Object.keys(this.data))
+const copy = this.cast<Prettify<T>>(this.data)
 ```
 
 The `cast` method is a private helper that centralizes all type assertions:
@@ -342,17 +329,23 @@ Never use abbreviated or shorthand variable names. Every identifier must clearly
 // BAD — shorthands everywhere
 type Op<T> = { (f: CrushKeys<T>[]): void }
 function makeOp<T>() {
-  const s: OpState<T> = { t: 'include', p: [] }
-  const fn = (f: CrushKeys<T>[]) => { s.t = 'include'; s.p = f }
-  return Object.assign(fn as any, { omit: fn.omit, s })
+      const s: OpState<T> = { t: 'include', p: [] }
+      const fn = (f: CrushKeys<T>[]) => {
+            s.t = 'include'
+            s.p = f
+      }
+      return Object.assign(fn as any, { omit: fn.omit, s })
 }
 
 // GOOD — every name is descriptive
 type Operation<Model> = { (fields: CrushKeys<Model>[]): void }
 function createOperation<Model>() {
-  const captured: OperationCapture<Model> = { type: 'include', paths: [] }
-  const handler = (fields: CrushKeys<Model>[]) => { captured.type = 'include'; captured.paths = fields }
-  return Object.assign(handler as any, { omit: handler.omit, captured })
+      const captured: OperationCapture<Model> = { type: 'include', paths: [] }
+      const handler = (fields: CrushKeys<Model>[]) => {
+            captured.type = 'include'
+            captured.paths = fields
+      }
+      return Object.assign(handler as any, { omit: handler.omit, captured })
 }
 ```
 

@@ -3,57 +3,57 @@ import { join } from 'node:path'
 import type { Adapter } from '@aromix/core'
 
 export class FileKv implements Adapter.KV {
-  private readonly directory: string
+      private readonly directory: string
 
-  constructor(directory: string) {
-    this.directory = directory
-  }
-
-  async get(key: string): Promise<unknown> {
-    try {
-      const data = await readFile(this.pathFor(key), 'utf-8')
-
-      return JSON.parse(data)
-    } catch (error) {
-      if (isNotFoundError(error)) {
-        return null
+      constructor(directory: string) {
+            this.directory = directory
       }
 
-      throw error
-    }
-  }
+      async get(key: string): Promise<unknown> {
+            try {
+                  const data = await readFile(this.pathFor(key), 'utf-8')
 
-  async set(key: string, value: unknown): Promise<void> {
-    await mkdir(this.directory, { recursive: true })
+                  return JSON.parse(data)
+            } catch (error) {
+                  if (isNotFoundError(error)) {
+                        return null
+                  }
 
-    await writeFile(this.pathFor(key), JSON.stringify(value, null, 2), 'utf-8')
-  }
-
-  async delete(key: string): Promise<void> {
-    try {
-      await unlink(this.pathFor(key))
-    } catch (error) {
-      if (!isNotFoundError(error)) {
-        throw error
+                  throw error
+            }
       }
-    }
-  }
 
-  async has(key: string): Promise<boolean> {
-    try {
-      await access(this.pathFor(key))
+      async set(key: string, value: unknown): Promise<void> {
+            await mkdir(this.directory, { recursive: true })
 
-      return true
-    } catch {
-      return false
-    }
-  }
+            await writeFile(this.pathFor(key), JSON.stringify(value, null, 2), 'utf-8')
+      }
 
-  private pathFor(key: string): string {
-    return join(this.directory, `${key}.json`)
-  }
+      async delete(key: string): Promise<void> {
+            try {
+                  await unlink(this.pathFor(key))
+            } catch (error) {
+                  if (!isNotFoundError(error)) {
+                        throw error
+                  }
+            }
+      }
+
+      async has(key: string): Promise<boolean> {
+            try {
+                  await access(this.pathFor(key))
+
+                  return true
+            } catch {
+                  return false
+            }
+      }
+
+      private pathFor(key: string): string {
+            return join(this.directory, `${key}.json`)
+      }
 }
 
 function isNotFoundError(error: unknown): boolean {
-  return typeof error === 'object' && error !== null && 'code' in error && error.code === 'ENOENT'
+      return typeof error === 'object' && error !== null && 'code' in error && error.code === 'ENOENT'
 }
