@@ -12,12 +12,14 @@ Triggered when change files are pushed to `main` (path: `change/**`).
 
 ## Publish (`publish.yml`)
 
-Triggered when versioned `package.json` or `CHANGELOG.json` are pushed to `main` (from the merged version PR).
+Triggered when the version PR merges to `main` (path: `packages/**/package.json`).
 
 1. Installs dependencies
-2. Verifies the merge was the version PR (commit message starts with `chore: version packages` and no change files remain)
+2. Verifies the merge is from the version PR (commit message starts with `chore: version packages` and no change files remain)
 3. Builds all packages
-4. Runs `beachball publish` to publish to npm
+4. Copies root `README.md` into each package (so npm shows the right readme)
+5. Publishes all changed packages to npm via `beachball publish` (creates git tags like `@aromix/core_v0.2.0`)
+6. Creates a GitHub Release from the most recent tag
 
 ## Adding a change file
 
