@@ -1,7 +1,0 @@
-{
-  "type": "patch",
-  "comment": "refactor(core): update entity type imports",
-  "packageName": "@aromix/core",
-  "email": "istiuak.0@gmail.com",
-  "dependentChangeType": "patch"
-}
