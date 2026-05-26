@@ -1,54 +1,45 @@
 name: Publish
 
 on:
-      push:
-            branches: [main]
-            paths:
-                  - 'packages/**/package.json'
-                  - 'packages/**/CHANGELOG.json'
+  push:
+    branches: [main]
+    paths:
+      - 'change/**'
 
-permissions:
-      contents: write
-      id-token: write
+concurrency: ${{ github.workflow }}-${{ github.ref }}
 
 jobs:
-      publish:
-            runs-on: ubuntu-latest
-            steps:
-                  - uses: actions/checkout@v4
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-                  - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v4
 
-                  - uses: actions/setup-node@v4
-                    with:
-                          node-version: 22
-                          registry-url: 'https://registry.npmjs.org'
-                          cache: pnpm
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: 'https://registry.npmjs.org'
+          cache: pnpm
 
-                  - run: pnpm install --frozen-lockfile
+      - run: pnpm install --frozen-lockfile
 
-                  - name: Verify version merge
-                    id: check
-                    run: |
-                          message=$(git log -1 --pretty=%B)
-                          count=$(ls change/*.json 2>/dev/null | wc -l)
+      - run: pnpm --filter @aromix/core build
+      - run: pnpm --filter @aromix/bun build
+      - run: pnpm --filter @aromix/cloudflare build
+      - run: pnpm --filter @aromix/cli build
 
-                          if [[ "$message" == "chore: version packages"* ]] && [ "$count" -eq 0 ]; then
-                            echo "ready=true" >> "$GITHUB_OUTPUT"
-                          else
-                            echo "ready=false" >> "$GITHUB_OUTPUT"
-                          fi
-                  - run: pnpm --filter @aromix/core build
-                    if: steps.check.outputs.ready == 'true'
-                  - run: pnpm --filter @aromix/bun build
-                    if: steps.check.outputs.ready == 'true'
-                  - run: pnpm --filter @aromix/cloudflare build
-                    if: steps.check.outputs.ready == 'true'
-                  - run: pnpm --filter @aromix/cli build
-                    if: steps.check.outputs.ready == 'true'
-
-                  - name: Publish packages to npm
-                    if: steps.check.outputs.ready == 'true'
-                    run: pnpm -r publish --access public --no-git-checks
-                    env:
-                          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Publish
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config user.name "aromix-bot"
+          git config user.email "bot@aromix.dev"
+          git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}"
+          npx beachball publish --yes --access public
