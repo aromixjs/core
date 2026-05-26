@@ -1,0 +1,21 @@
+{
+  "name": "@aromix/core",
+  "entries": [
+    {
+      "date": "Tue, 26 May 2026 02:10:27 GMT",
+      "version": "0.2.0",
+      "tag": "@aromix/core_v0.2.0",
+      "comments": {
+        "minor": [
+          {
+            "author": "dev@aromix.dev",
+            "package": "@aromix/core",
+            "commit": "test",
+            "comment": "feat: add entity query builder API",
+            "date": "2026-05-26T00:00:00.000Z"
+          }
+        ]
+      }
+    }
+  ]
+}

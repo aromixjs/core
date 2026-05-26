@@ -1,62 +1,62 @@
 {
-      "name": "@aromix/cli",
-      "version": "0.1.0",
-      "description": "CLI for Aromix",
-      "type": "module",
-      "license": "MIT",
-      "homepage": "https://aromixjs.github.io/aromix",
-      "repository": {
-            "type": "git",
-            "url": "https://github.com/aromixjs/aromix.git",
-            "directory": "packages/cli"
-      },
-      "bugs": {
-            "url": "https://github.com/aromixjs/aromix/issues"
-      },
-      "keywords": [
-            "aromix",
-            "cli",
-            "framework",
-            "tooling"
-      ],
-      "files": [
-            "dist"
-      ],
-      "bin": {
-            "aromix": "./dist/index.js"
-      },
-      "exports": {
-            ".": {
-                  "types": "./dist/index.d.ts",
-                  "import": "./dist/index.js"
-            }
-      },
-      "publishConfig": {
-            "access": "public",
-            "registry": "https://registry.npmjs.org"
-      },
-      "scripts": {
-            "build": "tsup",
-            "dev": "tsup --watch",
-            "typecheck": "tsc --noEmit",
-            "link": "pnpm link --global"
-      },
-      "dependencies": {
-            "@clack/prompts": "^1.4.0",
-            "esbuild": "^0.28.0",
-            "fast-glob": "^3.3.3",
-            "get-tsconfig": "^4.14.0",
-            "handlebars": "^4.7.9",
-            "ts-morph": "^28.0.0"
-      },
-      "peerDependencies": {
-            "@aromix/core": "workspace:^"
-      },
-      "devDependencies": {
-            "@aromix/core": "workspace:^",
-            "@types/micromatch": "^4.0.10",
-            "@types/node": "catalog:",
-            "tsup": "catalog:",
-            "typescript": "catalog:"
-      }
+  "name": "@aromix/cli",
+  "version": "0.1.1",
+  "description": "CLI for Aromix",
+  "type": "module",
+  "license": "MIT",
+  "homepage": "https://aromixjs.github.io/aromix",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/aromixjs/aromix.git",
+    "directory": "packages/cli"
+  },
+  "bugs": {
+    "url": "https://github.com/aromixjs/aromix/issues"
+  },
+  "keywords": [
+    "aromix",
+    "cli",
+    "framework",
+    "tooling"
+  ],
+  "files": [
+    "dist"
+  ],
+  "bin": {
+    "aromix": "./dist/index.js"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org"
+  },
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit",
+    "link": "pnpm link --global"
+  },
+  "dependencies": {
+    "@clack/prompts": "^1.4.0",
+    "esbuild": "^0.28.0",
+    "fast-glob": "^3.3.3",
+    "get-tsconfig": "^4.14.0",
+    "handlebars": "^4.7.9",
+    "ts-morph": "^28.0.0"
+  },
+  "peerDependencies": {
+    "@aromix/core": "workspace:^"
+  },
+  "devDependencies": {
+    "@aromix/core": "workspace:^",
+    "@types/micromatch": "^4.0.10",
+    "@types/node": "catalog:",
+    "tsup": "catalog:",
+    "typescript": "catalog:"
+  }
 }
