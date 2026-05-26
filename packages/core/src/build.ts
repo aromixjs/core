@@ -1,6 +1,6 @@
 export type Platform = 'node' | 'bun' | 'cloudflare:worker'
 
-export interface AromixBuildConfig {
+export interface BuildConfig {
       entry: string
       outDir: string
       platform: Platform
@@ -9,9 +9,7 @@ export interface AromixBuildConfig {
       tsConfig: string
 }
 
-export interface Config {}
-
 /** Identity fn :: exists purely for autocomplete and type safety */
-export function build(options: AromixBuildConfig): AromixBuildConfig {
+export function build(options: BuildConfig): BuildConfig {
       return options
 }

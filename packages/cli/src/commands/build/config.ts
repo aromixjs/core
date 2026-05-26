@@ -1,4 +1,4 @@
-import { AromixBuildConfig } from '@aromix/core'
+import { BuildConfig } from '@aromix/core'
 import esbuild from 'esbuild'
 import { existsSync, unlinkSync } from 'node:fs'
 import { join, relative } from 'node:path'
@@ -9,7 +9,7 @@ export class Config {
 
       readonly ConfigFileName = ['aromix.build.ts', 'aromix.build.js', 'aromix.build.mjs'] as const
 
-      async buildConfig(): Promise<AromixBuildConfig> {
+      async buildConfig(): Promise<BuildConfig> {
             const configPath = this.ConfigFileName.map((file) => join(this.root, file)).find(existsSync)
 
             if (!configPath) {
@@ -31,7 +31,7 @@ export class Config {
 
                   const mod = await import(pathToFileURL(tmp).href)
                   console.log(`Loaded config from ${relative(this.root, configPath)}`)
-                  return mod.default as AromixBuildConfig
+                  return mod.default as BuildConfig
             } finally {
                   if (existsSync(tmp)) {
                         unlinkSync(tmp)

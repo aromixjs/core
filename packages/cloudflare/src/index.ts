@@ -1,6 +1,4 @@
-import { Config, toFetchHandler } from '@aromix/core'
-
-export function serve(config: Config) {
+export function serve() {
       // const handler = toFetchHandler(app);
       // let ready = false;
       // async function runReadyOnce() {

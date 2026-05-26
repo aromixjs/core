@@ -1,14 +1,10 @@
-import { type AromixBuildConfig, type Platform } from '@aromix/core'
+import { type BuildConfig, type Platform } from '@aromix/core'
 import esbuild from 'esbuild'
-import fg from 'fast-glob'
-import { getTsconfig } from 'get-tsconfig'
 import { existsSync } from 'node:fs'
-import { copyFile, mkdir } from 'node:fs/promises'
-import { dirname, join, resolve } from 'node:path'
+import { copyFile, mkdir, readdir } from 'node:fs/promises'
+import { basename, dirname, join, resolve } from 'node:path'
 import { Config } from './config'
-import { MacroResolver } from './macro.resolver'
-import { loadMacro } from './macro/load'
-import type { ResolvedBuildOptions } from './types'
+
 export class Build {
       readonly root = process.cwd()
 
@@ -23,30 +19,21 @@ export class Build {
             const buildConfig = await config.buildConfig()
             const opts = this.resolveOptions(buildConfig)
 
-            const resolver = new MacroResolver({ root: this.root, buildConfig, opts })
-            resolver.register(loadMacro)
-
-            const srcDir = dirname(opts.entry)
-            const sourceFiles = await fg('**/*.{ts,tsx}', { cwd: srcDir, absolute: true, ignore: ['**/*.d.ts'] })
-
             await esbuild.build({
-                  entryPoints: sourceFiles,
-                  outdir: opts.outDir,
-                  outbase: srcDir,
-                  bundle: false,
+                  entryPoints: [opts.entry],
+                  outfile: opts.outfile,
                   format: 'esm',
                   platform: opts.platform,
                   sourcemap: opts.sourcemap,
                   minify: opts.minify,
                   tsconfig: opts.tsConfigPath,
-                  plugins: [resolver.build()],
             })
 
-            await this.copyAssets(srcDir, opts.outDir)
+            await this.copyAssets(dirname(opts.entry), opts.outDir)
             console.log('Done.')
       }
 
-      private resolveOptions(config: AromixBuildConfig): ResolvedBuildOptions {
+      private resolveOptions(config: BuildConfig) {
             const entry = resolve(this.root, config.entry)
             if (!existsSync(entry)) {
                   throw new Error(`Entry point not found: ${entry}`)
@@ -57,37 +44,31 @@ export class Build {
                   throw new Error(`tsconfig not found: ${tsConfigPath}`)
             }
 
-            const parsed = getTsconfig(tsConfigPath)
-            if (!parsed) {
-                  throw new Error(`Failed to parse tsconfig: ${tsConfigPath}`)
-            }
-
             return {
                   entry,
+                  outfile: resolve(this.root, config.outDir, basename(entry).replace(/\.ts$/, '.js')),
                   outDir: resolve(this.root, config.outDir),
                   platform: this.PlatformMap[config.platform],
                   sourcemap: config.sourcemap,
                   minify: config.minify,
                   tsConfigPath,
-                  tsConfigDir: dirname(tsConfigPath),
-                  tsConfig: parsed.config,
             }
       }
 
       private async copyAssets(srcDir: string, outDir: string): Promise<void> {
-            const files = await fg('**/*', {
-                  cwd: srcDir,
-                  absolute: false,
-                  onlyFiles: true,
-                  ignore: ['**/*.ts', '**/*.tsx'],
-            })
+            const entries = await readdir(srcDir, { withFileTypes: true })
 
             await Promise.all(
-                  files.map(async (file) => {
-                        const src = join(srcDir, file)
-                        const dest = join(outDir, file)
-                        await mkdir(dirname(dest), { recursive: true })
-                        await copyFile(src, dest)
+                  entries.map(async (entry) => {
+                        const src = join(srcDir, entry.name)
+                        const dest = join(outDir, entry.name)
+
+                        if (entry.isDirectory()) {
+                              await this.copyAssets(src, dest)
+                        } else if (!/\.(ts|js)$/.test(entry.name)) {
+                              await mkdir(dirname(dest), { recursive: true })
+                              await copyFile(src, dest)
+                        }
                   }),
             )
       }

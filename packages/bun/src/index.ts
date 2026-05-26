@@ -1,11 +1,3 @@
-import { Config, toFetchHandler } from '@aromix/core'
-
-declare module '@aromix/core' {
-      interface Config {
-            server: { port: number; host: string }
-      }
-}
-
 export async function serve() {
       // const { onReady } = app;
       // const { port, host } = config.server;
@@ -17,4 +9,8 @@ export async function serve() {
       //    fetch: handler
       // });
       // return server
+
+      return {
+            with(config: any) {},
+      }
 }

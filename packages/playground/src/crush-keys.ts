@@ -1,4 +1,4 @@
-import { ObjectProcessor } from "@aromix/core"
+import { ObjectProcessor } from '@aromix/core'
 
 const config = {
       app: {
