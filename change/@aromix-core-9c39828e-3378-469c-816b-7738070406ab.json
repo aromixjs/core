@@ -1,0 +1,7 @@
+{
+  "type": "patch",
+  "comment": "feat(sqlite): add initial ddl and dml modules",
+  "packageName": "@aromix/core",
+  "email": "istiuak.0@gmail.com",
+  "dependentChangeType": "patch"
+}
