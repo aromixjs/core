@@ -42,5 +42,5 @@ jobs:
           git config user.email "bot@aromix.dev"
           git remote set-url origin "https://x-access-token:${GH_PAT}@github.com/${{ github.repository }}"
           git rm .bumped
-          git commit -m "chore: cleanup bumped manifest"
+          git commit -m "chore: cleanup bumped manifest [skip ci]"
           git push

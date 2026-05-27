@@ -1,5 +1,10 @@
 import { execSync } from "child_process";
-import { readFileSync } from "fs";
+import { existsSync, readFileSync } from "fs";
+
+if (!existsSync(".bumped")) {
+  console.log("No .bumped manifest found, skipping");
+  process.exit(0);
+}
 
 const content = readFileSync(".bumped", "utf8");
 const lines = content.trim().split("\n").filter(Boolean);
