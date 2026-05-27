@@ -1,7 +1,0 @@
-{
-  "type": "patch",
-  "comment": "rafactor core",
-  "packageName": "@aromix/core",
-  "email": "istiuak.0@gmail.com",
-  "dependentChangeType": "patch"
-}

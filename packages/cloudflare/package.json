@@ -1,53 +1,53 @@
 {
-      "name": "@aromix/cloudflare",
-      "version": "0.1.0",
-      "description": "Cloudflare Workers runtime adapter for Aromix",
-      "type": "module",
-      "license": "MIT",
-      "homepage": "https://aromixjs.github.io/aromix",
-      "repository": {
-            "type": "git",
-            "url": "https://github.com/aromixjs/aromix.git",
-            "directory": "packages/cloudflare"
-      },
-      "bugs": {
-            "url": "https://github.com/aromixjs/aromix/issues"
-      },
-      "keywords": [
-            "aromix",
-            "cloudflare",
-            "workers",
-            "runtime",
-            "adapter",
-            "server",
-            "framework"
-      ],
-      "files": [
-            "dist"
-      ],
-      "exports": {
-            ".": {
-                  "types": "./dist/index.d.ts",
-                  "import": "./dist/index.js",
-                  "require": "./dist/index.cjs"
-            }
-      },
-      "publishConfig": {
-            "access": "public",
-            "registry": "https://registry.npmjs.org"
-      },
-      "scripts": {
-            "build": "tsup",
-            "dev": "tsup --watch",
-            "typecheck": "tsc --noEmit"
-      },
-      "peerDependencies": {
-            "@aromix/core": "workspace:^"
-      },
-      "devDependencies": {
-            "@aromix/core": "workspace:^",
-            "@cloudflare/workers-types": "^4.20241218.0",
-            "tsup": "catalog:",
-            "typescript": "catalog:"
-      }
+  "name": "@aromix/cloudflare",
+  "version": "0.1.1",
+  "description": "Cloudflare Workers runtime adapter for Aromix",
+  "type": "module",
+  "license": "MIT",
+  "homepage": "https://aromixjs.github.io/aromix",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/aromixjs/aromix.git",
+    "directory": "packages/cloudflare"
+  },
+  "bugs": {
+    "url": "https://github.com/aromixjs/aromix/issues"
+  },
+  "keywords": [
+    "aromix",
+    "cloudflare",
+    "workers",
+    "runtime",
+    "adapter",
+    "server",
+    "framework"
+  ],
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org"
+  },
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit"
+  },
+  "peerDependencies": {
+    "@aromix/core": "workspace:^"
+  },
+  "devDependencies": {
+    "@aromix/core": "workspace:^",
+    "@cloudflare/workers-types": "^4.20241218.0",
+    "tsup": "catalog:",
+    "typescript": "catalog:"
+  }
 }

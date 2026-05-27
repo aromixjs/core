@@ -1,0 +1,20 @@
+{
+  "name": "@aromix/cli",
+  "entries": [
+    {
+      "date": "Wed, 27 May 2026 00:21:37 GMT",
+      "version": "0.1.1",
+      "tag": "@aromix/cli_v0.1.1",
+      "comments": {
+        "patch": [
+          {
+            "author": "beachball",
+            "package": "@aromix/cli",
+            "comment": "Bump @aromix/core to v0.1.3",
+            "commit": "not available"
+          }
+        ]
+      }
+    }
+  ]
+}
