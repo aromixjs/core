@@ -2,6 +2,7 @@ export * from './build';
 export * from './compose/compose.def';
 export * from './compose/compose.type';
 export * from './ddl/lite.ddl';
+export * from './ddl/lite.kit';
 export * from './dml/lite.dml';
 export * from './entity/entity.def';
 export * from './entity/entity.type';
