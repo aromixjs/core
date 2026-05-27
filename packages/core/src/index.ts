@@ -1,5 +1,3 @@
-export * from './bootstrap/bootstrap.def';
-export * from './bootstrap/bootstrap.type';
 export * from './build';
 export * from './compose/compose.def';
 export * from './compose/compose.type';
@@ -12,6 +10,8 @@ export * from './fetch/codec';
 export * from './fetch/fetch';
 export * from './global/kit';
 export * from './global/type';
+export * from './make/make.def';
+export * from './make/make.type';
 export * from './storage/adapter';
 export * from './storage/storage';
 
