@@ -1,0 +1,20 @@
+{
+  "name": "@aromix/core",
+  "entries": [
+    {
+      "date": "Wed, 27 May 2026 00:54:50 GMT",
+      "version": "0.1.3",
+      "tag": "@aromix/core_v0.1.3",
+      "comments": {
+        "patch": [
+          {
+            "author": "istiuak.0@gmail.com",
+            "package": "@aromix/core",
+            "commit": "a2df613f23585deed9ef65ff899354ac3fb08397",
+            "comment": "feat(make): introduce ResolvedApp interface"
+          }
+        ]
+      }
+    }
+  ]
+}
