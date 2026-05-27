@@ -4,9 +4,6 @@
 
 import { liteKit } from "./lite.kit"
 
-
-
-
 export class lite<Type extends liteKit.ColType = liteKit.ColType> {
 
    [liteKit.$meta]: liteKit.Meta
@@ -21,10 +18,6 @@ export class lite<Type extends liteKit.ColType = liteKit.ColType> {
          unique: false,
       }
    }
-
-   static table() { }
-
-
 
    // all data type entry
    static int() {
@@ -104,7 +97,7 @@ export class lite<Type extends liteKit.ColType = liteKit.ColType> {
          col,
          actions: actions || []
       }
-      
+
       return this
    }
 
@@ -120,19 +113,19 @@ export class lite<Type extends liteKit.ColType = liteKit.ColType> {
       return this
    }
 
-   minLength(value: string) {
+   minLength(value: number) {
       this[liteKit.$meta].minLength = value
       return this
    }
 
 
-   maxLength(value: string) {
+   maxLength(value: number) {
       this[liteKit.$meta].maxLength = value
       return this
    }
 
 
-   in(...values: liteKit.ColTypeMap[Type][]) {
+   in(values: liteKit.ColTypeMap[Type][]) {
       this[liteKit.$meta].in = values
       return this
    }

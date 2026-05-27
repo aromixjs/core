@@ -54,8 +54,8 @@ export namespace liteKit {
       collate?: Collation
       min?: number,
       max?: number,
-      minLength?: string,
-      maxLength?: string,
+      minLength?: number,
+      maxLength?: number,
       in?: Array<ColTypeMap[ColType]>
       references?: {
          col: any
