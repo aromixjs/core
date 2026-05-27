@@ -1,6 +1,6 @@
 {
   "type": "patch",
-  "comment": "Change files",
+  "comment": "update core",
   "packageName": "@aromix/core",
   "email": "istiuak.0@gmail.com",
   "dependentChangeType": "patch"
