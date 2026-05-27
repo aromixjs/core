@@ -4,9 +4,8 @@ export const bootstrap: Bootstrap = () => { }
 
 
 
-bootstrap.compose = () => {
+bootstrap.compose = (config) => {
 
 }
-
 
 
