@@ -24,7 +24,7 @@ for (const entry of packageList) {
   const { version } = JSON.parse(readFileSync(entry.file, "utf8"));
 
   if (before[entry.name] !== version) {
-    bumped.push(entry);
+    bumped.push({ name: entry.name, version });
   }
 }
 
