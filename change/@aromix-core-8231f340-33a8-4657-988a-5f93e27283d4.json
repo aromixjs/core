@@ -1,0 +1,7 @@
+{
+  "type": "patch",
+  "comment": "feat(make): introduce ResolvedApp interface",
+  "packageName": "@aromix/core",
+  "email": "istiuak.0@gmail.com",
+  "dependentChangeType": "patch"
+}
