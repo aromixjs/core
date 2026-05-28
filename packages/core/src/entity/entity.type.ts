@@ -1,38 +1,49 @@
-import type { StandardSchemaV1 } from '@standard-schema/spec'
-import { Adapter } from '../storage/adapter'
-import { Entity } from './entity.def'
-import { Type } from '../global/type'
+import type { StandardSchemaV1 } from '@standard-schema/spec';
+import { Storage } from "./../storage";
+import { Entity } from './entity.def';
+import { liteKit } from '../ddl/lite.kit';
 
 export type SchemaInput<Schema extends StandardSchemaV1> = NonNullable<Schema['~standard']['types']>['input']
 export type SchemaOutput<Schema extends StandardSchemaV1> = NonNullable<Schema['~standard']['types']>['output']
 
-export interface EntityConfig<Schema extends StandardSchemaV1> {
+
+
+// kv
+export interface EntityKvConfig<Schema extends StandardSchemaV1> {
       name: string
-      storage: Adapter.kv
+      storage: Storage.KvAdapter
       guards?: any[]
       effects?: any[]
       model: Schema
-      access: (can: PermissionSet<SchemaOutput<Schema>>) => void
 }
 
-export interface Operation<Model> {
-      (fields: Type.CrushKeys<Model>[]): void
-      omit(fields: Type.CrushKeys<Model>[]): void
-}
-
-export interface PermissionSet<Model> {
-      read: Operation<Model>
-      write: Operation<Model>
-}
 
 export interface EntityKV<Schema extends StandardSchemaV1> {
       get(key: string): Promise<SchemaOutput<Schema>>
       set(key: string, value: SchemaInput<Schema>): Promise<void>
       delete(key: string): Promise<void>
+      has(key: string): Promise<boolean>
       [Entity.$meta]: {
-            adapter: Adapter.kv
+            name: string
+            adapter: Storage.KvAdapter
             model: Schema
-            readAccess: Record<string, boolean>
-            writeAccess: Record<string, boolean>
+      }
+}
+
+
+export type LiteModel = Record<string, { [liteKit.$meta]: liteKit.Meta }>
+export interface EntitySQLiteConfig {
+      name: string
+      storage: Storage.SQLiteAdapter
+      model: LiteModel
+}
+
+
+
+export interface EntitySQLite {
+      [Entity.$meta]: {
+            name: string
+            adapter: Storage.SQLiteAdapter
+            model: LiteModel
       }
 }

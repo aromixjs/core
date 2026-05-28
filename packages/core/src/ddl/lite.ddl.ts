@@ -102,7 +102,7 @@ export class lite<Type extends liteKit.ColType = liteKit.ColType> {
    }
 
 
-   // value restrictions
+   // single-col value checks
    min(value: number) {
       this[liteKit.$meta].min = value
       return this
@@ -125,9 +125,62 @@ export class lite<Type extends liteKit.ColType = liteKit.ColType> {
    }
 
 
-   in(values: liteKit.ColTypeMap[Type][]) {
+   in(values: string[]) {
       this[liteKit.$meta].in = values
       return this
    }
+
+   lt(col: string) {
+      this[liteKit.$meta].lt = col
+      return this
+   }
+
+   gt(col: string) {
+      this[liteKit.$meta].gt = col
+
+      return this
+   }
+
+   lte(col: string) {
+
+      this[liteKit.$meta].lte = col
+      return this
+   }
+
+
+   gte(col: string) {
+
+      this[liteKit.$meta].gte = col
+      return this
+   }
+
+
+   uniqueWith(cols: string[], conflict: liteKit.UniqueConflict = 'conflict:error') {
+      this[liteKit.$meta].uniqueWith = cols
+      this[liteKit.$meta].uniqueWithConflict = conflict
+      return this
+   }
+
+   indexWith(cols: string[]) {
+      this[liteKit.$meta].indexWith = cols
+      return this
+
+   }
+
+
+   uniqueIndexWith(cols: string[]) {
+      this[liteKit.$meta].uniqueIndexWith = cols
+      return this
+   }
+
+
+   primaryKeyWith(cols: string[]) {
+      this[liteKit.$meta].primaryKeyWith = cols
+      return this
+   }
+
+
+
+
 
 }

@@ -1,15 +1,13 @@
 import type { StandardSchemaV1 } from '@standard-schema/spec'
-import type { EntityConfig, SchemaInput, SchemaOutput } from './entity.type'
-import { createOperation, validate } from './entity.util'
+import type { EntityKV, EntityKvConfig, EntitySQLite, EntitySQLiteConfig, SchemaInput, SchemaOutput } from './entity.type'
+import { validate } from './entity.util'
+import { config } from 'process'
 
 export namespace Entity {
       export const $meta = Symbol.for('entity:meta')
 
-      export function kv<Schema extends StandardSchemaV1>(configuration: EntityConfig<Schema>) {
-            const readOperation = createOperation<SchemaOutput<Schema>>()
-            const writeOperation = createOperation<SchemaOutput<Schema>>()
+      export function kv<Schema extends StandardSchemaV1>(configuration: EntityKvConfig<Schema>): EntityKV<Schema> {
 
-            configuration.access({ read: readOperation, write: writeOperation })
 
             const adapter = configuration.storage
 
@@ -39,9 +37,22 @@ export namespace Entity {
                   [$meta]: {
                         adapter,
                         model: configuration.model,
-                        readAccess: readOperation.state,
-                        writeAccess: writeOperation.state,
+                        name: configuration.name
                   },
             }
       }
+
+
+
+      export function sqlite(configuration: EntitySQLiteConfig): EntitySQLite {
+
+            return {
+                  [Entity.$meta]: {
+                        name: configuration.name,
+                        model: configuration.model,
+                        adapter: configuration.storage
+                  }
+            }
+      }
+
 }

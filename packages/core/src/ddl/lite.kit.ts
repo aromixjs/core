@@ -56,11 +56,21 @@ export namespace liteKit {
       max?: number,
       minLength?: number,
       maxLength?: number,
-      in?: Array<ColTypeMap[ColType]>
+      in?: string[]
       references?: {
          col: any
          actions: ReferenceAction[]
       }
+      lt?: string,
+      gt?: string,
+      lte?: string,
+      gte?: string,
+
+      uniqueWith?: string[],
+      uniqueWithConflict?: UniqueConflict
+      indexWith?: string[],
+      uniqueIndexWith?: string[],
+      primaryKeyWith?: string[],
    }
 
 }
