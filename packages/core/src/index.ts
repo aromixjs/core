@@ -13,6 +13,5 @@ export * from './global/kit';
 export * from './global/type';
 export * from './make/make.def';
 export * from './make/make.type';
-export * from './storage/adapter';
 export * from './storage';
 
