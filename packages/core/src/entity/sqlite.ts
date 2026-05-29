@@ -1,34 +1,27 @@
-
-import { Adapter } from "../adapter";
-import { Meta } from "../ddl/lite.type";
-import { Kit } from "../global/kit";
-
-
-export type LiteModel = Record<string, { [Kit.$meta]: Meta }>
+import { Adapter } from '../adapter'
+import { LiteModel } from '../ddl/lite.type'
+import { Kit } from '../global/kit'
 
 export interface SQLiteEntityInput {
-   name: string
-   storage: Adapter.SQLite
-   model: LiteModel
+      name: string
+      storage: Adapter.SQLite
+      model: LiteModel
 }
 
-
-
 export interface SQLiteEntityOutput {
-   [Kit.$meta]: {
-      name: string
-      adapter: Adapter.SQLite
-      model: LiteModel
-   }
+      [Kit.$meta]: {
+            name: string
+            adapter: Adapter.SQLite
+            model: LiteModel
+      }
 }
 
 export function sqlite(configuration: SQLiteEntityInput): SQLiteEntityOutput {
-
-   return {
-      [Kit.$meta]: {
-         name: configuration.name,
-         model: configuration.model,
-         adapter: configuration.storage
+      return {
+            [Kit.$meta]: {
+                  name: configuration.name,
+                  model: configuration.model,
+                  adapter: configuration.storage,
+            },
       }
-   }
 }

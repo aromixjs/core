@@ -10,8 +10,6 @@ export namespace Adapter {
             return adapter
       }
 
-
-
       export interface SQLite {
             query(sql: string): Promise<any>
             foreignKeys?: boolean
@@ -22,7 +20,4 @@ export namespace Adapter {
       export function sqlite(adapter: SQLite) {
             return adapter
       }
-
-
-
 }
