@@ -1,3 +1,5 @@
+import { StandardSchemaV1 } from "@standard-schema/spec"
+
 export namespace Type {
       /** Resolves a mapped/generic type into a plain object shape — improves IDE hover readability. */
       export type Prettify<TargetType> = { [Key in keyof TargetType]: TargetType[Key] } & {}
@@ -7,4 +9,10 @@ export namespace Type {
 
       /** Returns all dot-joined key paths for a given object. Stops at arrays and `Date`. e.g. `{ a: { b: 1 } }` → `"a" | "a.b"` */
       export type CrushKeys<Input> = Input extends unknown[] | Date ? never : WalkKeys<Input>
+
+
+
+      // Standard schema Types 
+      export type SchemaInput<Schema extends StandardSchemaV1> = NonNullable<Schema['~standard']['types']>['input']
+      export type SchemaOutput<Schema extends StandardSchemaV1> = NonNullable<Schema['~standard']['types']>['output']
 }

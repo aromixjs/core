@@ -2,14 +2,18 @@
  *  DDL IMPLEMENTATION FOR SQL LITE
  */
 
-import { liteKit } from "./lite.kit"
 
-export class lite<Type extends liteKit.ColType = liteKit.ColType> {
+import { Kit } from "../global/kit"
+import { Collation, ColType, ColTypeMap, DateFormat, Input, Meta, ReferenceAction, UniqueConflict } from "./lite.type"
 
-   [liteKit.$meta]: liteKit.Meta
 
-   private constructor(input: liteKit.Input) {
-      this[liteKit.$meta] = {
+
+export class lite<Type extends ColType = ColType> {
+
+   [Kit.$meta]: Meta
+
+   private constructor(input: Input) {
+      this[Kit.$meta] = {
          type: input.type,
          dateFormat: input.dateFormat,
          primaryKey: false,
@@ -44,56 +48,56 @@ export class lite<Type extends liteKit.ColType = liteKit.ColType> {
       return new lite<'bigint'>({ type: 'bigint' })
    }
 
-   static date(format: liteKit.DateFormat) {
+   static date(format: DateFormat) {
       return new lite<'date'>({ type: 'date', dateFormat: format })
    }
 
 
    // col modifiers
    primaryKey() {
-      this[liteKit.$meta].primaryKey = true
+      this[Kit.$meta].primaryKey = true
       return this
    }
 
    autoIncrement() {
-      this[liteKit.$meta].autoIncrement = true
+      this[Kit.$meta].autoIncrement = true
       return this
    }
 
    notNull() {
-      this[liteKit.$meta].notNull = true
+      this[Kit.$meta].notNull = true
       return this
    }
 
-   unique(conflict: liteKit.UniqueConflict = 'conflict:error') {
-      this[liteKit.$meta].unique = true
-      this[liteKit.$meta].uniqueConflict = conflict
+   unique(conflict: UniqueConflict = 'conflict:error') {
+      this[Kit.$meta].unique = true
+      this[Kit.$meta].uniqueConflict = conflict
       return this
    }
 
-   default(value: liteKit.ColTypeMap[Type]) {
-      this[liteKit.$meta].default = value
+   default(value: ColTypeMap[Type]) {
+      this[Kit.$meta].default = value
       return this
    }
 
-   defaultFn(callback: () => liteKit.ColTypeMap[Type]) {
-      this[liteKit.$meta].defaultFn = callback
+   defaultFn(callback: () => ColTypeMap[Type]) {
+      this[Kit.$meta].defaultFn = callback
       return this
    }
 
-   onUpdate(callback: () => liteKit.ColTypeMap[Type]) {
-      this[liteKit.$meta].onUpdate = callback
+   onUpdate(callback: () => ColTypeMap[Type]) {
+      this[Kit.$meta].onUpdate = callback
       return this
    }
 
-   collate(collation: liteKit.Collation) {
-      this[liteKit.$meta].collate = collation
+   collate(collation: Collation) {
+      this[Kit.$meta].collate = collation
       return this
    }
 
 
-   references(col: any, actions?: liteKit.ReferenceAction[]) {
-      this[liteKit.$meta].references = {
+   references(col: any, actions?: ReferenceAction[]) {
+      this[Kit.$meta].references = {
          col,
          actions: actions || []
       }
@@ -104,83 +108,79 @@ export class lite<Type extends liteKit.ColType = liteKit.ColType> {
 
    // single-col value checks
    min(value: number) {
-      this[liteKit.$meta].min = value
+      this[Kit.$meta].min = value
       return this
    }
 
    max(value: number) {
-      this[liteKit.$meta].max = value
+      this[Kit.$meta].max = value
       return this
    }
 
    minLength(value: number) {
-      this[liteKit.$meta].minLength = value
+      this[Kit.$meta].minLength = value
       return this
    }
 
 
    maxLength(value: number) {
-      this[liteKit.$meta].maxLength = value
+      this[Kit.$meta].maxLength = value
       return this
    }
 
 
    in(values: string[]) {
-      this[liteKit.$meta].in = values
+      this[Kit.$meta].in = values
       return this
    }
 
    lt(col: string) {
-      this[liteKit.$meta].lt = col
+      this[Kit.$meta].lt = col
       return this
    }
 
    gt(col: string) {
-      this[liteKit.$meta].gt = col
+      this[Kit.$meta].gt = col
 
       return this
    }
 
    lte(col: string) {
 
-      this[liteKit.$meta].lte = col
+      this[Kit.$meta].lte = col
       return this
    }
 
 
    gte(col: string) {
 
-      this[liteKit.$meta].gte = col
+      this[Kit.$meta].gte = col
       return this
    }
 
 
-   uniqueWith(cols: string[], conflict: liteKit.UniqueConflict = 'conflict:error') {
-      this[liteKit.$meta].uniqueWith = cols
-      this[liteKit.$meta].uniqueWithConflict = conflict
+   uniqueWith(cols: string[], conflict: UniqueConflict = 'conflict:error') {
+      this[Kit.$meta].uniqueWith = cols
+      this[Kit.$meta].uniqueWithConflict = conflict
       return this
    }
 
    indexWith(cols: string[]) {
-      this[liteKit.$meta].indexWith = cols
+      this[Kit.$meta].indexWith = cols
       return this
 
    }
 
 
    uniqueIndexWith(cols: string[]) {
-      this[liteKit.$meta].uniqueIndexWith = cols
+      this[Kit.$meta].uniqueIndexWith = cols
       return this
    }
 
 
    primaryKeyWith(cols: string[]) {
-      this[liteKit.$meta].primaryKeyWith = cols
+      this[Kit.$meta].primaryKeyWith = cols
       return this
    }
-
-
-
-
 
 }
