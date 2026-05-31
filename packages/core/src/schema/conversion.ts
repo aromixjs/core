@@ -1,6 +1,5 @@
-import { LiteModel, Meta } from '../ddl/lite.type'
+import { $meta, type LiteModel, type Meta } from '@aromix/sqlite'
 import * as v from 'valibot'
-import { Kit } from '../global/kit'
 import { InsertSchema, SelectSchema, ToShape, UpdateSchema } from './conversion.type'
 import { Type } from '../global/type'
 
@@ -69,7 +68,7 @@ export class SchemaBuilder<Model extends LiteModel> {
             return Object.fromEntries(
                   Object.entries(this.model).map(([key, col]) => [
                         key,
-                        this.buildCol(col[Kit.$meta], context)
+                        this.buildCol(col[$meta], context)
                   ])
             )
       }

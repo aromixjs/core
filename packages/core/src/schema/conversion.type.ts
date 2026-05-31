@@ -1,5 +1,4 @@
-import { LiteModel, Meta } from "../ddl/lite.type"
-import { Kit } from "../global/kit"
+import { $meta, type LiteModel, type Meta } from "@aromix/sqlite"
 import * as v from 'valibot'
 
 type BaseSchema<T extends Meta['type']> =
@@ -27,7 +26,7 @@ type ApplyUpdate<M extends Meta> =
    v.OptionalSchema<BaseSchema<M['type']>, undefined>
 
 type ExtractMeta<T> =
-   T extends { readonly [K in typeof Kit.$meta]: infer M extends Meta } ? M : never
+   T extends { readonly [K in typeof $meta]: infer M extends Meta } ? M : never
 
 export type ToShape<TModel extends LiteModel, TContext extends 'select' | 'insert' | 'update'> = {
    readonly [K in keyof TModel]:

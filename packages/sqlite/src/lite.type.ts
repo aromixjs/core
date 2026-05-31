@@ -1,4 +1,4 @@
-import { Kit } from '../global/kit'
+export const $meta = Symbol.for('aromix:sqlite:meta')
 
 export type ColType = 'int' | 'real' | 'text' | 'blob' | 'boolean' | 'bigint' | 'date'
 
@@ -67,4 +67,4 @@ export interface Meta {
       primaryKeyWith?: string[]
 }
 
-export type LiteModel = Record<string, { [Kit.$meta]: Meta }>
+export type LiteModel = Record<string, { [$meta]: Meta }>

@@ -1,6 +1,4 @@
 export { Adapter } from './adapter'
 export { build, type BuildConfig } from './build'
-export { lite } from './ddl/lite.ddl'
-export * from './ddl/lite.type'
 export * from './entity'
 export { SchemaBuilder } from './schema/conversion'

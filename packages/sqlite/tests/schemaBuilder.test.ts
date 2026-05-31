@@ -1,8 +1,7 @@
 import { describe, it, expect, expectTypeOf } from 'vitest'
 import * as v from 'valibot'
-import { lite, SchemaBuilder } from '../src'
-
-// ─── helpers ───────────────────────────────────────────────────────────────
+import { lite } from '@aromix/sqlite'
+import { SchemaBuilder } from '@aromix/core'
 
 function build<T extends Record<string, lite>>(model: T) {
    return new SchemaBuilder(model)
@@ -15,8 +14,6 @@ function accepts(schema: v.GenericSchema, value: unknown) {
 function rejects(schema: v.GenericSchema, value: unknown) {
    return !v.safeParse(schema, value).success
 }
-
-// ─── base types ────────────────────────────────────────────────────────────
 
 describe('base types — select', () => {
 
@@ -63,8 +60,6 @@ describe('base types — select', () => {
    })
 
 })
-
-// ─── base types — type level ────────────────────────────────────────────────
 
 describe('base types — inferred types', () => {
 
@@ -130,8 +125,6 @@ describe('base types — inferred types', () => {
 
 })
 
-// ─── nullability ───────────────────────────────────────────────────────────
-
 describe('nullability', () => {
 
    it('select — bare column accepts null', () => {
@@ -181,8 +174,6 @@ describe('nullability', () => {
 
 })
 
-// ─── nullability — type level ───────────────────────────────────────────────
-
 describe('nullability — inferred types', () => {
 
    it('select — bare column type includes null', () => {
@@ -229,8 +220,6 @@ describe('nullability — inferred types', () => {
    })
 
 })
-
-// ─── constraints ───────────────────────────────────────────────────────────
 
 describe('constraints', () => {
 
@@ -286,8 +275,6 @@ describe('constraints', () => {
 
 })
 
-// ─── complex models ────────────────────────────────────────────────────────
-
 describe('complex model', () => {
 
    const userModel = {
@@ -304,8 +291,6 @@ describe('complex model', () => {
    }
 
    const schema = build(userModel)
-
-   // ── runtime ──────────────────────────────────────────────────────────────
 
    describe('select — runtime', () => {
 
@@ -476,8 +461,6 @@ describe('complex model', () => {
    })
 
 })
-
-// ─── edge cases ────────────────────────────────────────────────────────────
 
 describe('edge cases', () => {
 

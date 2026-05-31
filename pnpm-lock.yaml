@@ -121,6 +121,9 @@ importers:
         specifier: ^1.4.0
         version: 1.4.0(typescript@5.9.3)
     devDependencies:
+      '@aromix/sqlite':
+        specifier: workspace:^
+        version: link:../sqlite
       '@types/node':
         specifier: 'catalog:'
         version: 22.19.19
@@ -167,6 +170,24 @@ importers:
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
+
+  packages/sqlite:
+    devDependencies:
+      '@aromix/core':
+        specifier: workspace:^
+        version: link:../core
+      '@types/node':
+        specifier: 'catalog:'
+        version: 22.19.19
+      tsup:
+        specifier: 'catalog:'
+        version: 8.5.1(postcss@8.5.15)(typescript@5.9.3)
+      typescript:
+        specifier: 'catalog:'
+        version: 5.9.3
+      valibot:
+        specifier: ^1.4.0
+        version: 1.4.0(typescript@5.9.3)
 
 packages:
 
