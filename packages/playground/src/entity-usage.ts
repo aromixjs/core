@@ -1,7 +1,7 @@
-import { Entity, Storage } from '@aromix/core'
+import { Adapter, Entity } from '@aromix/core'
 import * as v from 'valibot'
 
-declare const kvStorage: Storage.KV
+declare const kvStorage: Adapter.KV
 
 Entity.kv({
       name: 'post',
@@ -27,10 +27,4 @@ Entity.kv({
                   sourceIp: v.optional(v.string()),
             }),
       }),
-
-      access(can) {
-            can.read(['id', 'title', 'body', 'author', 'createdAt'])
-            can.write(['title', 'body', 'status'])
-            can.read.omit(['internal', 'internal.sourceIp', 'author.name'])
-      },
 })

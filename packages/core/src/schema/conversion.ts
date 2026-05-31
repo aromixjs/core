@@ -1,11 +1,13 @@
 import { LiteModel, Meta } from '../ddl/lite.type'
 import * as v from 'valibot'
 import { Kit } from '../global/kit'
+import { InsertSchema, SelectSchema, ToShape, UpdateSchema } from './conversion.type'
+import { Type } from '../global/type'
 
-export class SchemaBuilder {
-      private model: LiteModel
+export class SchemaBuilder<Model extends LiteModel> {
+      private model: Model
 
-      constructor(model: LiteModel) {
+      constructor(model: Model) {
             this.model = model
       }
 
@@ -29,10 +31,10 @@ export class SchemaBuilder {
 
       private applyConstraints(schema: any, meta: Meta): any {
             if (meta.in) return v.picklist(meta.in)
-            if (meta.min) schema = v.pipe(schema, v.minValue(meta.min))
-            if (meta.max) schema = v.pipe(schema, v.maxValue(meta.max))
-            if (meta.minLength) schema = v.pipe(schema, v.minLength(meta.minLength))
-            if (meta.maxLength) schema = v.pipe(schema, v.maxLength(meta.maxLength))
+            if (meta.min !== undefined) schema = v.pipe(schema, v.minValue(meta.min))
+            if (meta.max !== undefined) schema = v.pipe(schema, v.maxValue(meta.max))
+            if (meta.minLength !== undefined) schema = v.pipe(schema, v.minLength(meta.minLength))
+            if (meta.maxLength !== undefined) schema = v.pipe(schema, v.maxLength(meta.maxLength))
             return schema
       }
 
@@ -63,18 +65,23 @@ export class SchemaBuilder {
                         return this.forUpdate(constrained)
             }
       }
-
       private buildShape(context: 'select' | 'insert' | 'update') {
-            return Object.fromEntries(Object.entries(this.model).map(([key, col]) => [key, this.buildCol(col[Kit.$meta], context)]))
+            return Object.fromEntries(
+                  Object.entries(this.model).map(([key, col]) => [
+                        key,
+                        this.buildCol(col[Kit.$meta], context)
+                  ])
+            )
+      }
+      select(): v.ObjectSchema<Type.Prettify<ToShape<Model, 'select'>>, undefined> {
+            return v.object(this.buildShape('select')) as any
       }
 
-      select() {
-            return v.object(this.buildShape('select'))
+      insert(): v.ObjectSchema<Type.Prettify<ToShape<Model, 'insert'>>, undefined> {
+            return v.object(this.buildShape('insert')) as any
       }
-      insert() {
-            return v.object(this.buildShape('insert'))
-      }
-      update() {
-            return v.object(this.buildShape('update'))
+
+      update(): v.ObjectSchema<Type.Prettify<ToShape<Model, 'update'>>, undefined> {
+            return v.object(this.buildShape('update')) as any
       }
 }
