@@ -46,6 +46,16 @@ export class Validate {
          }
       }
 
+      if (this.state.type === 'tuple' && this.state.tuple) {
+         const arr = value as unknown[]
+         for (let i = 0; i < this.state.tuple.elements.length; i++) {
+            const issues = new Validate(this.state.tuple.elements[i].state).run(arr[i])
+            for (const issue of issues) {
+               allIssues.push({ message: `[${i}]: ${issue.message}`, received: issue.received })
+            }
+         }
+      }
+
       return allIssues
    }
 
@@ -62,6 +72,7 @@ export class Validate {
          case 'never': return false
           case 'object': return typeof value === 'object' && value !== null && !Array.isArray(value)
           case 'array': return Array.isArray(value)
+          case 'tuple': return Array.isArray(value)
       }
    }
 

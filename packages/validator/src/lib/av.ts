@@ -12,6 +12,7 @@ export class av<Output> implements Schema<Output> {
       nullable: false,
       object: options.object,
       array: options.array,
+      tuple: options.tuple,
     }
   }
 
@@ -60,6 +61,10 @@ export class av<Output> implements Schema<Output> {
 
   static array<Element extends Schema>(element: Element): Chain<Element['$infer'][]> {
     return new av<Element['$infer'][]>({ type: 'array', array: { element } })
+  }
+
+  static tuple<T extends Schema[]>(elements: [...T]): Chain<{ [K in keyof T]: T[K]['$infer'] }> {
+    return new av<{ [K in keyof T]: T[K]['$infer'] }>({ type: 'tuple', tuple: { elements } })
   }
 
 

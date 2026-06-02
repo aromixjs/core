@@ -21,8 +21,8 @@ Schema validation library. Every schema is a 1:1 runtime mapping of a TypeScript
 Every primitive accepts `.message()` to override the default error when the type check fails:
 
 ```ts
-ax.string().message('Please enter your username')
-ax.number().message('Age must be a number')
+ax.string()
+ax.number()
 ```
 
 ---
@@ -49,14 +49,14 @@ Chained on any schema. Each changes `$infer`.
 .nullable()            // T → T | null
 .nullish()             // T → T | null | undefined
 .default(value)        // T | undefined → T  (absent input uses the default)
-.default(() => value)  // lazy default — function called fresh each time
+.defaultFn(() => value)  // lazy default — function called fresh each time
 ```
 
 ```ts
 ax.string().optional()          // string | undefined
 ax.number().nullable()          // number | null
 ax.string().default('guest')    // string  (never undefined in output)
-ax.array(ax.string()).default(() => [])  // fresh array each time
+ax.array(ax.string()).defaultFn(() => [])  // fresh array each time
 ```
 
 ---

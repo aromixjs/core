@@ -1,14 +1,14 @@
-import { ax, Infer } from "@aromix/validator";
+import { av, Infer } from "@aromix/validator";
 
-const name = ax.string()
-const age = ax.number()
-const active = ax.boolean()
-const score = ax.bigint()
-const tag = ax.symbol()
-const empty = ax.null()
-const missing = ax.undefined()
-const anything = ax.unknown()
-const impossible = ax.never()
+const name = av.string()
+const age = av.number()
+const active = av.boolean()
+const score = av.bigint()
+const tag = av.symbol()
+const empty = av.null()
+const missing = av.undefined()
+const anything = av.unknown()
+const impossible = av.never()
 
 type Name = typeof name.$infer      // string
 type Age = typeof age.$infer       // number
@@ -21,48 +21,48 @@ type Anything = typeof anything.$infer // unknown
 
 // --- nullability ---
 
-const optionalName = ax.string().optional()
+const optionalName = av.string().optional()
 type OptionalName = typeof optionalName.$infer   // string | undefined
 
-const nullableAge = ax.number().nullable()
+const nullableAge = av.number().nullable()
 type NullableAge = typeof nullableAge.$infer     // number | null
 
 // --- parse (stub) ---
 
-const parsedName = ax.string().parse('rifat')
+const parsedName = av.string().parse('rifat')
 //    ^? string
 
-const parsedAge = ax.number().nullable().parse(null)
+const parsedAge = av.number().nullable().parse(null)
 //    ^? number | null
 
 // --- meta ---
 
-console.log(ax.string().meta())
+console.log(av.string().meta())
 // { type: 'string', optional: false, nullable: false }
 
-console.log(ax.string().optional().meta())
+console.log(av.string().optional().meta())
 // { type: 'string', optional: true, nullable: false }
 
-console.log(ax.number().nullable().meta())
+console.log(av.number().nullable().meta())
 // { type: 'number', optional: false, nullable: true }
 
 // --- chain hides used methods ---
 
-const s = ax.string().optional()
+const s = av.string().optional()
 // s.optional() — gone, TS error
 // s.nullable() — gone, TS error
 
 // --- Infer utility ---
 
-const Schema = ax.boolean().optional()
+const Schema = av.boolean().optional()
 type SchemaOutput = Infer<typeof Schema>   // boolean | undefined
 
 
 
 
-const schemaObj = ax.object({
-   name: ax.string().nullable(),
-   age: ax.number().optional()
+const schemaObj = av.object({
+   name: av.string().nullable(),
+   age: av.number().optional()
 }).optional()
 
 
@@ -73,7 +73,7 @@ const data = schemaObj.parse({
 
 
 
-const sar = ax.array(schemaObj)
+const sar = av.array(schemaObj)
 
 
 const parsedData = sar.parse([
@@ -82,3 +82,9 @@ const parsedData = sar.parse([
       age: '20'
    }
 ])
+
+
+const tpl= av.tuple([av.string()])
+
+
+const dataTpl =tpl.parse({data:'test'})

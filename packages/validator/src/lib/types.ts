@@ -10,6 +10,7 @@ export interface AvTypeMap {
   never: never
   object: Record<string, unknown>
   array: unknown[]
+  tuple: unknown[]
 }
 
 export type AvType = keyof AvTypeMap
@@ -22,6 +23,7 @@ export interface State {
   nullable: boolean
   object?: { shape: Record<string, Schema> }
   array?: { element: Schema }
+  tuple?: { elements: Schema[] }
 }
 
 export interface Schema<Output = unknown> {
@@ -38,6 +40,7 @@ export type AvInput = {
   type: AvType
   object?: { shape: Record<string, Schema> }
   array?: { element: Schema }
+  tuple?: { elements: Schema[] }
 }
 
 export type Chain<Output, Used extends string = never> = Omit<{
