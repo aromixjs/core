@@ -22,8 +22,6 @@ export type AvType = keyof AvTypeMap
 
 export interface State {
   type: AvType
-  optional: boolean
-  nullable: boolean
   object?: { shape: Record<string, Schema> }
   array?: { element: Schema }
   tuple?: { elements: Schema[] }
@@ -52,7 +50,4 @@ export type AvInput = {
   union?: { schemas: Schema[] }
 }
 
-export type Chain<Output, Used extends string = never> = Omit<{
-  optional(): Chain<Output | undefined, Used | 'optional' | 'nullable'>
-  nullable(): Chain<Output | null, Used | 'optional' | 'nullable'>
-} & Schema<Output>, Used>
+export type Chain<Output> = Schema<Output>

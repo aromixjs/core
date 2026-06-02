@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { ValidationError,av } from "./../src/index";
+import { ValidationError, av } from "./../src/index";
 // helpers
 const pass = (schema: any, value: unknown) =>
   expect(() => schema.parse(value)).not.toThrow()
@@ -105,29 +105,27 @@ describe('av.never', () => {
   it('fails undefined', () => fail(av.never(), undefined))
 })
 
-// --- optional ---
+// --- union (replaces optional/nullable) ---
 
-describe('.optional()', () => {
-  it('passes undefined',    () => pass(av.string().optional(), undefined))
-  it('still passes string', () => pass(av.string().optional(), 'hello'))
-  it('still fails number',  () => fail(av.string().optional(), 42))
-  it('still fails null',    () => fail(av.string().optional(), null))
+describe('av.union with undefined', () => {
+  it('passes undefined',    () => pass(av.union([av.string(), av.undefined()]), undefined))
+  it('still passes string', () => pass(av.union([av.string(), av.undefined()]), 'hello'))
+  it('still fails number',  () => fail(av.union([av.string(), av.undefined()]), 42))
+  it('still fails null',    () => fail(av.union([av.string(), av.undefined()]), null))
   it('infers string | undefined', () => {
-    const schema = av.string().optional()
+    const schema = av.union([av.string(), av.undefined()])
     const val: typeof schema.$infer = undefined
     expect(val).toBeUndefined()
   })
 })
 
-// --- nullable ---
-
-describe('.nullable()', () => {
-  it('passes null',         () => pass(av.string().nullable(), null))
-  it('still passes string', () => pass(av.string().nullable(), 'hello'))
-  it('still fails number',  () => fail(av.string().nullable(), 42))
-  it('still fails undefined', () => fail(av.string().nullable(), undefined))
+describe('av.union with null', () => {
+  it('passes null',         () => pass(av.union([av.string(), av.null()]), null))
+  it('still passes string', () => pass(av.union([av.string(), av.null()]), 'hello'))
+  it('still fails number',  () => fail(av.union([av.string(), av.null()]), 42))
+  it('still fails undefined', () => fail(av.union([av.string(), av.null()]), undefined))
   it('infers string | null', () => {
-    const schema = av.string().nullable()
+    const schema = av.union([av.string(), av.null()])
     const val: typeof schema.$infer = null
     expect(val).toBeNull()
   })
@@ -153,10 +151,6 @@ describe('ValidationError', () => {
 
 describe('.meta()', () => {
   it('returns correct type',     () => expect(av.string().meta().type).toBe('string'))
-  it('optional defaults false',  () => expect(av.string().meta().optional).toBe(false))
-  it('nullable defaults false',  () => expect(av.string().meta().nullable).toBe(false))
-  it('optional sets flag',       () => expect(av.string().optional().meta().optional).toBe(true))
-  it('nullable sets flag',       () => expect(av.string().nullable().meta().nullable).toBe(true))
   it('meta is a deep clone',    () => {
     const schema = av.string()
     const m = schema.meta()

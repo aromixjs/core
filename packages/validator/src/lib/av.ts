@@ -8,8 +8,6 @@ export class av<Output> implements Schema<Output> {
   private constructor(options: AvInput) {
     this.state = {
       type: options.type,
-      optional: false,
-      nullable: false,
       object: options.object,
       array: options.array,
       tuple: options.tuple,
@@ -81,19 +79,6 @@ export class av<Output> implements Schema<Output> {
   static union<T extends Schema[]>(schemas: [...T]): Chain<T[number]['$infer']> {
     return new av<T[number]['$infer']>({ type: 'union', union: { schemas } })
   }
-
-
-  // Nullability
-  optional(): Chain<Output | undefined> {
-    this.state.optional = true
-    return this
-  }
-
-  nullable(): Chain<Output | null> {
-    this.state.nullable = true
-    return this
-  }
-
 
 
   // --- introspection ---

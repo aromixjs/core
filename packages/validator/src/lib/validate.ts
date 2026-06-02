@@ -14,9 +14,6 @@ export class Validate {
    constructor(private state: State) { }
 
    run(value: unknown): Issue[] {
-      if (value === undefined && this.state.optional) return []
-      if (value === null && this.state.nullable) return []
-
       if (!this.check(value)) {
          const message = `Expected ${this.state.type}, got ${value === null ? 'null' : typeof value}`
          return [{ message, received: value }]
