@@ -1,15 +1,17 @@
-import { AxType, Chain, Schema, State } from "./types"
+import { AxInput, Chain, Schema, State } from "./types"
 import { ValidationError, Validator } from "./validator"
 export class ax<Output> implements Schema<Output> {
 
   readonly $infer!: Output
   state: State
 
-  private constructor(options: { type: AxType }) {
+  private constructor(options: AxInput) {
     this.state = {
       type: options.type,
       optional: false,
       nullable: false,
+      object: options.object,
+      array: options.array,
     }
   }
 
@@ -51,6 +53,16 @@ export class ax<Output> implements Schema<Output> {
   }
 
 
+  // Composites ( Entry Point )
+  static object<Shape extends Record<string, Schema>>(shape: Shape): Chain<{ [Key in keyof Shape]: Shape[Key]['$infer'] }> {
+    return new ax<{ [Key in keyof Shape]: Shape[Key]['$infer'] }>({ type: 'object', object: { shape } })
+  }
+
+  static array<Element extends Schema>(element: Element): Chain<Element['$infer'][]> {
+    return new ax<Element['$infer'][]>({ type: 'array', array: { element } })
+  }
+
+
   // Nullability
   optional(): Chain<Output | undefined> {
     this.state.optional = true
@@ -69,7 +81,6 @@ export class ax<Output> implements Schema<Output> {
     return structuredClone(this.state)
   }
 
-  // --- parse (stub) ---
 
   parse(value: unknown) {
     const issues = new Validator(this.state).run(value)

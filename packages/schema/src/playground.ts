@@ -1,22 +1,22 @@
 import { ax } from "./lib/ax"
 import { Infer } from "./lib/types"
 
-const name    = ax.string()
-const age     = ax.number()
-const active  = ax.boolean()
-const score   = ax.bigint()
-const tag     = ax.symbol()
-const empty   = ax.null()
+const name = ax.string()
+const age = ax.number()
+const active = ax.boolean()
+const score = ax.bigint()
+const tag = ax.symbol()
+const empty = ax.null()
 const missing = ax.undefined()
 const anything = ax.unknown()
 const impossible = ax.never()
 
-type Name    = typeof name.$infer      // string
-type Age     = typeof age.$infer       // number
-type Active  = typeof active.$infer    // boolean
-type Score   = typeof score.$infer     // bigint
-type Tag     = typeof tag.$infer       // symbol
-type Empty   = typeof empty.$infer     // null
+type Name = typeof name.$infer      // string
+type Age = typeof age.$infer       // number
+type Active = typeof active.$infer    // boolean
+type Score = typeof score.$infer     // bigint
+type Tag = typeof tag.$infer       // symbol
+type Empty = typeof empty.$infer     // null
 type Missing = typeof missing.$infer   // undefined
 type Anything = typeof anything.$infer // unknown
 
@@ -57,3 +57,29 @@ const s = ax.string().optional()
 
 const Schema = ax.boolean().optional()
 type SchemaOutput = Infer<typeof Schema>   // boolean | undefined
+
+
+
+
+const schemaObj = ax.object({
+   name: ax.string().nullable(),
+   age: ax.number().optional()
+}).optional()
+
+
+const data = schemaObj.parse({
+   name: null,
+   age: undefined
+})
+
+
+
+const sar = ax.array(schemaObj)
+
+
+const parsedData = sar.parse([
+   {
+      name: 20,
+      age: '20'
+   }
+])
