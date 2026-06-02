@@ -6,6 +6,7 @@
       "dependencies": {
             "@aromix/bun": "workspace:^",
             "@aromix/core": "workspace:^",
+            "@aromix/validator": "workspace:^",
             "radash": "^12.1.1",
             "valibot": "^1.4.0"
       },

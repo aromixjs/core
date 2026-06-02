@@ -1,4 +1,4 @@
 {
       "files": [],
-      "references": [{ "path": "packages/core" }, { "path": "packages/bun" }, { "path": "packages/cloudflare" }, { "path": "packages/cli" }, { "path": "packages/schema" }, { "path": "packages/playground" }]
+      "references": [{ "path": "packages/core" }, { "path": "packages/bun" }, { "path": "packages/cloudflare" }, { "path": "packages/cli" }, { "path": "packages/validator" }, { "path": "packages/playground" }]
 }

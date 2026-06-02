@@ -1,5 +1,4 @@
-import { ax } from "./lib/ax"
-import { Infer } from "./lib/types"
+import { ax, Infer } from "@aromix/validator";
 
 const name = ax.string()
 const age = ax.number()

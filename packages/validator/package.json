@@ -1,5 +1,5 @@
 {
-      "name": "@aromix/schema",
+      "name": "@aromix/validator",
       "version": "0.1.0",
       "description": "Schema validation library for Aromix",
       "type": "module",
@@ -8,7 +8,7 @@
       "repository": {
             "type": "git",
             "url": "https://github.com/aromixjs/aromix.git",
-            "directory": "packages/schema"
+            "directory": "packages/validator"
       },
       "bugs": {
             "url": "https://github.com/aromixjs/aromix/issues"
