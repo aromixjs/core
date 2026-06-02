@@ -1,28 +1,24 @@
 {
-      "name": "@aromix/core",
-      "version": "0.1.3",
-      "description": "Core runtime-agnostic framework for Aromix",
+      "name": "@aromix/sqlite",
+      "version": "0.1.0",
+      "description": "SQLite DDL & DML fluent chain API for Aromix",
       "type": "module",
       "license": "MIT",
       "homepage": "https://aromixjs.github.io/aromix",
       "repository": {
             "type": "git",
             "url": "https://github.com/aromixjs/aromix.git",
-            "directory": "packages/core"
+            "directory": "packages/sqlite"
       },
       "bugs": {
             "url": "https://github.com/aromixjs/aromix/issues"
       },
       "keywords": [
             "aromix",
-            "core",
-            "server",
-            "framework",
-            "runtime-agnostic",
-            "bun",
-            "deno",
-            "cloudflare",
-            "node"
+            "sqlite",
+            "ddl",
+            "dml",
+            "fluent"
       ],
       "files": [
             "dist"
@@ -42,18 +38,11 @@
             "dev": "tsup --watch",
             "typecheck": "tsc --noEmit"
       },
-      "dependencies": {
-            "@msgpack/msgpack": "catalog:",
-            "@standard-schema/spec": "^1.1.0",
-            "valibot": "^1.4.0"
-      },
-      "peerDependencies": {
-            "@aromix/sqlite": "workspace:^"
-      },
       "devDependencies": {
-            "@aromix/sqlite": "workspace:^",
+            "@aromix/core": "workspace:^",
             "@types/node": "catalog:",
             "tsup": "catalog:",
-            "typescript": "catalog:"
+            "typescript": "catalog:",
+            "valibot": "^1.4.0"
       }
 }

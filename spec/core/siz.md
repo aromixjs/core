@@ -1,4 +1,4 @@
-**File Extension:** `.siz`
+**File Extension:** `.sliz`
 
 ## Component
 
@@ -18,7 +18,7 @@ export component Button {
 ```
 
 - Defined with `export component Name { }`
-- Multiple components can live in one `.siz` file
+- Multiple components can live in one `.sliz` file
 - Logic lives in `<script>` blocks — multiple blocks are merged into one `setup()` at compile time
 
 ---

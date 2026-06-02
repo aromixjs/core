@@ -1,46 +1,46 @@
 name: Publish
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - '.bumped'
+      push:
+            branches: [main]
+            paths:
+                  - '.bumped'
 
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
 permissions:
-  contents: write
-  id-token: write
+      contents: write
+      id-token: write
 
 jobs:
-  publish:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+      publish:
+            runs-on: ubuntu-latest
+            steps:
+                  - uses: actions/checkout@v4
+                    with:
+                          fetch-depth: 0
 
-      - uses: pnpm/action-setup@v4
+                  - uses: pnpm/action-setup@v4
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          registry-url: 'https://registry.npmjs.org'
-          cache: pnpm
+                  - uses: actions/setup-node@v4
+                    with:
+                          node-version: 22
+                          registry-url: 'https://registry.npmjs.org'
+                          cache: pnpm
 
-      - run: pnpm install --frozen-lockfile
+                  - run: pnpm install --frozen-lockfile
 
-      - uses: ./.github/actions/publish-bumped
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+                  - uses: ./.github/actions/publish-bumped
+                    env:
+                          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      - name: Clean up manifest
-        env:
-          GH_PAT: ${{ secrets.GH_PAT }}
-        run: |
-          git config user.name "aromix-bot"
-          git config user.email "bot@aromix.dev"
-          git remote set-url origin "https://x-access-token:${GH_PAT}@github.com/${{ github.repository }}"
-          git rm .bumped
-          git commit -m "chore: cleanup bumped manifest [skip ci]"
-          git push
+                  - name: Clean up manifest
+                    env:
+                          GH_PAT: ${{ secrets.GH_PAT }}
+                    run: |
+                          git config user.name "aromix-bot"
+                          git config user.email "bot@aromix.dev"
+                          git remote set-url origin "https://x-access-token:${GH_PAT}@github.com/${{ github.repository }}"
+                          git rm .bumped
+                          git commit -m "chore: cleanup bumped manifest [skip ci]"
+                          git push

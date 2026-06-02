@@ -1,3 +1,4 @@
+import { StandardSchemaV1 } from '@standard-schema/spec'
 import { Type } from './type'
 
 /**
@@ -5,6 +6,11 @@ import { Type } from './type'
  * Holds internal helper functions that are not bound to any specific feature.
  */
 export namespace Kit {
+      /**
+       * Global meta symbol that is used to hide internal data
+       */
+      export const $meta = Symbol.for('aromix:meta')
+
       /**
        * Returns a shallow clone of `input` with the specified keys removed.
        * Preserves the prototype chain.
@@ -46,5 +52,16 @@ export namespace Kit {
             walk(input, '')
 
             return keys as Type.CrushKeys<Input>[]
+      }
+
+      // Standard schema validation util
+      export async function validate<Schema extends StandardSchemaV1>(schema: Schema, value: unknown): Promise<Type.SchemaOutput<Schema>> {
+            const result = await schema['~standard'].validate(value)
+
+            if ('issues' in result) {
+                  throw new Error(`Validation failed: ${JSON.stringify(result.issues)}`)
+            }
+
+            return result.value
       }
 }

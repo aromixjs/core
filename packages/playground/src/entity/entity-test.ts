@@ -11,7 +11,7 @@ async function setup() {
       await mkdir(dataDirectory, { recursive: true })
 
       const fileKv = new FileKv(dataDirectory)
-      const kvStorage = Storage.kv(fileKv)
+      const kvStorage = Storage.KvAdapter(fileKv)
 
       return { fileKv, kvStorage }
 }
