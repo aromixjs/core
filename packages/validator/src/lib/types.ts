@@ -1,4 +1,4 @@
-export interface AvTypeMap {
+export interface AxTypeMap {
   string: string
   number: number
   boolean: boolean
@@ -16,12 +16,12 @@ export interface AvTypeMap {
   union: unknown
 }
 
-export type AvType = keyof AvTypeMap
+export type AxType = keyof AxTypeMap
 
 
 
 export interface State {
-  type: AvType
+  type: AxType
   object?: { shape: Record<string, Schema> }
   array?: { element: Schema }
   tuple?: { elements: Schema[] }
@@ -40,8 +40,8 @@ export interface Schema<Output = unknown> {
 export type Infer<SchemaType extends Schema> = SchemaType['$infer']
 
 
-export type AvInput = {
-  type: AvType
+export type AxInput = {
+  type: AxType
   object?: { shape: Record<string, Schema> }
   array?: { element: Schema }
   tuple?: { elements: Schema[] }

@@ -1,14 +1,14 @@
-import { av, Infer } from "@aromix/validator";
+import { ax, Infer } from "@aromix/validator";
 
-const name = av.string()
-const age = av.number()
-const active = av.boolean()
-const score = av.bigint()
-const tag = av.symbol()
-const empty = av.null()
-const missing = av.undefined()
-const anything = av.unknown()
-const impossible = av.never()
+const name = ax.string()
+const age = ax.number()
+const active = ax.boolean()
+const score = ax.bigint()
+const tag = ax.symbol()
+const empty = ax.null()
+const missing = ax.undefined()
+const anything = ax.unknown()
+const impossible = ax.never()
 
 type Name = typeof name.$infer      // string
 type Age = typeof age.$infer       // number
@@ -21,44 +21,44 @@ type Anything = typeof anything.$infer // unknown
 
 // --- union instead of optional/nullable ---
 
-const optionalName = av.union([av.string(), av.undefined()])
+const optionalName = ax.union([ax.string(), ax.undefined()])
 type OptionalName = typeof optionalName.$infer   // string | undefined
 
-const nullableAge = av.union([av.number(), av.null()])
+const nullableAge = ax.union([ax.number(), ax.null()])
 type NullableAge = typeof nullableAge.$infer     // number | null
 
 // --- parse ---
 
-const parsedName = av.string().parse('rifat')
+const parsedName = ax.string().parse('rifat')
 //    ^? string
 
-const parsedAge = av.union([av.number(), av.null()]).parse(null)
+const parsedAge = ax.union([ax.number(), ax.null()]).parse(null)
 //    ^? number | null
 
 // --- meta ---
 
-console.log(av.string().meta())
+console.log(ax.string().meta())
 // { type: 'string' }
 
-console.log(av.union([av.string(), av.undefined()]).meta())
+console.log(ax.union([ax.string(), ax.undefined()]).meta())
 // { type: 'union', schemas: [...] }
 
 // --- Infer utility ---
 
-const Schema = av.union([av.boolean(), av.undefined()])
+const Schema = ax.union([ax.boolean(), ax.undefined()])
 type SchemaOutput = Infer<typeof Schema>   // boolean | undefined
 
-const schemaObj = av.union([av.object({
-   name: av.union([av.string(), av.null()]),
-   age: av.union([av.number(), av.undefined()])
-}), av.undefined()])
+const schemaObj = ax.union([ax.object({
+   name: ax.union([ax.string(), ax.null()]),
+   age: ax.union([ax.number(), ax.undefined()])
+}), ax.undefined()])
 
 const data = schemaObj.parse({
    name: null,
    age: undefined
 })
 
-const sar = av.array(schemaObj)
+const sar = ax.array(schemaObj)
 
 const parsedData = sar.parse([
    {
@@ -67,35 +67,35 @@ const parsedData = sar.parse([
    }
 ])
 
-const tpl = av.tuple([av.string(), av.number()])
+const tpl = ax.tuple([ax.string(), ax.number()])
 
 const dataTpl = tpl.parse(['hello', 42])
 
 // --- literal ---
 
-const hello = av.literal('hello')
+const hello = ax.literal('hello')
 type Hello = typeof hello.$infer   // 'hello'
 
-const fortyTwo = av.literal(42)
+const fortyTwo = ax.literal(42)
 type FortyTwo = typeof fortyTwo.$infer  // 42
 
-const isTrue = av.literal(true)
+const isTrue = ax.literal(true)
 type IsTrue = typeof isTrue.$infer    // true
 
-const nothing = av.literal(null)
+const nothing = ax.literal(null)
 type Nothing = typeof nothing.$infer  // null
 
 hello.parse('hello')  // OK
 hello.parse('world')  // throws
 
-const rcs = av.record(av.string())
+const rcs = ax.record(ax.string())
 
 const rcsv = rcs.parse({})
 
-const union = av.union([
-   av.literal('1'),
-   av.literal(4),
-   av.literal('test')
+const union = ax.union([
+   ax.literal('1'),
+   ax.literal(4),
+   ax.literal('test')
 ])
 
 const parsedUnion = union.parse({})
