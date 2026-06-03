@@ -1,4 +1,4 @@
-import { AxInput, Chain, Schema, State } from "./types"
+import { AxInput, AxType, Chain, Schema, State } from "./types"
 import { Validate, ValidationError } from "./validate"
 export class ax<Output> implements Schema<Output> {
 
@@ -54,6 +54,10 @@ export class ax<Output> implements Schema<Output> {
     return new ax<never>({ type: 'never' })
   }
 
+  static date(): Chain<Date> {
+    return new ax<Date>({ type: 'date' })
+  }
+
 
   // Composites ( Entry Point )
   static object<Shape extends Record<string, Schema>>(shape: Shape): Chain<{ [Key in keyof Shape]: Shape[Key]['$infer'] }> {
@@ -88,10 +92,26 @@ export class ax<Output> implements Schema<Output> {
 
 
   parse(value: unknown) {
-    const issues = new Validate(this.state).run(value)
+    const val = parseRaw(this.state.type, value)
+    const issues = new Validate(this.state).run(val)
     if (issues.length > 0) throw new ValidationError(issues)
-    return value as Output
+    return val as Output
   }
+}
 
-
+function parseRaw(type: AxType, value: unknown): unknown {
+  switch (type) {
+    case 'string': return String(value)
+    case 'number': return Number(value)
+    case 'boolean': {
+      if (value === 'true' || value === '1' || value === 'yes' || value === 'on') return true
+      if (value === 'false' || value === '0' || value === 'no' || value === 'off') return false
+      return Boolean(value)
+    }
+    case 'bigint': {
+      try { return BigInt(value as number | string) } catch { return NaN }
+    }
+    case 'date': return new Date(value as string | number)
+    default: return value
+  }
 }

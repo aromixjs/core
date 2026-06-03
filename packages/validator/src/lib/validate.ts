@@ -1,4 +1,4 @@
-import { State } from "./types";
+import { Schema, State } from "./types";
 
 
 
@@ -26,9 +26,12 @@ export class Validate {
 
          for (const key of Object.keys(this.state.object.shape)) {
             const schema = this.state.object.shape[key]
-            const issues = new Validate(schema.state).run(obj[key])
-            for (const issue of issues) {
-               allIssues.push({ message: `${key}: ${issue.message}`, received: issue.received })
+            try { schema.parse(obj[key]) } catch (e) {
+               if (e instanceof ValidationError) {
+                  for (const issue of e.issues) {
+                     allIssues.push({ message: `${key}: ${issue.message}`, received: issue.received })
+                  }
+               }
             }
          }
       }
@@ -36,9 +39,12 @@ export class Validate {
       if (this.state.type === 'array' && this.state.array) {
          const arr = value as unknown[]
          for (let i = 0; i < arr.length; i++) {
-            const issues = new Validate(this.state.array.element.state).run(arr[i])
-            for (const issue of issues) {
-               allIssues.push({ message: `[${i}]: ${issue.message}`, received: issue.received })
+            try { this.state.array.element.parse(arr[i]) } catch (e) {
+               if (e instanceof ValidationError) {
+                  for (const issue of e.issues) {
+                     allIssues.push({ message: `[${i}]: ${issue.message}`, received: issue.received })
+                  }
+               }
             }
          }
       }
@@ -46,9 +52,12 @@ export class Validate {
       if (this.state.type === 'tuple' && this.state.tuple) {
          const arr = value as unknown[]
          for (let i = 0; i < this.state.tuple.elements.length; i++) {
-            const issues = new Validate(this.state.tuple.elements[i].state).run(arr[i])
-            for (const issue of issues) {
-               allIssues.push({ message: `[${i}]: ${issue.message}`, received: issue.received })
+            try { this.state.tuple.elements[i].parse(arr[i]) } catch (e) {
+               if (e instanceof ValidationError) {
+                  for (const issue of e.issues) {
+                     allIssues.push({ message: `[${i}]: ${issue.message}`, received: issue.received })
+                  }
+               }
             }
          }
       }
@@ -62,9 +71,12 @@ export class Validate {
       if (this.state.type === 'record' && this.state.record) {
          const obj = value as Record<string, unknown>
          for (const key of Object.keys(obj)) {
-            const issues = new Validate(this.state.record.value.state).run(obj[key])
-            for (const issue of issues) {
-               allIssues.push({ message: `${key}: ${issue.message}`, received: issue.received })
+            try { this.state.record.value.parse(obj[key]) } catch (e) {
+               if (e instanceof ValidationError) {
+                  for (const issue of e.issues) {
+                     allIssues.push({ message: `${key}: ${issue.message}`, received: issue.received })
+                  }
+               }
             }
          }
       }
@@ -72,8 +84,7 @@ export class Validate {
       if (this.state.type === 'union' && this.state.union) {
          let matched = false
          for (const schema of this.state.union.schemas) {
-            const issues = new Validate(schema.state).run(value)
-            if (issues.length === 0) { matched = true; break }
+            try { schema.parse(value); matched = true; break } catch {}
          }
          if (!matched) {
             allIssues.push({ message: `Invalid union, no branch matched`, received: value })
@@ -100,6 +111,7 @@ export class Validate {
           case 'literal': return true // checked in run() with strict equality
           case 'record': return typeof value === 'object' && value !== null && !Array.isArray(value)
           case 'union': return true // checked in run()
+          case 'date': return value instanceof Date && !isNaN(value.getTime())
       }
    }
 

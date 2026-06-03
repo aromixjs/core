@@ -33,7 +33,7 @@
             "validator:build": "pnpm --filter @aromix/validator build",
             "validator:dev": "pnpm --filter @aromix/validator dev",
             "validator:typecheck": "pnpm --filter @aromix/validator typecheck",
-            "validator:test": "vitest run --dir packages/validator",
+            "validator:test": "vitest run packages/validator/tests/",
             "change": "beachball change",
             "bump": "beachball bump",
             "release": "beachball publish --yes --access public"

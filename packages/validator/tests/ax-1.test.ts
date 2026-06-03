@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { ValidationError, ax } from "./../src/index";
-// helpers
+
 const pass = (schema: any, value: unknown) =>
   expect(() => schema.parse(value)).not.toThrow()
 
@@ -14,25 +14,19 @@ const issues = (schema: any, value: unknown) => {
   return []
 }
 
-// --- string ---
+// --- string (coerces via String()) ---
 
 describe('ax.string', () => {
   it('passes a string', () => pass(ax.string(), 'hello'))
   it('passes empty string', () => pass(ax.string(), ''))
-  it('fails number',  () => fail(ax.string(), 42))
-  it('fails boolean', () => fail(ax.string(), true))
-  it('fails null',    () => fail(ax.string(), null))
-  it('fails undefined', () => fail(ax.string(), undefined))
+  it('coerces number to string', () => expect(ax.string().parse(42)).toBe('42'))
+  it('coerces boolean to string', () => expect(ax.string().parse(true)).toBe('true'))
+  it('coerces null to string', () => expect(ax.string().parse(null)).toBe('null'))
+  it('coerces undefined to string', () => expect(ax.string().parse(undefined)).toBe('undefined'))
   it('returns the value', () => expect(ax.string().parse('hi')).toBe('hi'))
-  it('issue has correct message', () => {
-    expect(issues(ax.string(), 42)[0].message).toBe('Expected string, got number')
-  })
-  it('issue has received value', () => {
-    expect(issues(ax.string(), 42)[0].received).toBe(42)
-  })
 })
 
-// --- number ---
+// --- number (coerces via Number()) ---
 
 describe('ax.number', () => {
   it('passes integer',  () => pass(ax.number(), 42))
@@ -40,30 +34,37 @@ describe('ax.number', () => {
   it('passes negative', () => pass(ax.number(), -1))
   it('passes zero',     () => pass(ax.number(), 0))
   it('fails NaN',       () => fail(ax.number(), NaN))
-  it('fails string',    () => fail(ax.number(), '42'))
-  it('fails null',      () => fail(ax.number(), null))
+  it('coerces numeric string', () => expect(ax.number().parse('42')).toBe(42))
+  it('fails non-numeric string', () => fail(ax.number(), 'hello'))
+  it('coerces null to 0', () => expect(ax.number().parse(null)).toBe(0))
   it('returns the value', () => expect(ax.number().parse(7)).toBe(7))
 })
 
-// --- boolean ---
+// --- boolean (coerces via Boolean() with smart string matching) ---
 
 describe('ax.boolean', () => {
   it('passes true',  () => pass(ax.boolean(), true))
   it('passes false', () => pass(ax.boolean(), false))
-  it('fails 0',      () => fail(ax.boolean(), 0))
-  it('fails 1',      () => fail(ax.boolean(), 1))
-  it('fails string', () => fail(ax.boolean(), 'true'))
+  it('coerces 0 to false', () => expect(ax.boolean().parse(0)).toBe(false))
+  it('coerces 1 to true', () => expect(ax.boolean().parse(1)).toBe(true))
+  it('coerces "true" to true', () => expect(ax.boolean().parse('true')).toBe(true))
+  it('coerces "false" to false', () => expect(ax.boolean().parse('false')).toBe(false))
+  it('coerces "1" to true', () => expect(ax.boolean().parse('1')).toBe(true))
+  it('coerces "0" to false', () => expect(ax.boolean().parse('0')).toBe(false))
+  it('coerces "yes" to true', () => expect(ax.boolean().parse('yes')).toBe(true))
+  it('coerces "no" to false', () => expect(ax.boolean().parse('no')).toBe(false))
 })
 
-// --- bigint ---
+// --- bigint (coerces via BigInt()) ---
 
 describe('ax.bigint', () => {
   it('passes bigint', () => pass(ax.bigint(), 1n))
-  it('fails number',  () => fail(ax.bigint(), 1))
-  it('fails string',  () => fail(ax.bigint(), '1'))
+  it('coerces number to bigint', () => expect(ax.bigint().parse(1)).toBe(1n))
+  it('coerces numeric string to bigint', () => expect(ax.bigint().parse('1')).toBe(1n))
+  it('fails non-numeric string', () => fail(ax.bigint(), 'hello'))
 })
 
-// --- symbol ---
+// --- symbol (no coercion) ---
 
 describe('ax.symbol', () => {
   it('passes symbol', () => pass(ax.symbol(), Symbol('x')))
@@ -105,13 +106,29 @@ describe('ax.never', () => {
   it('fails undefined', () => fail(ax.never(), undefined))
 })
 
-// --- union (replaces optional/nullable) ---
+// --- date (coerces via new Date()) ---
+
+describe('ax.date', () => {
+  it('passes a Date', () => pass(ax.date(), new Date('2024-01-01')))
+  it('coerces ISO string to Date', () => {
+    const d = ax.date().parse('2024-01-01T00:00:00.000Z')
+    expect(d).toBeInstanceOf(Date)
+    expect(d.getTime()).toBe(1704067200000)
+  })
+  it('coerces timestamp to Date', () => {
+    const d = ax.date().parse(1704067200000)
+    expect(d).toBeInstanceOf(Date)
+  })
+  it('fails invalid date string', () => fail(ax.date(), 'not-a-date'))
+  it('fails NaN timestamp', () => fail(ax.date(), NaN))
+})
+
+// --- union ---
 
 describe('ax.union with undefined', () => {
   it('passes undefined',    () => pass(ax.union([ax.string(), ax.undefined()]), undefined))
   it('still passes string', () => pass(ax.union([ax.string(), ax.undefined()]), 'hello'))
-  it('still fails number',  () => fail(ax.union([ax.string(), ax.undefined()]), 42))
-  it('still fails null',    () => fail(ax.union([ax.string(), ax.undefined()]), null))
+  it('coerces number via string branch', () => pass(ax.union([ax.string(), ax.undefined()]), 42))
   it('infers string | undefined', () => {
     const schema = ax.union([ax.string(), ax.undefined()])
     const val: typeof schema.$infer = undefined
@@ -122,8 +139,7 @@ describe('ax.union with undefined', () => {
 describe('ax.union with null', () => {
   it('passes null',         () => pass(ax.union([ax.string(), ax.null()]), null))
   it('still passes string', () => pass(ax.union([ax.string(), ax.null()]), 'hello'))
-  it('still fails number',  () => fail(ax.union([ax.string(), ax.null()]), 42))
-  it('still fails undefined', () => fail(ax.union([ax.string(), ax.null()]), undefined))
+  it('coerces number via string branch', () => pass(ax.union([ax.string(), ax.null()]), 42))
   it('infers string | null', () => {
     const schema = ax.union([ax.string(), ax.null()])
     const val: typeof schema.$infer = null
@@ -135,13 +151,13 @@ describe('ax.union with null', () => {
 
 describe('ValidationError', () => {
   it('is instance of Error', () => {
-    try { ax.string().parse(1) } catch (e) {
+    try { ax.symbol().parse(1) } catch (e) {
       expect(e).toBeInstanceOf(Error)
       expect(e).toBeInstanceOf(ValidationError)
     }
   })
   it('has issues array', () => {
-    try { ax.string().parse(1) } catch (e) {
+    try { ax.symbol().parse(1) } catch (e) {
       if (e instanceof ValidationError) expect(e.issues).toHaveLength(1)
     }
   })

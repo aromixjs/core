@@ -14,6 +14,7 @@ export interface AxTypeMap {
   literal: string | number | boolean | bigint | null
   record: Record<string, unknown>
   union: unknown
+  date: Date
 }
 
 export type AxType = keyof AxTypeMap
