@@ -1,20 +1,12 @@
-import { AxInput, AxType, Chain, Schema, State } from "./types"
+import { AxType, Chain, Schema, State } from "./types"
 import { Validate, ValidationError } from "./validate"
 export class ax<Output> implements Schema<Output> {
 
   readonly $infer!: Output
   state: State
 
-  private constructor(options: AxInput) {
-    this.state = {
-      type: options.type,
-      object: options.object,
-      array: options.array,
-      tuple: options.tuple,
-      literal: options.literal,
-      record: options.record,
-      union: options.union,
-    }
+  private constructor(state: State) {
+    this.state = state
   }
 
   // Primitives ( Entry point )
@@ -85,6 +77,16 @@ export class ax<Output> implements Schema<Output> {
   }
 
 
+  // --- defaults ---
+  default(value: Output): ax<Output> {
+    return new ax<Output>({ ...this.state, default: { value }, defaultFn: undefined })
+  }
+
+  defaultFn(fn: () => Output): ax<Output> {
+    return new ax<Output>({ ...this.state, defaultFn: { fn }, default: undefined })
+  }
+
+
   // --- introspection ---
   meta(): Readonly<State> {
     return structuredClone(this.state)
@@ -92,6 +94,10 @@ export class ax<Output> implements Schema<Output> {
 
 
   parse(value: unknown) {
+    if (value === undefined) {
+      if (this.state.default !== undefined) return this.state.default.value as Output
+      if (this.state.defaultFn !== undefined) return this.state.defaultFn.fn() as Output
+    }
     const val = parseRaw(this.state.type, value)
     const issues = new Validate(this.state).run(val)
     if (issues.length > 0) throw new ValidationError(issues)

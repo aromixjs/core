@@ -6,17 +6,17 @@ Schema validation library. Every schema is a 1:1 runtime mapping of a TypeScript
 
 ## Primitives
 
-| Schema | Runtime check | TS type |
-|---|---|---|
-| `ax.string()` | `typeof x === 'string'` | `string` |
-| `ax.number()` | `typeof x === 'number' && !isNaN(x)` | `number` |
-| `ax.boolean()` | `typeof x === 'boolean'` | `boolean` |
-| `ax.bigint()` | `typeof x === 'bigint'` | `bigint` |
-| `ax.symbol()` | `typeof x === 'symbol'` | `symbol` |
-| `ax.null()` | `x === null` | `null` |
-| `ax.undefined()` | `x === undefined` | `undefined` |
-| `ax.unknown()` | always passes | `unknown` |
-| `ax.never()` | always fails | `never` |
+| Schema           | Runtime check                        | TS type     |
+| ---------------- | ------------------------------------ | ----------- |
+| `ax.string()`    | `typeof x === 'string'`              | `string`    |
+| `ax.number()`    | `typeof x === 'number' && !isNaN(x)` | `number`    |
+| `ax.boolean()`   | `typeof x === 'boolean'`             | `boolean`   |
+| `ax.bigint()`    | `typeof x === 'bigint'`              | `bigint`    |
+| `ax.symbol()`    | `typeof x === 'symbol'`              | `symbol`    |
+| `ax.null()`      | `x === null`                         | `null`      |
+| `ax.undefined()` | `x === undefined`                    | `undefined` |
+| `ax.unknown()`   | always passes                        | `unknown`   |
+| `ax.never()`     | always fails                         | `never`     |
 
 Every primitive accepts `.message()` to override the default error when the type check fails:
 
@@ -32,10 +32,10 @@ ax.number()
 Exact value match. Inferred type is the value itself.
 
 ```ts
-ax.literal('admin')   // → 'admin'
-ax.literal(42)        // → 42
-ax.literal(true)      // → true
-ax.literal(0n)        // → 0n
+ax.literal('admin') // → 'admin'
+ax.literal(42) // → 42
+ax.literal(true) // → true
+ax.literal(0n) // → 0n
 ```
 
 ---
@@ -53,10 +53,10 @@ Chained on any schema. Each changes `$infer`.
 ```
 
 ```ts
-ax.string().optional()          // string | undefined
-ax.number().nullable()          // number | null
-ax.string().default('guest')    // string  (never undefined in output)
-ax.array(ax.string()).defaultFn(() => [])  // fresh array each time
+ax.string().optional() // string | undefined
+ax.number().nullable() // number | null
+ax.string().default('guest') // string  (never undefined in output)
+ax.array(ax.string()).defaultFn(() => []) // fresh array each time
 ```
 
 ---
@@ -67,11 +67,11 @@ Validates a plain object. Undeclared keys are dropped from the output — the ou
 
 ```ts
 ax.object({
-  id:    ax.number(),
-  name:  ax.string(),
-  email: ax.string(),
-  role:  ax.union([ax.literal('admin'), ax.literal('user')]),
-  bio:   ax.string().optional(),
+      id: ax.number(),
+      name: ax.string(),
+      email: ax.string(),
+      role: ax.union([ax.literal('admin'), ax.literal('user')]),
+      bio: ax.string().optional(),
 })
 ```
 
@@ -79,22 +79,22 @@ ax.object({
 
 All return a new schema. Originals are never mutated.
 
-| Method | TS equivalent | Notes |
-|---|---|---|
-| `.pick(['a', 'b'])` | `Pick<T, 'a' \| 'b'>` | keep only listed fields |
-| `.omit(['a', 'b'])` | `Omit<T, 'a' \| 'b'>` | remove listed fields |
-| `.partial()` | `Partial<T>` | all fields optional |
-| `.partial(['a', 'b'])` | selective | only listed fields optional |
-| `.required()` | `Required<T>` | strip all optional wrappers |
-| `.readonly()` | `Readonly<T>` | type-level only, no runtime cost |
+| Method                 | TS equivalent         | Notes                            |
+| ---------------------- | --------------------- | -------------------------------- |
+| `.pick(['a', 'b'])`    | `Pick<T, 'a' \| 'b'>` | keep only listed fields          |
+| `.omit(['a', 'b'])`    | `Omit<T, 'a' \| 'b'>` | remove listed fields             |
+| `.partial()`           | `Partial<T>`          | all fields optional              |
+| `.partial(['a', 'b'])` | selective             | only listed fields optional      |
+| `.required()`          | `Required<T>`         | strip all optional wrappers      |
+| `.readonly()`          | `Readonly<T>`         | type-level only, no runtime cost |
 
 ```ts
 const User = ax.object({
-  id:        ax.number(),
-  name:      ax.string(),
-  email:     ax.string(),
-  password:  ax.string(),
-  createdAt: ax.date(),
+      id: ax.number(),
+      name: ax.string(),
+      email: ax.string(),
+      password: ax.string(),
+      createdAt: ax.date(),
 })
 
 // safe to send to client — no password, no timestamps
@@ -119,20 +119,20 @@ ax.merge([schemaA, schemaB, ...])
 
 ```ts
 const BaseEntity = ax.object({
-  id:        ax.number(),
-  createdAt: ax.coerce.date(),
-  updatedAt: ax.coerce.date(),
+      id: ax.number(),
+      createdAt: ax.coerce.date(),
+      updatedAt: ax.coerce.date(),
 })
 
 const SoftDelete = ax.object({
-  deletedAt: ax.date().nullable(),
-  deletedBy: ax.number().nullable(),
+      deletedAt: ax.date().nullable(),
+      deletedBy: ax.number().nullable(),
 })
 
 const PostFields = ax.object({
-  title:  ax.string(),
-  body:   ax.string(),
-  status: ax.union([ax.literal('draft'), ax.literal('published'), ax.literal('archived')]),
+      title: ax.string(),
+      body: ax.string(),
+      status: ax.union([ax.literal('draft'), ax.literal('published'), ax.literal('archived')]),
 })
 
 // full db model
@@ -153,15 +153,13 @@ const PostResponse = ax.merge([BaseEntity, PostFields])
 ## Array
 
 ```ts
-ax.array(schema)   // → T[]
+ax.array(schema) // → T[]
 ```
 
 ```ts
-ax.array(ax.string())            // string[]
+ax.array(ax.string()) // string[]
 ax.array(ax.number()).optional() // number[] | undefined
-ax.array(
-  ax.object({ id: ax.number(), name: ax.string() })
-)                                // { id: number, name: string }[]
+ax.array(ax.object({ id: ax.number(), name: ax.string() })) // { id: number, name: string }[]
 ```
 
 ---
@@ -171,13 +169,13 @@ ax.array(
 Fixed-length array, each position independently typed.
 
 ```ts
-ax.tuple([ax.string(), ax.number(), ax.boolean()])   // → [string, number, boolean]
+ax.tuple([ax.string(), ax.number(), ax.boolean()]) // → [string, number, boolean]
 ```
 
 ```ts
-const Coord     = ax.tuple([ax.number(), ax.number()])            // [number, number]
-const RGBColor  = ax.tuple([ax.number(), ax.number(), ax.number()]) // [number, number, number]
-const NamedPair = ax.tuple([ax.string(), ax.unknown()])           // [string, unknown]
+const Coord = ax.tuple([ax.number(), ax.number()]) // [number, number]
+const RGBColor = ax.tuple([ax.number(), ax.number(), ax.number()]) // [number, number, number]
+const NamedPair = ax.tuple([ax.string(), ax.unknown()]) // [string, unknown]
 ```
 
 ---
@@ -187,13 +185,13 @@ const NamedPair = ax.tuple([ax.string(), ax.unknown()])           // [string, un
 Dynamic keys, uniform value type.
 
 ```ts
-ax.record(keySchema, valueSchema)   // → Record<K, V>
+ax.record(keySchema, valueSchema) // → Record<K, V>
 ```
 
 Key schema must resolve to `string`, `number`, or `symbol`.
 
 ```ts
-ax.record(ax.string(), ax.number())           // Record<string, number>
+ax.record(ax.string(), ax.number()) // Record<string, number>
 ax.record(ax.string(), ax.array(ax.string())) // Record<string, string[]>
 
 // config map
@@ -207,17 +205,13 @@ const Config = ax.record(ax.string(), ax.unknown())
 Tries each schema in order. First match wins.
 
 ```ts
-ax.union([schemaA, schemaB])   // → A | B
+ax.union([schemaA, schemaB]) // → A | B
 ```
 
 No `ax.enum` — a union of literals covers it with an identical inferred type:
 
 ```ts
-const Status = ax.union([
-  ax.literal('draft'),
-  ax.literal('published'),
-  ax.literal('archived'),
-])
+const Status = ax.union([ax.literal('draft'), ax.literal('published'), ax.literal('archived')])
 // → 'draft' | 'published' | 'archived'
 
 // mixed types
@@ -232,7 +226,7 @@ const MaybeString = ax.union([ax.string(), ax.null()])
 ## Date
 
 ```ts
-ax.date()   // → Date
+ax.date() // → Date
 ```
 
 `instanceof Date && !isNaN(x.getTime())`. The extra check is necessary — `new Date('invalid')` passes `instanceof Date` but is not a valid date.
@@ -244,7 +238,7 @@ ax.date()   // → Date
 For any class.
 
 ```ts
-ax.instanceof(Constructor)   // → InstanceType<typeof Constructor>
+ax.instanceof(Constructor) // → InstanceType<typeof Constructor>
 ```
 
 ```ts
@@ -253,9 +247,12 @@ ax.instanceof(Blob)
 ax.instanceof(ArrayBuffer)
 
 class Money {
-  constructor(public amount: number, public currency: string) {}
+      constructor(
+            public amount: number,
+            public currency: string,
+      ) {}
 }
-ax.instanceof(Money)   // → Money
+ax.instanceof(Money) // → Money
 ```
 
 ---
@@ -266,19 +263,19 @@ For recursive schemas. Pass a function that returns the schema.
 
 ```ts
 const Category: ax.AnySchema = ax.lazy(() =>
-  ax.object({
-    id:       ax.number(),
-    name:     ax.string(),
-    children: ax.array(Category),
-  })
+      ax.object({
+            id: ax.number(),
+            name: ax.string(),
+            children: ax.array(Category),
+      }),
 )
 
 const TreeNode: ax.AnySchema = ax.lazy(() =>
-  ax.object({
-    value: ax.unknown(),
-    left:  ax.lazy(() => TreeNode).optional(),
-    right: ax.lazy(() => TreeNode).optional(),
-  })
+      ax.object({
+            value: ax.unknown(),
+            left: ax.lazy(() => TreeNode).optional(),
+            right: ax.lazy(() => TreeNode).optional(),
+      }),
 )
 ```
 
@@ -289,11 +286,11 @@ const TreeNode: ax.AnySchema = ax.lazy(() =>
 Convert from one JS type to another before validation. The inferred input type changes — the output type is the target type. Use at API and form boundaries where input is not yet the right JS type.
 
 ```ts
-ax.coerce.string()    // number | boolean | bigint → string
-ax.coerce.number()    // string → number
-ax.coerce.boolean()   // 0/1 → boolean, "true"/"false"/"yes"/"no"/"on"/"off" → boolean
-ax.coerce.date()      // ISO 8601 string | unix-ms integer → Date
-ax.coerce.bigint()    // number | string → bigint
+ax.coerce.string() // number | boolean | bigint → string
+ax.coerce.number() // string → number
+ax.coerce.boolean() // 0/1 → boolean, "true"/"false"/"yes"/"no"/"on"/"off" → boolean
+ax.coerce.date() // ISO 8601 string | unix-ms integer → Date
+ax.coerce.bigint() // number | string → bigint
 ```
 
 All chain methods available after coercion:
@@ -301,22 +298,22 @@ All chain methods available after coercion:
 ```ts
 // HTML form — everything arrives as a string
 const RegistrationForm = ax.object({
-  age:      ax.coerce.number(),
-  isAdmin:  ax.coerce.boolean().default(false),
-  joinedAt: ax.coerce.date(),
+      age: ax.coerce.number(),
+      isAdmin: ax.coerce.boolean().default(false),
+      joinedAt: ax.coerce.date(),
 })
 
 // database row — status stored as 0/1
 const DbUser = ax.object({
-  id:        ax.coerce.number(),
-  active:    ax.coerce.boolean(),
-  createdAt: ax.coerce.date(),
+      id: ax.coerce.number(),
+      active: ax.coerce.boolean(),
+      createdAt: ax.coerce.date(),
 })
 
 // query string params
 const PaginationQuery = ax.object({
-  page:  ax.coerce.number().default(1),
-  limit: ax.coerce.number().default(20),
+      page: ax.coerce.number().default(1),
+      limit: ax.coerce.number().default(20),
 })
 ```
 
@@ -330,13 +327,13 @@ Operators are the single extension point for everything after the type check: va
 
 ```ts
 ax.operator({
-  validate(value) {
-    // return a value   → passes, $infer becomes the return type
-    // return ax.fail() → fails with the operator's default message
-    // return ax.fail('explicit message') → fails with this message
-    // return nothing   → passes, value unchanged
-  },
-  message: 'default error message used when ax.fail() is called with no argument',
+      validate(value) {
+            // return a value   → passes, $infer becomes the return type
+            // return ax.fail() → fails with the operator's default message
+            // return ax.fail('explicit message') → fails with this message
+            // return nothing   → passes, value unchanged
+      },
+      message: 'default error message used when ax.fail() is called with no argument',
 })
 ```
 
@@ -358,37 +355,37 @@ Return nothing to pass, `ax.fail()` to reject. `$infer` does not change.
 
 ```ts
 const isInt = ax.operator({
-  message: 'Must be a whole number',
-  validate(v: number) {
-    if (!Number.isInteger(v)) return ax.fail()
-  },
+      message: 'Must be a whole number',
+      validate(v: number) {
+            if (!Number.isInteger(v)) return ax.fail()
+      },
 })
 
 const isPositive = ax.operator({
-  message: 'Must be greater than zero',
-  validate(v: number) {
-    if (v <= 0) return ax.fail()
-  },
+      message: 'Must be greater than zero',
+      validate(v: number) {
+            if (v <= 0) return ax.fail()
+      },
 })
 
 const email = ax.operator({
-  message: 'Invalid email address',
-  validate(v: string) {
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) return ax.fail()
-  },
+      message: 'Invalid email address',
+      validate(v: string) {
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) return ax.fail()
+      },
 })
 
 const uuid = ax.operator({
-  message: 'Invalid UUID',
-  validate(v: string) {
-    if (!/^[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}$/i.test(v)) return ax.fail()
-  },
+      message: 'Invalid UUID',
+      validate(v: string) {
+            if (!/^[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}$/i.test(v)) return ax.fail()
+      },
 })
 
 // usage
 const UserSchema = ax.object({
-  id:    ax.number().pipe(isInt).pipe(isPositive),
-  email: ax.string().pipe(email),
+      id: ax.number().pipe(isInt).pipe(isPositive),
+      email: ax.string().pipe(email),
 })
 ```
 
@@ -400,31 +397,40 @@ Return a new value. `$infer` becomes the return type.
 
 ```ts
 const trim = ax.operator({
-  validate(v: string) { return v.trim() },
+      validate(v: string) {
+            return v.trim()
+      },
 })
 
 const lowercase = ax.operator({
-  validate(v: string) { return v.toLowerCase() },
+      validate(v: string) {
+            return v.toLowerCase()
+      },
 })
 
 const uppercase = ax.operator({
-  validate(v: string) { return v.toUpperCase() },
+      validate(v: string) {
+            return v.toUpperCase()
+      },
 })
 
 const toNumber = ax.operator({
-  message: 'Must be a numeric string',
-  validate(v: string) {
-    const n = Number(v)
-    if (isNaN(n)) return ax.fail()
-    return n   // $infer becomes number
-  },
+      message: 'Must be a numeric string',
+      validate(v: string) {
+            const n = Number(v)
+            if (isNaN(n)) return ax.fail()
+            return n // $infer becomes number
+      },
 })
 
 const splitComma = ax.operator({
-  validate(v: string) {
-    return v.split(',').map(s => s.trim()).filter(Boolean)
-    // $infer becomes string[]
-  },
+      validate(v: string) {
+            return v
+                  .split(',')
+                  .map((s) => s.trim())
+                  .filter(Boolean)
+            // $infer becomes string[]
+      },
 })
 
 // usage
@@ -442,53 +448,59 @@ const Slug = ax.string().pipe(trim).pipe(lowercase)
 A factory is a plain function that takes arguments and returns an operator:
 
 ```ts
-const min = (n: number) => ax.operator({
-  message: `Must be at least ${n}`,
-  validate(v: number) {
-    if (v < n) return ax.fail()
-  },
-})
+const min = (n: number) =>
+      ax.operator({
+            message: `Must be at least ${n}`,
+            validate(v: number) {
+                  if (v < n) return ax.fail()
+            },
+      })
 
-const max = (n: number) => ax.operator({
-  message: `Must be at most ${n}`,
-  validate(v: number) {
-    if (v > n) return ax.fail()
-  },
-})
+const max = (n: number) =>
+      ax.operator({
+            message: `Must be at most ${n}`,
+            validate(v: number) {
+                  if (v > n) return ax.fail()
+            },
+      })
 
-const minLen = (n: number) => ax.operator({
-  message: `Must be at least ${n} characters`,
-  validate(v: string) {
-    if (v.length < n) return ax.fail()
-  },
-})
+const minLen = (n: number) =>
+      ax.operator({
+            message: `Must be at least ${n} characters`,
+            validate(v: string) {
+                  if (v.length < n) return ax.fail()
+            },
+      })
 
-const maxLen = (n: number) => ax.operator({
-  message: `Must be at most ${n} characters`,
-  validate(v: string) {
-    if (v.length > n) return ax.fail()
-  },
-})
+const maxLen = (n: number) =>
+      ax.operator({
+            message: `Must be at most ${n} characters`,
+            validate(v: string) {
+                  if (v.length > n) return ax.fail()
+            },
+      })
 
-const oneOf = (vals: string[]) => ax.operator({
-  message: `Must be one of: ${vals.join(', ')}`,
-  validate(v: string) {
-    if (!vals.includes(v)) return ax.fail()
-  },
-})
+const oneOf = (vals: string[]) =>
+      ax.operator({
+            message: `Must be one of: ${vals.join(', ')}`,
+            validate(v: string) {
+                  if (!vals.includes(v)) return ax.fail()
+            },
+      })
 
-const maxSize = (bytes: number) => ax.operator({
-  message: `File must be under ${Math.round(bytes / 1024 / 1024)}MB`,
-  validate(v: Blob) {
-    if (v.size > bytes) return ax.fail()
-  },
-})
+const maxSize = (bytes: number) =>
+      ax.operator({
+            message: `File must be under ${Math.round(bytes / 1024 / 1024)}MB`,
+            validate(v: Blob) {
+                  if (v.size > bytes) return ax.fail()
+            },
+      })
 
 // usage
-const AgeField     = ax.number().pipe(isInt).pipe(min(13)).pipe(max(120))
+
 const UsernameField = ax.string().pipe(trim).pipe(minLen(3)).pipe(maxLen(32))
-const CountryField  = ax.string().pipe(oneOf(['US', 'GB', 'BD', 'IN']))
-const AvatarField   = ax.instanceof(Blob).pipe(maxSize(5 * 1024 * 1024))
+const CountryField = ax.string().pipe(oneOf(['US', 'GB', 'BD', 'IN']))
+const AvatarField = ax.instanceof(Blob).pipe(maxSize(5 * 1024 * 1024))
 ```
 
 ---
@@ -498,25 +510,31 @@ const AvatarField   = ax.instanceof(Blob).pipe(maxSize(5 * 1024 * 1024))
 An operator applied to an object schema receives the whole object. Use `ax.fail(message, { path })` to attach the error to a specific field:
 
 ```ts
-const ResetPassword = ax.object({
-  password:        ax.string().pipe(minLen(8)),
-  confirmPassword: ax.string(),
-}).pipe(ax.operator({
-  validate(d) {
-    if (d.password !== d.confirmPassword)
-      return ax.fail('Passwords do not match', { path: ['confirmPassword'] })
-  },
-}))
+const ResetPassword = ax
+      .object({
+            password: ax.string().pipe(minLen(8)),
+            confirmPassword: ax.string(),
+      })
+      .pipe(
+            ax.operator({
+                  validate(d) {
+                        if (d.password !== d.confirmPassword) return ax.fail('Passwords do not match', { path: ['confirmPassword'] })
+                  },
+            }),
+      )
 
-const DateRange = ax.object({
-  from: ax.date(),
-  to:   ax.date(),
-}).pipe(ax.operator({
-  validate(d) {
-    if (d.to <= d.from)
-      return ax.fail('End date must be after start date', { path: ['to'] })
-  },
-}))
+const DateRange = ax
+      .object({
+            from: ax.date(),
+            to: ax.date(),
+      })
+      .pipe(
+            ax.operator({
+                  validate(d) {
+                        if (d.to <= d.from) return ax.fail('End date must be after start date', { path: ['to'] })
+                  },
+            }),
+      )
 ```
 
 ---
@@ -538,11 +556,9 @@ All issues are collected before returning — a single parse never short-circuit
 const result = UserSchema.safeParse(req.body)
 
 if (!result.ok) {
-  // map issues to field errors
-  const fieldErrors = Object.fromEntries(
-    result.issues.map(i => [i.path.join('.'), i.message])
-  )
-  return res.status(422).json({ errors: fieldErrors })
+      // map issues to field errors
+      const fieldErrors = Object.fromEntries(result.issues.map((i) => [i.path.join('.'), i.message]))
+      return res.status(422).json({ errors: fieldErrors })
 }
 
 // result.value is fully typed as typeof UserSchema.$infer
@@ -555,21 +571,21 @@ const user = result.value
 
 ```ts
 interface ValidationIssue {
-  path:     (string | number)[]  // field path, e.g. ['address', 'zip']
-  code:     IssueCode
-  message:  string
-  received: unknown              // the actual value that failed
+      path: (string | number)[] // field path, e.g. ['address', 'zip']
+      code: IssueCode
+      message: string
+      received: unknown // the actual value that failed
 }
 ```
 
-| Code | When |
-|---|---|
-| `invalid_type` | type check failed (`typeof`, `instanceof`, `===`) |
-| `invalid_literal` | literal value did not match |
-| `invalid_union` | no branch in `ax.union` matched |
-| `missing_key` | required object field was absent |
-| `coerce_failed` | `ax.coerce.*` could not convert the input |
-| `custom` | operator returned `ax.fail(...)` |
+| Code              | When                                              |
+| ----------------- | ------------------------------------------------- |
+| `invalid_type`    | type check failed (`typeof`, `instanceof`, `===`) |
+| `invalid_literal` | literal value did not match                       |
+| `invalid_union`   | no branch in `ax.union` matched                   |
+| `missing_key`     | required object field was absent                  |
+| `coerce_failed`   | `ax.coerce.*` could not convert the input         |
+| `custom`          | operator returned `ax.fail(...)`                  |
 
 ---
 
@@ -579,17 +595,17 @@ Every schema exposes `$infer`. Use `typeof schema.$infer` to get the output type
 
 ```ts
 const UserSchema = ax.object({
-  id:   ax.number(),
-  name: ax.string(),
-  role: ax.union([ax.literal('admin'), ax.literal('user')]),
+      id: ax.number(),
+      name: ax.string(),
+      role: ax.union([ax.literal('admin'), ax.literal('user')]),
 })
 
 type User = typeof UserSchema.$infer
 // → { id: number; name: string; role: 'admin' | 'user' }
 
-type Status = typeof Status.$infer   // 'draft' | 'published' | 'archived'
-type Coord  = typeof Coord.$infer    // [number, number]
-type Tags   = typeof Tags.$infer     // string[]  (after .pipe(splitComma))
+type Status = typeof Status.$infer // 'draft' | 'published' | 'archived'
+type Coord = typeof Coord.$infer // [number, number]
+type Tags = typeof Tags.$infer // string[]  (after .pipe(splitComma))
 ```
 
 `$infer` is always the final output type — post-transform if a transform operator is in the chain.
@@ -598,11 +614,11 @@ For generic utilities:
 
 ```ts
 function validate<S extends ax.AnySchema>(schema: S, value: unknown): S['$infer'] {
-  return schema.parse(value)
+      return schema.parse(value)
 }
 
 function isValid<S extends ax.AnySchema>(schema: S, value: unknown): value is S['$infer'] {
-  return schema.safeParse(value).ok
+      return schema.safeParse(value).ok
 }
 ```
 
@@ -670,4 +686,12 @@ Runs an operator only when a condition passes.
 ```ts
 ax.when(predicate, operator)
 ax.when(predicate, operator, elseOperator)
+```
+
+```ts
+const AgeField= ax.number().pipe([
+  isInt
+  min(13)
+  max(120)
+])
 ```

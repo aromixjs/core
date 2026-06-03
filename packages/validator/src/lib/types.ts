@@ -29,6 +29,8 @@ export interface State {
   literal?: { value: string | number | boolean | bigint | null }
   record?: { value: Schema }
   union?: { schemas: Schema[] }
+  default?: { value: unknown }
+  defaultFn?: { fn: () => unknown }
 }
 
 export interface Schema<Output = unknown> {
@@ -36,19 +38,10 @@ export interface Schema<Output = unknown> {
   state: State
   meta(): Readonly<State>
   parse(value: unknown): Output
+  default(value: Output): Schema<Output>
+  defaultFn(fn: () => Output): Schema<Output>
 }
 
 export type Infer<SchemaType extends Schema> = SchemaType['$infer']
-
-
-export type AxInput = {
-  type: AxType
-  object?: { shape: Record<string, Schema> }
-  array?: { element: Schema }
-  tuple?: { elements: Schema[] }
-  literal?: { value: string | number | boolean | bigint | null }
-  record?: { value: Schema }
-  union?: { schemas: Schema[] }
-}
 
 export type Chain<Output> = Schema<Output>

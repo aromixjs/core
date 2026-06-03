@@ -174,3 +174,58 @@ describe('.meta()', () => {
     expect(schema.meta().type).toBe('string')
   })
 })
+
+// --- default ---
+
+describe('.default()', () => {
+  it('returns default when value is undefined', () => {
+    expect(ax.string().default('fallback').parse(undefined)).toBe('fallback')
+  })
+  it('passes through defined value', () => {
+    expect(ax.string().default('fallback').parse('hello')).toBe('hello')
+  })
+  it('coerces then validates before default', () => {
+    expect(ax.number().default(0).parse('42')).toBe(42)
+  })
+  it('still validates defined value', () => {
+    expect(() => ax.never().default('x' as never).parse('anything')).toThrow(ValidationError)
+  })
+  it('meta includes default', () => {
+    const m = ax.string().default('x').meta()
+    expect(m.default).toEqual({ value: 'x' })
+  })
+})
+
+// --- defaultFn ---
+
+describe('.defaultFn()', () => {
+  it('returns lazy default when value is undefined', () => {
+    let calls = 0
+    const fn = () => { calls++; return 'lazy' }
+    expect(ax.string().defaultFn(fn).parse(undefined)).toBe('lazy')
+    expect(calls).toBe(1)
+  })
+  it('calls fresh each time', () => {
+    let calls = 0
+    const fn = () => { calls++; return `call-${calls}` }
+    const s = ax.string().defaultFn(fn)
+    expect(s.parse(undefined)).toBe('call-1')
+    expect(s.parse(undefined)).toBe('call-2')
+  })
+  it('passes through defined value', () => {
+    const fn = () => 'fallback'
+    expect(ax.string().defaultFn(fn).parse('hello')).toBe('hello')
+  })
+  it('last defaultFn wins', () => {
+    const s = ax.string().defaultFn(() => 'first').defaultFn(() => 'second')
+    expect(s.parse(undefined)).toBe('second')
+  })
+  it('defaultFn overrides default', () => {
+    const s = ax.string().default('static').defaultFn(() => 'lazy')
+    expect(s.parse(undefined)).toBe('lazy')
+  })
+  it('default overrides defaultFn', () => {
+    const s = ax.string().defaultFn(() => 'lazy').default('static')
+    expect(s.parse(undefined)).toBe('static')
+  })
+})
