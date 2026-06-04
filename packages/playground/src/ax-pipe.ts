@@ -1,15 +1,4 @@
-import { ax } from "@aromix/validator";
+//@ts-nocheck
+import { ax } from '@aromix/validator'
 
-const validator = ax.operator((value: string) => {
-
-
-   return value
-
-
-})
-
-
-
-const schema = ax.string().pipe([
-   validator
-])
+const schema = ax.pipe([preprocess, ax.string()])

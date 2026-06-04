@@ -1,4 +1,3 @@
-import { StandardSchemaV1 } from '@standard-schema/spec'
 import { Adapter } from '../adapter'
 import { Kit } from '../global/kit'
 import { Type } from '../global/type'

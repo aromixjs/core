@@ -22,14 +22,7 @@ async function main() {
       const posts = Entity.kv({
             name: 'post',
             storage: kvStorage,
-
             model: postSchema,
-
-            access(can) {
-                  can.read(['id', 'title', 'body', 'author'])
-                  can.write(['title', 'body', 'status'])
-                  can.read.omit(['author.name'])
-            },
       })
 
       const key = 'post-1'
@@ -44,6 +37,7 @@ async function main() {
                   name: 'Alice',
             },
       })
+
       console.log('created -> ' + join(dataDirectory, key + '.json'))
 
       const loaded = await posts.get(key)
