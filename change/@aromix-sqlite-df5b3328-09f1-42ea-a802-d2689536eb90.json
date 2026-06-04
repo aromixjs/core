@@ -1,0 +1,7 @@
+{
+  "type": "none",
+  "comment": "feat(validator): add instance schema and migrate tests to vitest",
+  "packageName": "@aromix/sqlite",
+  "email": "istiuak.0@gmail.com",
+  "dependentChangeType": "none"
+}

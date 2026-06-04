@@ -1,0 +1,7 @@
+{
+  "type": "minor",
+  "comment": "feat(validator): add instance schema and migrate tests to vitest",
+  "packageName": "@aromix/validator",
+  "email": "istiuak.0@gmail.com",
+  "dependentChangeType": "patch"
+}
