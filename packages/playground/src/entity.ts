@@ -1,19 +1,23 @@
-import { guard } from 'valibot'
+import { Adapter, Entity } from '@aromix/core'
+import { ax } from '@aromix/validator'
+
+declare const FileKv: any
+declare const dataDirectory: string
 
 const fileKv = new FileKv(dataDirectory)
-const kvStorage = Storage.KvAdapter(fileKv)
+const kvStorage = Adapter.kv(fileKv)
 
-const user = Entity.kv({
+Entity.kv({
       name: 'session',
       storage: kvStorage,
-      model: v.object({
-            id: v.string(),
-            title: v.string(),
-            body: v.string(),
-            status: v.optional(v.string(), 'draft'),
-            author: v.object({
-                  id: v.string(),
-                  name: v.string(),
+      model: ax.object({
+            id: ax.string(),
+            title: ax.string(),
+            body: ax.string(),
+            status: ax.union([ax.string(), ax.undefined()]).default('draft'),
+            author: ax.object({
+                  id: ax.string(),
+                  name: ax.string(),
             }),
       }),
 })

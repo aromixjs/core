@@ -7,8 +7,7 @@
             "@aromix/bun": "workspace:^",
             "@aromix/core": "workspace:^",
             "@aromix/validator": "workspace:^",
-            "radash": "^12.1.1",
-            "valibot": "^1.4.0"
+            "radash": "^12.1.1"
       },
       "devDependencies": {
             "@types/bun": "^1.1.13",

@@ -42,7 +42,6 @@
             "@aromix/core": "workspace:^",
             "@types/node": "catalog:",
             "tsup": "catalog:",
-            "typescript": "catalog:",
-            "valibot": "^1.4.0"
+            "typescript": "catalog:"
       }
 }

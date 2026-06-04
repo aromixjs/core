@@ -44,13 +44,11 @@
       },
       "peerDependencies": {
             "@aromix/sqlite": "workspace:^",
-            "@aromix/validator": "workspace:^",
-            "@msgpack/msgpack": "catalog:"
+            "@aromix/validator": "workspace:^"
       },
       "devDependencies": {
             "@aromix/validator": "workspace:^",
             "@aromix/sqlite": "workspace:^",
-            "@msgpack/msgpack": "catalog:",
             "@types/node": "catalog:",
             "tsup": "catalog:",
             "typescript": "catalog:"

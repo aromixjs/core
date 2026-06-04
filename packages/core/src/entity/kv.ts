@@ -1,8 +1,8 @@
+import type { AnySchema } from '@aromix/validator'
 import { Adapter } from '../adapter'
 import { Kit } from '../global/kit'
-import { Type } from '../global/type'
 
-export interface KvEntityInput<Schema extends StandardSchemaV1> {
+export interface KvEntityInput<Schema extends AnySchema> {
       name: string
       storage: Adapter.KV
       guards?: any[]
@@ -10,9 +10,9 @@ export interface KvEntityInput<Schema extends StandardSchemaV1> {
       model: Schema
 }
 
-export interface KvEntityOutput<Schema extends StandardSchemaV1> {
-      get(key: string): Promise<Type.SchemaOutput<Schema>>
-      set(key: string, value: Type.SchemaInput<Schema>): Promise<void>
+export interface KvEntityOutput<Schema extends AnySchema> {
+      get(key: string): Promise<Schema['$infer']>
+      set(key: string, value: Schema['$infer']): Promise<void>
       delete(key: string): Promise<void>
       has(key: string): Promise<boolean>
       [Kit.$meta]: {
@@ -22,20 +22,19 @@ export interface KvEntityOutput<Schema extends StandardSchemaV1> {
       }
 }
 
-export function kv<Schema extends StandardSchemaV1>(configuration: KvEntityInput<Schema>): KvEntityOutput<Schema> {
+export function kv<Schema extends AnySchema>(configuration: KvEntityInput<Schema>): KvEntityOutput<Schema> {
       const adapter = configuration.storage
 
       return {
-            async get(key: string): Promise<Type.SchemaOutput<Schema>> {
+            async get(key: string): Promise<Schema['$infer']> {
                   const formattedKey = `${configuration.name}:${key}`
                   const raw = await adapter.get(formattedKey)
-                  const validated = await Kit.validate(configuration.model, raw)
-                  return validated
+                  return configuration.model.parse(raw)
             },
 
-            async set(key: string, value: Type.SchemaInput<Schema>): Promise<void> {
+            async set(key: string, value: Schema['$infer']): Promise<void> {
                   const formattedKey = `${configuration.name}:${key}`
-                  const validated = await Kit.validate(configuration.model, value)
+                  const validated = configuration.model.parse(value)
                   await adapter.set(formattedKey, validated)
             },
 
