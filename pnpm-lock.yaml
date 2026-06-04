@@ -135,6 +135,9 @@ importers:
       '@aromix/core':
         specifier: workspace:^
         version: link:../core
+      '@aromix/sqlite':
+        specifier: workspace:^
+        version: link:../sqlite
       '@aromix/validator':
         specifier: workspace:^
         version: link:../validator

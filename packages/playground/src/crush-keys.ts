@@ -1,4 +1,4 @@
-import { ObjectProcessor } from '@aromix/core'
+import { Kit } from '@aromix/core'
 
 const config = {
       app: {
@@ -91,4 +91,5 @@ const config = {
       },
 }
 
-const flatten = new ObjectProcessor(config).crushKeys()
+const keys = Kit.crushKeys(config)
+console.log(keys)

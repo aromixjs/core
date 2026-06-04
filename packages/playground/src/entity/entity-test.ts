@@ -1,10 +1,9 @@
-import { Entity, Adapter } from '@aromix/core'
+import { Entity, Adapter, Kit } from '@aromix/core'
 import { FileKv } from '../storage/file-kv'
 import { postSchema } from './post-entity'
 import { mkdir } from 'node:fs/promises'
 import { resolve, dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { Kit } from '@aromix/core'
 
 const dataDirectory = resolve(dirname(fileURLToPath(import.meta.url)), '../../dist/posts')
 
@@ -36,6 +35,7 @@ async function main() {
             author: {
                   id: 'user-1',
                   name: 'Alice',
+                  avatar: undefined,
             },
       })
 
