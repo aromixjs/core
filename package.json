@@ -34,6 +34,10 @@
             "validator:dev": "pnpm --filter @aromix/validator dev",
             "validator:typecheck": "pnpm --filter @aromix/validator typecheck",
             "validator:test": "vitest run packages/validator/tests/",
+            "sqlite:build": "pnpm --filter @aromix/sqlite build",
+            "sqlite:dev": "pnpm --filter @aromix/sqlite dev",
+            "sqlite:typecheck": "pnpm --filter @aromix/sqlite typecheck",
+            "sqlite:test": "vitest run packages/sqlite/tests/",
             "change": "beachball change",
             "bump": "beachball bump",
             "release": "beachball publish --yes --access public"

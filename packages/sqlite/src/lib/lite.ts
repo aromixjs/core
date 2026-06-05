@@ -1,9 +1,6 @@
 import { Ddl } from './ddl'
 import type { DateFormat } from './types'
 
-export interface TableDef {
-  model: Record<string, Ddl>
-}
 
 export const lite = {
   int() {
@@ -34,13 +31,7 @@ export const lite = {
     return new Ddl<'date'>({ type: 'date', dateFormat: format })
   },
 
-  table(model: Record<string, Ddl>): TableDef {
+  table(model: Record<string, Ddl>) {
     return { model }
   },
 }
-
-
-
-const userTable = lite.table({
-  name: lite.text().notNull()
-})
