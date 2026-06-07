@@ -1,24 +1,27 @@
-import { ColType, DdlInput, DdlState, OnConflict, Collation, ReferenceTrigger } from './types'
+import { Chain } from './chain.type'
+import { ColType, ColTypeMap, DDLState } from './state.type'
 
-export class Ddl<Type extends ColType = ColType> {
-  readonly state: DdlState
+export class DDL<Type extends ColType> {
+  declare readonly $infer: ColTypeMap[Type]
+  private constructor(readonly state: DDLState) { }
 
-  constructor(input: DdlInput) {
-    this.state = {
-      type: input.type,
-      dateFormat: input.dateFormat,
+
+  // Static Entry point
+  static create<Type extends ColType>(colType: Type): Chain<Type> {
+    const state: DDLState = {
+      colType,
       primaryKey: false,
       autoIncrement: false,
       notNull: false,
-      unique: false,
     }
+
+    return new DDL<Type>(state)
   }
 
   primaryKey() {
     this.state.primaryKey = true
     return this
   }
-
   autoIncrement() {
     this.state.autoIncrement = true
     return this
@@ -29,44 +32,4 @@ export class Ddl<Type extends ColType = ColType> {
     return this
   }
 
-  unique(onConflict?: OnConflict) {
-    this.state.unique = true
-    this.state.onConflict = onConflict
-    return this
-  }
-
-  default(value: unknown) {
-    this.state.default = value
-    return this
-  }
-
-  collate(collation: Collation) {
-    this.state.collate = collation
-    return this
-  }
-
-  references(table: string, column: string, actions?: ReferenceTrigger[]) {
-    this.state.references = { table, column, actions: actions ?? [] }
-    return this
-  }
-
-  primaryKeyWith(cols: string[]) {
-    this.state.primaryKeyWith = cols
-    return this
-  }
-
-  uniqueWith(cols: string[]) {
-    this.state.uniqueWith = cols
-    return this
-  }
-
-  indexWith(cols: string[]) {
-    this.state.indexWith = cols
-    return this
-  }
-
-  uniqueIndexWith(cols: string[]) {
-    this.state.uniqueIndexWith = cols
-    return this
-  }
 }

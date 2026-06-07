@@ -1,4 +1,5 @@
 # SQLite DDL Reference
+
 > For building `@aromix/schema` → `lite` dialect
 
 ---
@@ -12,11 +13,11 @@ CREATE TABLE [IF NOT EXISTS] table_name (
 ) [WITHOUT ROWID] [STRICT];
 ```
 
-| Keyword | Notes |
-|---|---|
-| `IF NOT EXISTS` | Skip silently if table already exists |
-| `WITHOUT ROWID` | No implicit rowid column; requires explicit PK |
-| `STRICT` | Enforces actual type checking (SQLite 3.37+, D1 supports) |
+| Keyword         | Notes                                                     |
+| --------------- | --------------------------------------------------------- |
+| `IF NOT EXISTS` | Skip silently if table already exists                     |
+| `WITHOUT ROWID` | No implicit rowid column; requires explicit PK            |
+| `STRICT`        | Enforces actual type checking (SQLite 3.37+, D1 supports) |
 
 ---
 
@@ -24,33 +25,33 @@ CREATE TABLE [IF NOT EXISTS] table_name (
 
 SQLite doesn't enforce types — it uses **type affinity**. The declared name maps to one of 5 affinities.
 
-| Type | Affinity | Use for |
-|---|---|---|
-| `INTEGER` | INTEGER | Integers, booleans (0/1), foreign keys |
-| `REAL` | REAL | Floating point numbers |
-| `TEXT` | TEXT | Strings, dates (ISO8601), UUIDs |
-| `BLOB` | BLOB | Binary data, raw bytes |
-| `NUMERIC` | NUMERIC | Decimals, can store as int or real depending on value |
+| Type      | Affinity | Use for                                               |
+| --------- | -------- | ----------------------------------------------------- |
+| `INTEGER` | INTEGER  | Integers, booleans (0/1), foreign keys                |
+| `REAL`    | REAL     | Floating point numbers                                |
+| `TEXT`    | TEXT     | Strings, dates (ISO8601), UUIDs                       |
+| `BLOB`    | BLOB     | Binary data, raw bytes                                |
+| `NUMERIC` | NUMERIC  | Decimals, can store as int or real depending on value |
 
 **STRICT mode types only** (stricter enforcement when `STRICT` table option is used):
 
-| Type | Notes |
-|---|---|
-| `INT` | Alias for INTEGER in STRICT |
-| `INTEGER` | |
-| `REAL` | |
-| `TEXT` | |
-| `BLOB` | |
-| `ANY` | Accepts any type, no coercion (STRICT-only) |
+| Type      | Notes                                       |
+| --------- | ------------------------------------------- |
+| `INT`     | Alias for INTEGER in STRICT                 |
+| `INTEGER` |                                             |
+| `REAL`    |                                             |
+| `TEXT`    |                                             |
+| `BLOB`    |                                             |
+| `ANY`     | Accepts any type, no coercion (STRICT-only) |
 
 **Conventions (no native type, use these by convention):**
 
-| Convention | Stored as | Notes |
-|---|---|---|
-| `BOOLEAN` | `INTEGER` | `0` = false, `1` = true |
-| `DATE` | `TEXT` | ISO8601 format `YYYY-MM-DD` |
-| `DATETIME` | `TEXT` or `INTEGER` | ISO8601 or Unix epoch |
-| `JSON` | `TEXT` | SQLite has JSON functions that work on TEXT |
+| Convention | Stored as           | Notes                                       |
+| ---------- | ------------------- | ------------------------------------------- |
+| `BOOLEAN`  | `INTEGER`           | `0` = false, `1` = true                     |
+| `DATE`     | `TEXT`              | ISO8601 format `YYYY-MM-DD`                 |
+| `DATETIME` | `TEXT` or `INTEGER` | ISO8601 or Unix epoch                       |
+| `JSON`     | `TEXT`              | SQLite has JSON functions that work on TEXT |
 
 ---
 
@@ -102,10 +103,10 @@ flag INTEGER DEFAULT 1
 - Literal values: numbers, strings, `NULL`, `TRUE`, `FALSE`
 - Expressions: must be wrapped in `(parens)` — e.g. `DEFAULT (datetime('now'))`
 - Common expression defaults:
-  - `DEFAULT (datetime('now'))` → current UTC datetime
-  - `DEFAULT (date('now'))` → current UTC date
-  - `DEFAULT (unixepoch())` → current Unix timestamp
-  - `DEFAULT (lower(hex(randomblob(16))))` → random UUID-ish
+     - `DEFAULT (datetime('now'))` → current UTC datetime
+     - `DEFAULT (date('now'))` → current UTC date
+     - `DEFAULT (unixepoch())` → current Unix timestamp
+     - `DEFAULT (lower(hex(randomblob(16))))` → random UUID-ish
 
 ### CHECK
 
@@ -135,11 +136,11 @@ name TEXT COLLATE NOCASE
 slug TEXT COLLATE BINARY
 ```
 
-| Collation | Behavior |
-|---|---|
-| `BINARY` | Byte-by-byte comparison (default) |
-| `NOCASE` | Case-insensitive for ASCII A-Z only |
-| `RTRIM` | Ignores trailing whitespace |
+| Collation | Behavior                            |
+| --------- | ----------------------------------- |
+| `BINARY`  | Byte-by-byte comparison (default)   |
+| `NOCASE`  | Case-insensitive for ASCII A-Z only |
+| `RTRIM`   | Ignores trailing whitespace         |
 
 ### ON CONFLICT (Column-level)
 
@@ -150,13 +151,13 @@ name TEXT NOT NULL ON CONFLICT ABORT
 code TEXT UNIQUE ON CONFLICT REPLACE
 ```
 
-| Option | Behavior |
-|---|---|
-| `ABORT` | Rollback current statement, keep prior changes (default) |
-| `FAIL` | Stop at failing row, keep prior inserted rows |
-| `IGNORE` | Skip the violating row silently |
-| `REPLACE` | Delete conflicting row, insert new one |
-| `ROLLBACK` | Rollback entire transaction |
+| Option     | Behavior                                                 |
+| ---------- | -------------------------------------------------------- |
+| `ABORT`    | Rollback current statement, keep prior changes (default) |
+| `FAIL`     | Stop at failing row, keep prior inserted rows            |
+| `IGNORE`   | Skip the violating row silently                          |
+| `REPLACE`  | Delete conflicting row, insert new one                   |
+| `ROLLBACK` | Rollback entire transaction                              |
 
 ### GENERATED (Computed Columns)
 
@@ -200,12 +201,12 @@ FOREIGN KEY (col1, col2) REFERENCES other_table(col1, col2) ON DELETE CASCADE
 
 **ON DELETE / ON UPDATE actions:**
 
-| Action | Behavior |
-|---|---|
-| `NO ACTION` | Do nothing (default; error if FK violated at commit) |
-| `RESTRICT` | Error immediately on violation |
-| `CASCADE` | Propagate delete/update to child rows |
-| `SET NULL` | Set FK column to NULL on parent delete/update |
+| Action        | Behavior                                             |
+| ------------- | ---------------------------------------------------- |
+| `NO ACTION`   | Do nothing (default; error if FK violated at commit) |
+| `RESTRICT`    | Error immediately on violation                       |
+| `CASCADE`     | Propagate delete/update to child rows                |
+| `SET NULL`    | Set FK column to NULL on parent delete/update        |
 | `SET DEFAULT` | Set FK column to its DEFAULT on parent delete/update |
 
 ### CHECK (Table-level)

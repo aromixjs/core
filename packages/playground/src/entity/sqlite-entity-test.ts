@@ -34,4 +34,3 @@ console.log('Entity name:', userMeta.name)
 console.log('Adapter type:', typeof userMeta.adapter.query)
 console.log('Foreign keys:', userMeta.adapter.foreignKeys)
 console.log('WAL mode:', userMeta.adapter.wal)
-

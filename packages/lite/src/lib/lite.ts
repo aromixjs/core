@@ -1,37 +1,38 @@
-import { Ddl } from './ddl'
-import type { DateFormat } from './types'
-
+import { TableDefinition, TableModel } from './chain.type'
+import { DDL } from './ddl'
+import { DDLState } from './state.type'
 
 export const lite = {
-  int() {
-    return new Ddl<'int'>({ type: 'int' })
-  },
+      int() {
+            return DDL.create('int')
+      },
 
-  real() {
-    return new Ddl<'real'>({ type: 'real' })
-  },
+      real() {
+            return DDL.create('real')
+      },
 
-  text() {
-    return new Ddl<'text'>({ type: 'text' })
-  },
+      text() {
+            return DDL.create('text')
+      },
 
-  blob() {
-    return new Ddl<'blob'>({ type: 'blob' })
-  },
+      blob() {
+            return DDL.create('blob')
+      },
 
-  bool() {
-    return new Ddl<'boolean'>({ type: 'boolean' })
-  },
+      table<Model extends TableModel>(model: Model): TableDefinition<Model> {
+            const states = {} as { [Key in keyof Model]: DDLState }
 
-  bigint() {
-    return new Ddl<'bigint'>({ type: 'bigint' })
-  },
+            for (const key of Object.keys(model)) {
+                  states[key as keyof Model] = model[key].state
+            }
 
-  date(format: DateFormat) {
-    return new Ddl<'date'>({ type: 'date', dateFormat: format })
-  },
-
-  table(model: Record<string, Ddl>) {
-    return { model }
-  },
+            return { model, states }
+      },
 }
+
+
+
+
+const table = lite.table({
+  name: lite.text().notNull().primaryKey().autoIncrement()
+})

@@ -22,7 +22,7 @@ Validate some data:
 
 ```ts
 s.parse('hello') // 'hello'
-s.parse(42)      // throws ValidationError
+s.parse(42) // throws ValidationError
 ```
 
 ---
@@ -35,9 +35,9 @@ Every schema has two ways to validate data.
 
 ```ts
 try {
-  const val = ax.number().parse('not a number')
+      const val = ax.number().parse('not a number')
 } catch (e) {
-  // e is ValidationError
+      // e is ValidationError
 }
 ```
 
@@ -49,11 +49,11 @@ Returns a discriminated union. Check `.success` to know which branch you're in.
 const result = ax.number().safeParse('hello')
 
 if (result.success) {
-  result.data   // typed as number
-  result.errors // null
+      result.data // typed as number
+      result.errors // null
 } else {
-  result.data   // null
-  result.errors // string[] — human-readable messages
+      result.data // null
+      result.errors // string[] — human-readable messages
 }
 ```
 
@@ -65,28 +65,28 @@ TypeScript narrows the type automatically inside each `if` branch, so `result.da
 
 These cover the basic JavaScript types.
 
-| Schema | What it accepts |
-|--------|-----------------|
-| `ax.string()` | any string |
-| `ax.number()` | any number (including NaN, Infinity) |
-| `ax.boolean()` | true or false |
-| `ax.bigint()` | BigInt values |
-| `ax.symbol()` | Symbol values |
-| `ax.null()` | only null |
-| `ax.undefined()` | only undefined |
-| `ax.unknown()` | literally anything — passes through |
-| `ax.never()` | nothing — always fails |
+| Schema           | What it accepts                      |
+| ---------------- | ------------------------------------ |
+| `ax.string()`    | any string                           |
+| `ax.number()`    | any number (including NaN, Infinity) |
+| `ax.boolean()`   | true or false                        |
+| `ax.bigint()`    | BigInt values                        |
+| `ax.symbol()`    | Symbol values                        |
+| `ax.null()`      | only null                            |
+| `ax.undefined()` | only undefined                       |
+| `ax.unknown()`   | literally anything — passes through  |
+| `ax.never()`     | nothing — always fails               |
 
 ```ts
-ax.string().parse('hello')   // ✓
-ax.number().parse(42)         // ✓
-ax.boolean().parse(true)      // ✓
-ax.bigint().parse(100n)       // ✓
-ax.symbol().parse(Symbol())   // ✓
-ax.null().parse(null)         // ✓
+ax.string().parse('hello') // ✓
+ax.number().parse(42) // ✓
+ax.boolean().parse(true) // ✓
+ax.bigint().parse(100n) // ✓
+ax.symbol().parse(Symbol()) // ✓
+ax.null().parse(null) // ✓
 ax.undefined().parse(undefined) // ✓
 ax.unknown().parse('anything') // ✓
-ax.never().parse('anything')  // ✗
+ax.never().parse('anything') // ✗
 ```
 
 ---
@@ -99,8 +99,8 @@ Define the shape of an object. Each field uses its own schema.
 
 ```ts
 const User = ax.object({
-  name: ax.string(),
-  age: ax.number(),
+      name: ax.string(),
+      age: ax.number(),
 })
 
 User.parse({ name: 'Alice', age: 30 })
@@ -114,7 +114,7 @@ User.parse({ name: 'Alice', age: 30 })
 
 ```ts
 const Nested = ax.object({
-  inner: ax.object({ value: ax.number() }),
+      inner: ax.object({ value: ax.number() }),
 })
 Nested.parse({ inner: { value: 99 } }) // ✓
 ```
@@ -126,14 +126,17 @@ Every element must match the schema.
 ```ts
 const Names = ax.array(ax.string())
 Names.parse(['Alice', 'Bob']) // ✓
-Names.parse([1, 2])           // ✗
+Names.parse([1, 2]) // ✗
 ```
 
 Nested arrays:
 
 ```ts
 const Matrix = ax.array(ax.array(ax.number()))
-Matrix.parse([[1, 2], [3, 4]]) // ✓
+Matrix.parse([
+      [1, 2],
+      [3, 4],
+]) // ✓
 ```
 
 ### tuple
@@ -145,11 +148,11 @@ const Coord = ax.tuple([ax.number(), ax.number()])
 Coord.parse([10, 20]) // ✓ [number, number]
 
 // Wrong length
-Coord.parse([1])      // ✗
-Coord.parse([1,2,3])  // ✗
+Coord.parse([1]) // ✗
+Coord.parse([1, 2, 3]) // ✗
 
 // Wrong type at position
-Coord.parse(['x',10]) // ✗
+Coord.parse(['x', 10]) // ✗
 ```
 
 ### union
@@ -159,17 +162,14 @@ Tries each schema in order. Returns the first one that succeeds.
 ```ts
 const StrOrNum = ax.union([ax.string(), ax.number()])
 StrOrNum.parse('hello') // 'hello'
-StrOrNum.parse(42)      // 42
-StrOrNum.parse(true)    // ✗
+StrOrNum.parse(42) // 42
+StrOrNum.parse(true) // ✗
 ```
 
 Useful for optional fields and discriminated unions:
 
 ```ts
-const Event = ax.union([
-  ax.object({ type: ax.literal('click'), x: ax.number(), y: ax.number() }),
-  ax.object({ type: ax.literal('keydown'), key: ax.string() }),
-])
+const Event = ax.union([ax.object({ type: ax.literal('click'), x: ax.number(), y: ax.number() }), ax.object({ type: ax.literal('keydown'), key: ax.string() })])
 ```
 
 ### record
@@ -179,7 +179,7 @@ All values in an object must match the schema. Keys are always strings.
 ```ts
 const Flags = ax.record(ax.boolean())
 Flags.parse({ a: true, b: false }) // ✓
-Flags.parse({ a: 1 })              // ✗
+Flags.parse({ a: 1 }) // ✗
 ```
 
 ---
@@ -192,10 +192,10 @@ Accepts one specific value and nothing else.
 
 ```ts
 ax.literal('admin').parse('admin') // ✓
-ax.literal(42).parse(42)           // ✓
-ax.literal(true).parse(true)       // ✓
+ax.literal(42).parse(42) // ✓
+ax.literal(true).parse(true) // ✓
 
-ax.literal('admin').parse('user')  // ✗
+ax.literal('admin').parse('user') // ✗
 ```
 
 Works with `string | number | boolean | bigint | null`.
@@ -205,11 +205,13 @@ Works with `string | number | boolean | bigint | null`.
 Validates using `instanceof`.
 
 ```ts
-ax.instance(Date).parse(new Date())   // ✓
+ax.instance(Date).parse(new Date()) // ✓
 ax.instance(Date).parse('2024-01-01') // ✗
 
 // Custom classes work too
-class MyClass { constructor(public x: number) {} }
+class MyClass {
+      constructor(public x: number) {}
+}
 ax.instance(MyClass).parse(new MyClass(5)) // ✓
 ```
 
@@ -226,17 +228,18 @@ When the input is `undefined`, you can supply a fallback.
 ```ts
 const s = ax.string().default('guest')
 
-s.parse('alice')   // 'alice'
+s.parse('alice') // 'alice'
 s.parse(undefined) // 'guest'
-s.parse(null)      // ✗ (null is not undefined)
+s.parse(null) // ✗ (null is not undefined)
 ```
 
 Default is applied before pipe operators run, so the operator sees the default:
 
 ```ts
-const s = ax.string()
-  .pipe(ax.operator(v => v.toUpperCase()))
-  .default('anon')
+const s = ax
+      .string()
+      .pipe(ax.operator((v) => v.toUpperCase()))
+      .default('anon')
 
 s.parse(undefined) // 'ANON'
 ```
@@ -267,10 +270,10 @@ Use `ax.operator()`:
 
 ```ts
 const minLen = (n: number) =>
-  ax.operator((v: string) => {
-    if (v.length < n) throw `Min ${n} chars`
-    return v
-  })
+      ax.operator((v: string) => {
+            if (v.length < n) throw `Min ${n} chars`
+            return v
+      })
 ```
 
 It's just a function `(value) => newValue`. Throw an error to reject the value.
@@ -280,8 +283,8 @@ It's just a function `(value) => newValue`. Throw an error to reject the value.
 ```ts
 const Name = ax.string().pipe(minLen(2))
 
-Name.parse('Al')  // ✓
-Name.parse('A')   // ✗ ValidationError (code: 'custom')
+Name.parse('Al') // ✓
+Name.parse('A') // ✗ ValidationError (code: 'custom')
 ```
 
 ### Transformation
@@ -289,13 +292,14 @@ Name.parse('A')   // ✗ ValidationError (code: 'custom')
 The type changes as you pipe:
 
 ```ts
-const toArray  = ax.operator((v: string) => v.split(',').map(s => s.trim()))
-const first    = ax.operator((v: string[]) => v[0])
-const upper    = ax.operator((v: string) => v.toUpperCase())
+const toArray = ax.operator((v: string) => v.split(',').map((s) => s.trim()))
+const first = ax.operator((v: string[]) => v[0])
+const upper = ax.operator((v: string) => v.toUpperCase())
 
-const CsvFirst = ax.string()
-  .pipe(toArray)   // Schema<string[]>
-  .pipe(first)     // Schema<string>
+const CsvFirst = ax
+      .string()
+      .pipe(toArray) // Schema<string[]>
+      .pipe(first) // Schema<string>
 
 CsvFirst.parse('a, b, c') // 'a'
 ```
@@ -303,11 +307,7 @@ CsvFirst.parse('a, b, c') // 'a'
 ### Chaining
 
 ```ts
-const Processed = ax.string()
-  .pipe(minLen(2))
-  .pipe(upper)
-  .pipe(toArray)
-  .pipe(first)
+const Processed = ax.string().pipe(minLen(2)).pipe(upper).pipe(toArray).pipe(first)
 
 Processed.parse('john, bob') // 'JOHN'
 ```
@@ -336,13 +336,13 @@ Whatever your operator throws — string or Error — gets wrapped in a `Validat
 import { ValidationError } from '@aromix/validator'
 
 try {
-  ax.object({ name: ax.string() }).parse({ name: 42 })
+      ax.object({ name: ax.string() }).parse({ name: 42 })
 } catch (e) {
-  const err = e as ValidationError
+      const err = e as ValidationError
 
-  err.name      // 'ValidationError'
-  err.message   // "Expected string, received number at 'name'"
-  err.issues    // [{ code, path, message }]
+      err.name // 'ValidationError'
+      err.message // "Expected string, received number at 'name'"
+      err.issues // [{ code, path, message }]
 }
 ```
 
@@ -358,11 +358,11 @@ try {
 
 ### Error Codes
 
-| Code | When it happens |
-|------|-----------------|
-| `'invalidType'` | Wrong type (string instead of number, etc.) |
-| `'invalidLiteral'` | Value doesn't match the literal |
-| `'custom'` | Operator threw an error |
+| Code               | When it happens                             |
+| ------------------ | ------------------------------------------- |
+| `'invalidType'`    | Wrong type (string instead of number, etc.) |
+| `'invalidLiteral'` | Value doesn't match the literal             |
+| `'custom'`         | Operator threw an error                     |
 
 ---
 
@@ -372,8 +372,8 @@ Access the TypeScript type of any schema via `$infer`:
 
 ```ts
 const User = ax.object({
-  name: ax.string(),
-  age: ax.number(),
+      name: ax.string(),
+      age: ax.number(),
 })
 
 type T = typeof User.$infer
@@ -383,9 +383,7 @@ type T = typeof User.$infer
 Works after pipes too:
 
 ```ts
-const Slug = ax.string().pipe(
-  ax.operator(v => v.toLowerCase().replace(/\s+/g, '-'))
-)
+const Slug = ax.string().pipe(ax.operator((v) => v.toLowerCase().replace(/\s+/g, '-')))
 
 type T = typeof Slug.$infer // string
 ```
@@ -398,8 +396,8 @@ Every schema exposes its internal config through `state`:
 
 ```ts
 const s = ax.string().default('hello')
-s.state.type     // 'string'
-s.state.default  // { value: 'hello' }
+s.state.type // 'string'
+s.state.default // { value: 'hello' }
 ```
 
 Read-only inspection, useful for metaprogramming.
