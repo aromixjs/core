@@ -1,5 +1,5 @@
 import { Chain } from './chain.type'
-import { ColType, ColTypeMap, DDLState } from './state.type'
+import { Collation, ColType, ColTypeMap, DDLState, UniqueConflict } from './state.type'
 
 export class DDL<Type extends ColType> {
   declare readonly $infer: ColTypeMap[Type]
@@ -13,6 +13,10 @@ export class DDL<Type extends ColType> {
       primaryKey: false,
       autoIncrement: false,
       notNull: false,
+      unique: false,
+      uniqueConflict: 'conflict:error',
+      index: false,
+      checks: []
     }
 
     return new DDL<Type>(state)
@@ -31,5 +35,36 @@ export class DDL<Type extends ColType> {
     this.state.notNull = true
     return this
   }
+
+  unique(conflict: UniqueConflict = 'conflict:error') {
+    this.state.unique = true;
+    this.state.uniqueConflict = conflict
+    return this
+  }
+
+
+  index() {
+    this.state.index = true
+    return this
+  }
+
+  collate(value: Collation) {
+    this.state.collate = value
+    return this
+  }
+
+
+
+  // Value Checks
+
+  gt(value: number) {
+    this.state.checks.push({
+      op: 'gt',
+      val: value
+    })
+    return this
+  }
+
+
 
 }

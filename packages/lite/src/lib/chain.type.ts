@@ -1,4 +1,4 @@
-import { ColType, DDLState } from "./state.type"
+import { Collation, ColType, DDLState, UniqueConflict } from "./state.type"
 
 // Chain :: a fluent interface with phantom Used to permanently remove methods within that context
 export type Chain<Type extends ColType, Used extends string = never> = Omit<
@@ -7,6 +7,10 @@ export type Chain<Type extends ColType, Used extends string = never> = Omit<
     primaryKey(): Chain<Type, Used | 'primaryKey'>
     autoIncrement(): Chain<Type, Used | 'autoIncrement'>
     notNull(): Chain<Type, Used | 'notNull'>
+    unique(conflict?: UniqueConflict): Chain<Type, Used | 'unique'>
+    index(): Chain<Type, Used | 'index'>
+    collate(value: Collation): Chain<Type, Used | 'collate'>
+    gt(value: number): Chain<Type, Used>
   },
   Used
 >

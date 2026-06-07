@@ -34,5 +34,5 @@ export const lite = {
 
 
 const table = lite.table({
-  name: lite.text().notNull().primaryKey().autoIncrement()
+  name: lite.text().notNull().primaryKey().autoIncrement().unique().index().collate('rtrim')
 })
