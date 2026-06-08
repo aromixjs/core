@@ -1,6 +1,5 @@
-import { TableModel } from './chain.type'
+import { TableModel } from '../types/chain'
 import { DDL } from './ddl'
-import { DDLState } from './state.type'
 import { Table } from './table'
 
 export const lite = {

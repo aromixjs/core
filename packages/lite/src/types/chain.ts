@@ -1,5 +1,5 @@
 import { Operator } from '@aromix/validator'
-import { Collation, ColType, ColTypeMap, DDLState, ReferenceAction, UniqueConflict } from './state.type'
+import { Collation, ColType, ColTypeMap, DDLState, ReferenceAction, UniqueConflict } from './column'
 
 // Chain :: a fluent interface with phantom Used to permanently remove methods within that context
 export type Chain<Type extends ColType, Used extends string = never, Output = ColTypeMap[Type]> = Omit<

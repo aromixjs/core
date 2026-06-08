@@ -1,6 +1,6 @@
 import { Operator } from '@aromix/validator'
-import { Chain } from './chain.type'
-import { Collation, ColType, ColTypeMap, DDLState, ReferenceAction, UniqueConflict } from './state.type'
+import { Chain } from '../types/chain'
+import { Collation, ColType, ColTypeMap, DDLState, ReferenceAction, UniqueConflict } from '../types/column'
 
 export class DDL<Type extends ColType> {
       declare readonly $infer: ColTypeMap[Type]
