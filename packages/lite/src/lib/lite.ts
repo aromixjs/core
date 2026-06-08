@@ -1,7 +1,7 @@
-import { ax } from '@aromix/validator'
-import { TableDefinition, TableModel } from './chain.type'
+import { TableModel } from './chain.type'
 import { DDL } from './ddl'
 import { DDLState } from './state.type'
+import { Table } from './table'
 
 export const lite = {
       int() {
@@ -20,13 +20,8 @@ export const lite = {
             return DDL.create('blob')
       },
 
-      table<Model extends TableModel>(model: Model): TableDefinition<Model> {
-            const states = {} as { [Key in keyof Model]: DDLState }
-
-            for (const key of Object.keys(model)) {
-                  states[key as keyof Model] = model[key].state
-            }
-
-            return { model, states }
+      table<Model extends TableModel>(model: Model) {
+            return new Table(model)
       },
 }
+
