@@ -1,26 +1,25 @@
 import { TableModel } from '../types/chain'
-import { DDL } from './ddl'
+import { Column } from './column'
 import { Table } from './table'
 
 export const lite = {
       int() {
-            return DDL.create('int')
+            return Column.create('int')
       },
 
       real() {
-            return DDL.create('real')
+            return Column.create('real')
       },
 
       text() {
-            return DDL.create('text')
+            return Column.create('text')
       },
 
       blob() {
-            return DDL.create('blob')
+            return Column.create('blob')
       },
 
       table<Model extends TableModel>(model: Model) {
             return new Table(model)
       },
 }
-

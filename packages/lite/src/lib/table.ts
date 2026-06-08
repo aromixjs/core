@@ -1,8 +1,6 @@
 import { TableModel } from '../types/chain'
 import { DDLState, UniqueConflict } from '../types/column'
-import { Col, Ctx, TableState } from '../types/table'
-
-
+import { Ctx, TableState } from '../types/table'
 
 export class Table<Model extends TableModel> {
       readonly state: TableState<Model>
@@ -24,20 +22,12 @@ export class Table<Model extends TableModel> {
             }
       }
 
-      with(fn: (ctx: Ctx,col: Col<Model>,) => void): this {
-            fn(this.buildCtx(),this.buildCol())
+      with(fn: (ctx: Ctx<Model>) => void) {
+            fn(this.buildCtx())
             return this
       }
 
-      private buildCol(): Col<Model> {
-            const col: any = {}
-            for (const key of Object.keys(this.state.columns)) {
-                  col[key] = key
-            }
-            return col
-      }
-
-      private buildCtx(): Ctx {
+      private buildCtx(): Ctx<Model> {
             const state = this.state
 
             return {
@@ -66,19 +56,19 @@ export class Table<Model extends TableModel> {
                   },
 
                   gt(left, right) {
-                        return { left, op: 'gt' as const, right }
+                        return { left, op: 'gt', right }
                   },
 
                   gte(left, right) {
-                        return { left, op: 'gte' as const, right }
+                        return { left, op: 'gte', right }
                   },
 
                   lt(left, right) {
-                        return { left, op: 'lt' as const, right }
+                        return { left, op: 'lt', right }
                   },
 
                   lte(left, right) {
-                        return { left, op: 'lte' as const, right }
+                        return { left, op: 'lte', right }
                   },
                   withoutRowId() {
                         state.withoutRowId = true

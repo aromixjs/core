@@ -1,7 +1,5 @@
-// internal table state that will hold all the final data
-
-import { TableModel } from "./chain"
-import { DDLState, UniqueConflict } from "./column"
+import { TableModel } from './chain'
+import { DDLState, UniqueConflict } from './column'
 
 export interface CheckExpr {
       left: string
@@ -19,17 +17,16 @@ export interface TableState<Model extends TableModel> {
       withoutRowId: boolean
 }
 
-export type Col<Model extends TableModel> = { [Key in keyof Model]: Key }
-
-export interface Ctx {
-      unique(cols: string[], conflict?: UniqueConflict): void
-      primaryKey(cols: string[]): void
-      index(cols: string[]): void
-      uniqueIndex(cols: string[]): void
+export type ColKey<Model extends TableModel> = keyof Model & string
+export interface Ctx<Model extends TableModel> {
+      unique(cols: ColKey<Model>[], conflict?: UniqueConflict): void
+      primaryKey(cols: ColKey<Model>[]): void
+      index(cols: ColKey<Model>[]): void
+      uniqueIndex(cols: ColKey<Model>[]): void
       checks(exprs: CheckExpr[]): void
-      gt(left: string, right: string): CheckExpr
-      gte(left: string, right: string): CheckExpr
-      lt(left: string, right: string): CheckExpr
-      lte(left: string, right: string): CheckExpr
+      gt(left: ColKey<Model>, right: ColKey<Model>): CheckExpr
+      gte(left: ColKey<Model>, right: ColKey<Model>): CheckExpr
+      lt(left: ColKey<Model>, right: ColKey<Model>): CheckExpr
+      lte(left: ColKey<Model>, right: ColKey<Model>): CheckExpr
       withoutRowId(): void
 }

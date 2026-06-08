@@ -1,5 +1,4 @@
 import { lite } from '@aromix/lite'
-import { createServer } from 'node:http'
 
 export const UserTable = lite
       .table({
@@ -11,6 +10,8 @@ export const UserTable = lite
             bio: lite.text().default(''),
             avatar: lite.blob(),
       })
-      .with((ctx, cols) => {
-            ctx.checks([ctx.gt(cols.age, cols.avatar)])
+      .with((ctx) => {
+            ctx.checks([
+                  ctx.gt('age', 'id')
+            ])
       })

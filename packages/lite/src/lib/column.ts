@@ -2,7 +2,7 @@ import { Operator } from '@aromix/validator'
 import { Chain } from '../types/chain'
 import { Collation, ColType, ColTypeMap, DDLState, ReferenceAction, UniqueConflict } from '../types/column'
 
-export class DDL<Type extends ColType> {
+export class Column<Type extends ColType> {
       declare readonly $infer: ColTypeMap[Type]
       private constructor(readonly state: DDLState) {}
 
@@ -21,7 +21,7 @@ export class DDL<Type extends ColType> {
                   pipes: [],
             }
 
-            return new DDL<Type>(state)
+            return new Column<Type>(state)
       }
 
       primaryKey() {
