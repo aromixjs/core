@@ -6,6 +6,7 @@ const packageList = [
     { name: '@aromix/bun', file: 'packages/bun/package.json' },
     { name: '@aromix/cloudflare', file: 'packages/cloudflare/package.json' },
     { name: '@aromix/cli', file: 'packages/cli/package.json' },
+    { name: '@aromix/validator', file: 'packages/cli/package.json' },
 ]
 
 const before = {}

@@ -12,7 +12,7 @@ concurrency: ${{ github.workflow }}-${{ github.ref }}
 permissions:
     contents: write
     id-token: write
-
+    pull-requests: write
 jobs:
     publish:
         runs-on: ubuntu-latest
@@ -35,13 +35,16 @@ jobs:
               env:
                   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-            - name: Clean up manifest
-              env:
-                  GH_PAT: ${{ secrets.GH_PAT }}
-              run: |
-                  git config user.name "aromix-bot"
-                  git config user.email "bot@aromix.dev"
-                  git remote set-url origin "https://x-access-token:${GH_PAT}@github.com/${{ github.repository }}"
-                  git rm .bumped
-                  git commit -m "chore: cleanup bumped manifest [skip ci]"
-                  git push
+            - name: Remove .bumped
+              run: git rm .bumped
+
+            - uses: peter-evans/create-pull-request@v7
+              with:
+                  token: ${{ secrets.GH_PAT }}
+                  commit-message: 'chore: cleanup bumped manifest [skip ci]'
+                  title: 'chore: cleanup bumped manifest'
+                  body: 'Removes .bumped after successful publish.'
+                  branch: cleanup-bumped
+                  base: main
+                  delete-branch: true
+                  labels: cleanup
