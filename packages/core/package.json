@@ -1,7 +1,7 @@
 {
     "name": "@aromix/core",
     "version": "0.1.3",
-    "description": "Core runtime-agnostic framework for Aromix",
+    "description": "The Core Package For Aromix",
     "type": "module",
     "license": "MIT",
     "homepage": "https://aromixjs.github.io/aromix",
@@ -43,12 +43,10 @@
         "typecheck": "tsc --noEmit"
     },
     "peerDependencies": {
-        "@aromix/lite": "workspace:^",
         "@aromix/validator": "workspace:^"
     },
     "devDependencies": {
         "@aromix/validator": "workspace:^",
-        "@aromix/lite": "workspace:^",
         "@types/node": "catalog:",
         "tsup": "catalog:",
         "typescript": "catalog:"

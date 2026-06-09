@@ -1,6 +1,4 @@
-import type { TableModel } from '../types/chain'
 import { Column } from './column'
-import { Table } from './table'
 
 export const lite = {
     int() {
@@ -14,8 +12,5 @@ export const lite = {
     },
     blob() {
         return Column.create('blob')
-    },
-    table<Model extends TableModel>(model: Model) {
-        return new Table(model)
     },
 }

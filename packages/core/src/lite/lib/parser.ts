@@ -1,5 +1,5 @@
-import { TableModel } from '../types/chain'
-import { TableState } from '../types/table'
+import type { TableModel } from '../types/chain'
+import type { TableState } from '../types/table'
 
 export function toSql<Model extends TableModel>(name: string, state: TableState<Model>) {
     const sql = {
@@ -20,7 +20,6 @@ export function toSql<Model extends TableModel>(name: string, state: TableState<
         },
     }
 
-    // PARSE COLUMNS
     for (const [colName, colState] of Object.entries(state.columns)) {
         const parts: string[] = []
         parts.push(colName)
@@ -40,17 +39,9 @@ export function toSql<Model extends TableModel>(name: string, state: TableState<
                 break
         }
 
-        if (colState.primaryKey) {
-            parts.push('PRIMARY KEY')
-        }
-
-        if (colState.autoIncrement) {
-            parts.push('AUTOINCREMENT')
-        }
-
-        if (colState.notNull) {
-            parts.push('NOT NULL')
-        }
+        if (colState.primaryKey) parts.push('PRIMARY KEY')
+        if (colState.autoIncrement) parts.push('AUTOINCREMENT')
+        if (colState.notNull) parts.push('NOT NULL')
 
         if (colState.unique) {
             switch (colState.uniqueConflict) {

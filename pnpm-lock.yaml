@@ -111,9 +111,6 @@ importers:
 
   packages/core:
     devDependencies:
-      '@aromix/lite':
-        specifier: workspace:^
-        version: link:../lite
       '@aromix/validator':
         specifier: workspace:^
         version: link:../validator
