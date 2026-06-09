@@ -1,5 +1,5 @@
 import type { Operator } from '@aromix/validator'
-import type { Collation, ColumnType, ColumnTypeMap, ColumnState, ReferenceAction, UniqueConflict } from './column'
+import type { Collation, ColumnType, ColumnTypeMap, ColumnState, ReferenceAction, UniqueConflict } from './column.d'
 
 export type Chain<Type extends ColumnType, Used extends string = never, Output = ColumnTypeMap[Type]> = Omit<
     {

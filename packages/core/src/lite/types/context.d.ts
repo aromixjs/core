@@ -1,4 +1,4 @@
-import { ColumnState, UniqueConflict } from './column'
+import { ColumnState, UniqueConflict } from './column.d'
 
 export type TableState = Record<string, { readonly state: ColumnState }>
 
