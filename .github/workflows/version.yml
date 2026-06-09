@@ -44,6 +44,7 @@ jobs:
 
             - uses: peter-evans/create-pull-request@v7
               with:
+                  token: ${{ secrets.GITHUB_TOKEN }}
                   commit-message: 'chore: cleanup bumped manifest [skip ci]'
                   title: 'chore: cleanup bumped manifest'
                   body: 'Removes .bumped after successful publish.'
