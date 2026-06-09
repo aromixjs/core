@@ -1,7 +1,9 @@
 import { lite, Sqlite } from "@aromix/core";
 
 const db = Sqlite.adapter({
-   async query(sql) { },
+   async query(sql) {
+      return sql
+   },
 })
 
 
@@ -18,5 +20,7 @@ Sqlite.entity({
       bio: lite.text().default(''),
       avatar: lite.blob(),
    },
-
+   options(ctx) {
+      ctx.gt('id', 'email')
+   },
 })

@@ -1,4 +1,5 @@
-import { ColumnState } from "../ddl/types/column"
+import { TableOptionsCtx, TableState } from "../lite"
+
 
 
 export namespace Sqlite {
@@ -10,12 +11,11 @@ export namespace Sqlite {
         return adapter
     }
 
-    export interface EntityInput {
+    export interface EntityInput<State extends TableState> {
         name: string
         adapter: Sqlite.Adapter
-        columns: Record<string, {
-            readonly state: ColumnState
-        }>
+        columns: State
+        options(ctx: TableOptionsCtx<State>): void
     }
 
     export interface EntityOutput {
@@ -25,7 +25,7 @@ export namespace Sqlite {
         }
     }
 
-    export function entity(input: Sqlite.EntityInput): Sqlite.EntityOutput {
+    export function entity<State extends TableState>(input: Sqlite.EntityInput<State>): Sqlite.EntityOutput {
         return {
             state: {
                 name: input.name,
