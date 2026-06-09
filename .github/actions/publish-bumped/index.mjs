@@ -9,12 +9,13 @@ if (!existsSync('.bumped')) {
 const content = readFileSync('.bumped', 'utf8')
 const lines = content.trim().split('\n').filter(Boolean)
 
+
+execSync('pnpm -r build', { stdio: 'inherit' })
+
 for (const line of lines) {
     const parts = line.split(' ')
     const name = parts[0]
     const version = parts[1]
-
-    execSync(`pnpm --filter "${name}" build`, { stdio: 'inherit' })
 
     try {
         execSync(`npm view "${name}@${version}" version`, { stdio: 'pipe' })
