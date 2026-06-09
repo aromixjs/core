@@ -1,6 +1,6 @@
 import type { Operator } from '@aromix/validator'
-import type { Chain } from '../types/chain'
-import type { Collation, ColumnType, ColumnTypeMap, ColumnState, ReferenceAction, UniqueConflict } from '../types/column'
+import type { Chain } from './types/chain'
+import type { Collation, ColumnState, ColumnType, ColumnTypeMap, ReferenceAction, UniqueConflict } from './types/column'
 
 export class Column<Type extends ColumnType> {
     private constructor(readonly state: ColumnState) {}

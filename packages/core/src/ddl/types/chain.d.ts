@@ -25,5 +25,3 @@ export type Chain<Type extends ColumnType, Used extends string = never, Output =
     },
     Used
 >
-
-export type TableModel = Record<string, { readonly state: ColumnState }>

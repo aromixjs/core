@@ -1,15 +1,21 @@
+import { ColumnState } from "../ddl/types/column"
+
+
 export namespace Sqlite {
     export interface Adapter {
         query(sql: string): Promise<unknown>
     }
 
-    export function sqlite(adapter: Sqlite.Adapter) {
+    export function adapter(adapter: Sqlite.Adapter) {
         return adapter
     }
 
     export interface EntityInput {
         name: string
         adapter: Sqlite.Adapter
+        columns: Record<string, {
+            readonly state: ColumnState
+        }>
     }
 
     export interface EntityOutput {
