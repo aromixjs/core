@@ -29,6 +29,11 @@ export interface CheckEntry {
     val: number
 }
 
+export interface ColumnReference {
+    entityName: string
+    columnName: string
+    tableState: Record<string, ColumnState>
+}
 export interface ColumnState {
     colType: ColumnType
     primaryKey: boolean
@@ -40,7 +45,7 @@ export interface ColumnState {
     checks: CheckEntry[]
     in: string[]
     collate?: Collation
-    references?: { col: unknown; actions: ReferenceAction[] }
+    references?: { col: ColumnReference; actions: ReferenceAction[] }
     default?: unknown
     defaultFn?: () => unknown
     onUpdate?: () => unknown

@@ -1,6 +1,6 @@
 import type { Operator } from '@aromix/validator'
 import type { Chain } from './types/chain'
-import type { Collation, ColumnState, ColumnType, ColumnTypeMap, ReferenceAction, UniqueConflict } from './types/column'
+import type { Collation, ColumnReference, ColumnState, ColumnType, ColumnTypeMap, ReferenceAction, UniqueConflict } from './types/column'
 
 export class Column<Type extends ColumnType> {
     private constructor(readonly state: ColumnState) {}
@@ -78,7 +78,7 @@ export class Column<Type extends ColumnType> {
         return this
     }
 
-    references(col: unknown, actions: ReferenceAction[] = []) {
+    references(col: ColumnReference, actions: ReferenceAction[] = []) {
         this.state.references = { col, actions }
         return this
     }
