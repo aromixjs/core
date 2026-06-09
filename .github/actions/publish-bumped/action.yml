@@ -4,3 +4,7 @@ description: Read .bumped file, build and publish each package to npm
 runs:
     using: node20
     main: index.mjs
+
+outputs:
+    published:
+        description: Whether any packages were published (true/false)

@@ -18,11 +18,7 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v4
-              with:
-                  fetch-depth: 0
-
             - uses: pnpm/action-setup@v4
-
             - uses: actions/setup-node@v4
               with:
                   node-version: 22
@@ -31,20 +27,21 @@ jobs:
 
             - run: pnpm install --frozen-lockfile
 
-            - uses: ./.github/actions/publish-bumped
+            - id: publish
+              uses: ./.github/actions/publish-bumped
               env:
                   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
             - name: Remove .bumped
+              if: steps.publish.outputs.published == 'true'
               run: git rm .bumped
 
             - uses: peter-evans/create-pull-request@v7
+              if: steps.publish.outputs.published == 'true'
               with:
-                  token: ${{ secrets.GH_PAT }}
                   commit-message: 'chore: cleanup bumped manifest [skip ci]'
                   title: 'chore: cleanup bumped manifest'
                   body: 'Removes .bumped after successful publish.'
                   branch: cleanup-bumped
                   base: main
-                  delete-branch: true
                   labels: cleanup
