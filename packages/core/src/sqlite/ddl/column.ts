@@ -1,6 +1,5 @@
 import type { Operator } from '@aromix/validator'
-import type { Chain, Collation, ColumnReference, ColumnState, ColumnType, ReferenceAction, UniqueConflict } from './types'
-
+import { Chain, Collation, ColumnReference, ColumnState, ColumnType, ReferenceAction, UniqueConflict } from "./column.d";
 export class Column {
     readonly state: ColumnState
 
@@ -20,7 +19,7 @@ export class Column {
             checks: [],
             in: [],
             pipes: [],
-        }) as any
+        })
     }
 
     primaryKey() {
@@ -39,7 +38,7 @@ export class Column {
         return this
     }
 
-    unique(conflict: UniqueConflict = 'conflict:error') {
+    unique(conflict: UniqueConflict) {
         this.state.unique = true
         this.state.uniqueConflict = conflict
         return this

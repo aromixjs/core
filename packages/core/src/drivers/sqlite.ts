@@ -1,7 +1,7 @@
-import { Chain, CheckExpression, ColumnReference, ColumnState, TableOptionsCtx, UniqueConflict } from '../lite'
-import { ax, Schema, AnySchema } from '@aromix/validator'
-import { liteToAx } from '../convert/def'
-import type { LiteToAxOutput } from '../convert/types'
+import { AnySchema, ax, Schema } from '@aromix/validator'
+import type { LiteToAxOutput } from '../sqlite/ddl/conver.types'
+import { liteToAx } from '../sqlite/ddl/convert'
+import { Chain, CheckExpression, ColumnReference, ColumnState, TableOptionsCtx, UniqueConflict } from '../sqlite/ddl/lite'
 
 export namespace Sqlite {
     // Data Adapters
@@ -33,17 +33,12 @@ export namespace Sqlite {
     }
 
     // Local entity-level helpers
-    type ChainNotNull<C extends Chain<any, any, boolean, boolean, any>> =
-        C extends Chain<any, any, infer N, any, any> ? N : false
+    type ChainNotNull<C extends Chain<any, any, boolean, boolean, any>> = C extends Chain<any, any, infer N, any, any> ? N : false
 
-    type ChainAutoInc<C extends Chain<any, any, boolean, boolean, any>> =
-        C extends Chain<any, any, any, infer A, any> ? A : false
+    type ChainAutoInc<C extends Chain<any, any, boolean, boolean, any>> = C extends Chain<any, any, any, infer A, any> ? A : false
 
     type InsertOutput<S extends Record<string, Chain<any, any, boolean, boolean, any>>> = {
-        [K in keyof S as ChainAutoInc<S[K]> extends true ? never : K]:
-            ChainNotNull<S[K]> extends true
-                ? LiteToAxOutput<S[K]>
-                : LiteToAxOutput<S[K]> | undefined
+        [K in keyof S as ChainAutoInc<S[K]> extends true ? never : K]: ChainNotNull<S[K]> extends true ? LiteToAxOutput<S[K]> : LiteToAxOutput<S[K]> | undefined
     }
 
     export interface EntityOutput<State extends Record<string, Chain<any, any, boolean, boolean, any>>> {
@@ -88,7 +83,9 @@ export namespace Sqlite {
 
     // ── Entity builder ─────────────────────────────────────────────────────────
 
-    export function entity<State extends Record<string, Chain<any, any, boolean, boolean, any>>>(input: Sqlite.EntityInput<State>): Sqlite.EntityOutput<State> & {
+    export function entity<State extends Record<string, Chain<any, any, boolean, boolean, any>>>(
+        input: Sqlite.EntityInput<State>,
+    ): Sqlite.EntityOutput<State> & {
         readonly $inferSelect: { [K in keyof State]: LiteToAxOutput<State[K]> }
         readonly $inferInsert: InsertOutput<State>
         readonly $inferUpdate: { [K in keyof State]: LiteToAxOutput<State[K]> | undefined }

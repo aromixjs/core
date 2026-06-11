@@ -1,7 +1,5 @@
-import { Column } from './column'
+import { Column } from "./column"
 
-export * from './types'
-export { Column } from './column'
 export const lite = {
     int() {
         return Column.create('int')

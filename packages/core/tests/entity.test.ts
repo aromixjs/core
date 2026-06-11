@@ -3,7 +3,11 @@ import { describe, it, expect, expectTypeOf } from 'vitest'
 import { ax } from '@aromix/validator'
 import { lite, Sqlite } from '../src'
 
-const db = Sqlite.adapter({ async query(sql) { return sql } })
+const db = Sqlite.adapter({
+    async query(sql) {
+        return sql
+    },
+})
 
 describe('Sqlite.entity — basic creation', () => {
     it('creates an entity with name', () => {
@@ -11,7 +15,9 @@ describe('Sqlite.entity — basic creation', () => {
             name: 'users',
             adapter: db,
             columns: { id: lite.int().primaryKey().autoIncrement() },
-            options(ctx) { ctx.primaryKey(['id']) },
+            options(ctx) {
+                ctx.primaryKey(['id'])
+            },
         })
         expect(E.state.name).toBe('users')
     })
@@ -37,52 +43,68 @@ describe('Sqlite.entity — basic creation', () => {
 describe('Sqlite.entity — table constraints', () => {
     it('primaryKey constraint is stored', () => {
         const E = Sqlite.entity({
-            name: 't', adapter: db,
+            name: 't',
+            adapter: db,
             columns: { id: lite.int().primaryKey(), name: lite.text() },
-            options(ctx) { ctx.primaryKey(['id']) },
+            options(ctx) {
+                ctx.primaryKey(['id'])
+            },
         })
         expect(E.state.primaryKey).toEqual([{ cols: ['id'] }])
     })
 
     it('unique constraint is stored with default conflict', () => {
         const E = Sqlite.entity({
-            name: 't', adapter: db,
+            name: 't',
+            adapter: db,
             columns: { email: lite.text().notNull() },
-            options(ctx) { ctx.unique(['email']) },
+            options(ctx) {
+                ctx.unique(['email'])
+            },
         })
         expect(E.state.unique).toEqual([{ cols: ['email'], conflict: undefined }])
     })
 
     it('unique constraint with conflict strategy', () => {
         const E = Sqlite.entity({
-            name: 't', adapter: db,
+            name: 't',
+            adapter: db,
             columns: { email: lite.text().notNull() },
-            options(ctx) { ctx.unique(['email'], 'conflict:ignore') },
+            options(ctx) {
+                ctx.unique(['email'], 'conflict:ignore')
+            },
         })
         expect(E.state.unique).toEqual([{ cols: ['email'], conflict: 'conflict:ignore' }])
     })
 
     it('index constraint is stored', () => {
         const E = Sqlite.entity({
-            name: 't', adapter: db,
+            name: 't',
+            adapter: db,
             columns: { name: lite.text(), role: lite.text() },
-            options(ctx) { ctx.index(['name', 'role']) },
+            options(ctx) {
+                ctx.index(['name', 'role'])
+            },
         })
         expect(E.state.index).toEqual([{ cols: ['name', 'role'] }])
     })
 
     it('uniqueIndex constraint is stored', () => {
         const E = Sqlite.entity({
-            name: 't', adapter: db,
+            name: 't',
+            adapter: db,
             columns: { a: lite.int(), b: lite.int() },
-            options(ctx) { ctx.uniqueIndex(['a', 'b']) },
+            options(ctx) {
+                ctx.uniqueIndex(['a', 'b'])
+            },
         })
         expect(E.state.uniqueIndex).toEqual([{ cols: ['a', 'b'] }])
     })
 
     it('withoutRowId is stored', () => {
         const E = Sqlite.entity({
-            name: 't', adapter: db,
+            name: 't',
+            adapter: db,
             columns: { id: lite.int().primaryKey() },
             options(ctx) {
                 ctx.primaryKey(['id'])
@@ -94,23 +116,23 @@ describe('Sqlite.entity — table constraints', () => {
 
     it('checks with gt expression', () => {
         const E = Sqlite.entity({
-            name: 't', adapter: db,
+            name: 't',
+            adapter: db,
             columns: { age: lite.int(), id: lite.int() },
-            options(ctx) { ctx.checks([ctx.gt('age', 'id')]) },
+            options(ctx) {
+                ctx.checks([ctx.gt('age', 'id')])
+            },
         })
         expect(E.state.checks).toEqual([{ left: 'age', op: 'gt', right: 'id' }])
     })
 
     it('checks with gte, lt, lte expressions', () => {
         const E = Sqlite.entity({
-            name: 't', adapter: db,
+            name: 't',
+            adapter: db,
             columns: { a: lite.int(), b: lite.int(), c: lite.int(), d: lite.int() },
             options(ctx) {
-                ctx.checks([
-                    ctx.gte('a', 'b'),
-                    ctx.lt('c', 'd'),
-                    ctx.lte('a', 'c'),
-                ])
+                ctx.checks([ctx.gte('a', 'b'), ctx.lt('c', 'd'), ctx.lte('a', 'c')])
             },
         })
         expect(E.state.checks).toHaveLength(3)
@@ -121,9 +143,12 @@ describe('Sqlite.entity — table constraints', () => {
 
     it('checks with exprs array', () => {
         const E = Sqlite.entity({
-            name: 't', adapter: db,
+            name: 't',
+            adapter: db,
             columns: { a: lite.int(), b: lite.int() },
-            options(ctx) { ctx.checks([{ left: 'a', op: 'gt', right: 'b' }]) },
+            options(ctx) {
+                ctx.checks([{ left: 'a', op: 'gt', right: 'b' }])
+            },
         })
         expect(E.state.checks).toEqual([{ left: 'a', op: 'gt', right: 'b' }])
     })
@@ -132,9 +157,12 @@ describe('Sqlite.entity — table constraints', () => {
 describe('Sqlite.entity — col() reference', () => {
     it('returns column reference for a valid column', () => {
         const User = Sqlite.entity({
-            name: 'users', adapter: db,
+            name: 'users',
+            adapter: db,
             columns: { id: lite.int().primaryKey(), name: lite.text() },
-            options(ctx) { ctx.primaryKey(['id']) },
+            options(ctx) {
+                ctx.primaryKey(['id'])
+            },
         })
         const ref = User.col('id')
         expect(ref.entityName).toBe('users')
@@ -146,13 +174,16 @@ describe('Sqlite.entity — col() reference', () => {
 describe('Sqlite.entity — toSelectSchema', () => {
     it('returns a valid object schema', () => {
         const User = Sqlite.entity({
-            name: 'users', adapter: db,
+            name: 'users',
+            adapter: db,
             columns: {
                 id: lite.int().primaryKey().autoIncrement(),
                 name: lite.text().notNull(),
                 age: lite.int(),
             },
-            options(ctx) { ctx.primaryKey(['id']) },
+            options(ctx) {
+                ctx.primaryKey(['id'])
+            },
         })
         const schema = User.toSelectSchema()
         const row = schema.parse({ id: 1, name: 'Alice', age: null })
@@ -161,9 +192,12 @@ describe('Sqlite.entity — toSelectSchema', () => {
 
     it('rejects missing required columns', () => {
         const User = Sqlite.entity({
-            name: 'users', adapter: db,
+            name: 'users',
+            adapter: db,
             columns: { id: lite.int().primaryKey(), name: lite.text().notNull() },
-            options(ctx) { ctx.primaryKey(['id']) },
+            options(ctx) {
+                ctx.primaryKey(['id'])
+            },
         })
         const schema = User.toSelectSchema()
         expect(() => schema.parse({ id: 1 })).toThrow()
@@ -171,9 +205,12 @@ describe('Sqlite.entity — toSelectSchema', () => {
 
     it('rejects wrong types', () => {
         const User = Sqlite.entity({
-            name: 'users', adapter: db,
+            name: 'users',
+            adapter: db,
             columns: { id: lite.int().primaryKey(), name: lite.text().notNull() },
-            options(ctx) { ctx.primaryKey(['id']) },
+            options(ctx) {
+                ctx.primaryKey(['id'])
+            },
         })
         const schema = User.toSelectSchema()
         expect(() => schema.parse({ id: 'not-a-number', name: 'X' })).toThrow()
@@ -181,9 +218,12 @@ describe('Sqlite.entity — toSelectSchema', () => {
 
     it('ignores extra fields', () => {
         const User = Sqlite.entity({
-            name: 'users', adapter: db,
+            name: 'users',
+            adapter: db,
             columns: { id: lite.int().primaryKey() },
-            options(ctx) { ctx.primaryKey(['id']) },
+            options(ctx) {
+                ctx.primaryKey(['id'])
+            },
         })
         const r = User.toSelectSchema().parse({ id: 1, extra: true })
         expect(r).not.toHaveProperty('extra')
@@ -193,12 +233,15 @@ describe('Sqlite.entity — toSelectSchema', () => {
 describe('Sqlite.entity — toInsertSchema', () => {
     it('excludes autoIncrement columns', () => {
         const User = Sqlite.entity({
-            name: 'users', adapter: db,
+            name: 'users',
+            adapter: db,
             columns: {
                 id: lite.int().primaryKey().autoIncrement(),
                 name: lite.text().notNull(),
             },
-            options(ctx) { ctx.primaryKey(['id']) },
+            options(ctx) {
+                ctx.primaryKey(['id'])
+            },
         })
         const schema = User.toInsertSchema()
         const r = schema.parse({ name: 'Alice' })
@@ -208,9 +251,12 @@ describe('Sqlite.entity — toInsertSchema', () => {
 
     it('non-autoIncrement PK is required in insert', () => {
         const E = Sqlite.entity({
-            name: 't', adapter: db,
+            name: 't',
+            adapter: db,
             columns: { id: lite.int().primaryKey(), label: lite.text().notNull() },
-            options(ctx) { ctx.primaryKey(['id']) },
+            options(ctx) {
+                ctx.primaryKey(['id'])
+            },
         })
         const schema = E.toInsertSchema()
         expect(() => schema.parse({ label: 'x' })).toThrow()
@@ -219,9 +265,12 @@ describe('Sqlite.entity — toInsertSchema', () => {
 
     it('makes nullable columns accept undefined', () => {
         const E = Sqlite.entity({
-            name: 't', adapter: db,
+            name: 't',
+            adapter: db,
             columns: { id: lite.int().primaryKey(), bio: lite.text() },
-            options(ctx) { ctx.primaryKey(['id']) },
+            options(ctx) {
+                ctx.primaryKey(['id'])
+            },
         })
         const schema = E.toInsertSchema()
         const r = schema.parse({ id: 1 })
@@ -230,9 +279,12 @@ describe('Sqlite.entity — toInsertSchema', () => {
 
     it('notNull columns without default are required', () => {
         const E = Sqlite.entity({
-            name: 't', adapter: db,
+            name: 't',
+            adapter: db,
             columns: { id: lite.int().primaryKey(), name: lite.text().notNull() },
-            options(ctx) { ctx.primaryKey(['id']) },
+            options(ctx) {
+                ctx.primaryKey(['id'])
+            },
         })
         const schema = E.toInsertSchema()
         expect(() => schema.parse({ id: 1 })).toThrow()
@@ -242,9 +294,12 @@ describe('Sqlite.entity — toInsertSchema', () => {
 describe('Sqlite.entity — toUpdateSchema', () => {
     it('all columns are optional', () => {
         const E = Sqlite.entity({
-            name: 't', adapter: db,
+            name: 't',
+            adapter: db,
             columns: { id: lite.int().primaryKey(), name: lite.text().notNull() },
-            options(ctx) { ctx.primaryKey(['id']) },
+            options(ctx) {
+                ctx.primaryKey(['id'])
+            },
         })
         const schema = E.toUpdateSchema()
         expect(schema.parse({ id: 1 }).id).toBe(1)
@@ -254,9 +309,12 @@ describe('Sqlite.entity — toUpdateSchema', () => {
 
     it('preserves nullability — nullable column accepts null', () => {
         const E = Sqlite.entity({
-            name: 't', adapter: db,
+            name: 't',
+            adapter: db,
             columns: { id: lite.int().primaryKey(), bio: lite.text() },
-            options(ctx) { ctx.primaryKey(['id']) },
+            options(ctx) {
+                ctx.primaryKey(['id'])
+            },
         })
         const schema = E.toUpdateSchema()
         expect(schema.parse({ bio: null }).bio).toBe(null)
@@ -264,7 +322,8 @@ describe('Sqlite.entity — toUpdateSchema', () => {
 
     it('rejects wrong types', () => {
         const E = Sqlite.entity({
-            name: 't', adapter: db,
+            name: 't',
+            adapter: db,
             columns: { name: lite.text().notNull() },
             options(ctx) {},
         })
@@ -276,13 +335,16 @@ describe('Sqlite.entity — toUpdateSchema', () => {
 describe('Sqlite.entity — $infer types', () => {
     it('$inferSelect matches select schema type', () => {
         const User = Sqlite.entity({
-            name: 'users', adapter: db,
+            name: 'users',
+            adapter: db,
             columns: {
                 id: lite.int().primaryKey().autoIncrement(),
                 name: lite.text().notNull(),
                 age: lite.int(),
             },
-            options(ctx) { ctx.primaryKey(['id']) },
+            options(ctx) {
+                ctx.primaryKey(['id'])
+            },
         })
         type S = typeof User.$inferSelect
         const selectSchema = User.toSelectSchema()
@@ -292,13 +354,16 @@ describe('Sqlite.entity — $infer types', () => {
 
     it('$inferInsert matches insert schema type', () => {
         const User = Sqlite.entity({
-            name: 'users', adapter: db,
+            name: 'users',
+            adapter: db,
             columns: {
                 id: lite.int().primaryKey().autoIncrement(),
                 name: lite.text().notNull(),
                 age: lite.int(),
             },
-            options(ctx) { ctx.primaryKey(['id']) },
+            options(ctx) {
+                ctx.primaryKey(['id'])
+            },
         })
         type I = typeof User.$inferInsert
         const insertSchema = User.toInsertSchema()
@@ -308,13 +373,16 @@ describe('Sqlite.entity — $infer types', () => {
 
     it('$inferUpdate matches update schema type', () => {
         const User = Sqlite.entity({
-            name: 'users', adapter: db,
+            name: 'users',
+            adapter: db,
             columns: {
                 id: lite.int().primaryKey().autoIncrement(),
                 name: lite.text().notNull(),
                 age: lite.int(),
             },
-            options(ctx) { ctx.primaryKey(['id']) },
+            options(ctx) {
+                ctx.primaryKey(['id'])
+            },
         })
         type U = typeof User.$inferUpdate
         const updateSchema = User.toUpdateSchema()
@@ -361,8 +429,14 @@ describe('Sqlite.entity — complex entity', () => {
         // Select schema
         const select = User.toSelectSchema()
         const row = select.parse({
-            id: 1, name: 'Alice', email: 'a@b.com',
-            age: null, score: null, bio: null, avatar: new Uint8Array(), role: 'user',
+            id: 1,
+            name: 'Alice',
+            email: 'a@b.com',
+            age: null,
+            score: null,
+            bio: null,
+            avatar: new Uint8Array(),
+            role: 'user',
         })
         expect(row.name).toBe('Alice')
 
@@ -407,7 +481,7 @@ describe('Sqlite.entity — complex entity', () => {
 })
 
 describe('Sqlite.entity — pipes on entity columns', () => {
-    const toArray = ax.operator((v: string) => v.split(',').map(s => s.trim()))
+    const toArray = ax.operator((v: string) => v.split(',').map((s) => s.trim()))
 
     it('pipe transforms select schema output type', () => {
         const HasLabels = Sqlite.entity({
@@ -417,7 +491,9 @@ describe('Sqlite.entity — pipes on entity columns', () => {
                 id: lite.int().primaryKey().autoIncrement(),
                 labels: lite.text().notNull().pipe(toArray),
             },
-            options(ctx) { ctx.primaryKey(['id']) },
+            options(ctx) {
+                ctx.primaryKey(['id'])
+            },
         })
         const select = HasLabels.toSelectSchema()
         const row = select.parse({ id: 1, labels: 'a,b,c' })
@@ -435,7 +511,9 @@ describe('Sqlite.entity — pipes on entity columns', () => {
                 id: lite.int().primaryKey().autoIncrement(),
                 labels: lite.text().notNull().pipe(toArray),
             },
-            options(ctx) { ctx.primaryKey(['id']) },
+            options(ctx) {
+                ctx.primaryKey(['id'])
+            },
         })
         const insert = HasLabels.toInsertSchema()
         const row = insert.parse({ labels: 'x,y,z' })
@@ -459,7 +537,8 @@ describe('Sqlite.entity — edge cases', () => {
 
     it('entity with only nullable columns', () => {
         const E = Sqlite.entity({
-            name: 't', adapter: db,
+            name: 't',
+            adapter: db,
             columns: { a: lite.int(), b: lite.text(), c: lite.real() },
             options() {},
         })
@@ -470,7 +549,8 @@ describe('Sqlite.entity — edge cases', () => {
 
     it('entity with blob column', () => {
         const E = Sqlite.entity({
-            name: 't', adapter: db,
+            name: 't',
+            adapter: db,
             columns: { data: lite.blob().notNull() },
             options() {},
         })
@@ -481,17 +561,23 @@ describe('Sqlite.entity — edge cases', () => {
 
     it('references between entities via col()', () => {
         const User = Sqlite.entity({
-            name: 'users', adapter: db,
+            name: 'users',
+            adapter: db,
             columns: { id: lite.int().primaryKey(), name: lite.text().notNull() },
-            options(ctx) { ctx.primaryKey(['id']) },
+            options(ctx) {
+                ctx.primaryKey(['id'])
+            },
         })
         const Post = Sqlite.entity({
-            name: 'posts', adapter: db,
+            name: 'posts',
+            adapter: db,
             columns: {
                 id: lite.int().primaryKey().autoIncrement(),
                 userId: lite.int().notNull().references(User.col('id')),
             },
-            options(ctx) { ctx.primaryKey(['id']) },
+            options(ctx) {
+                ctx.primaryKey(['id'])
+            },
         })
         expect(Post.state.columns.userId.references!.col.columnName).toBe('id')
         expect(Post.state.columns.userId.references!.col.entityName).toBe('users')

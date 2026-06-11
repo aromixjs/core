@@ -298,7 +298,12 @@ describe('method blocking via Used type', () => {
     })
 
     it('chain supports the full builder pipeline', () => {
-        const col = lite.text().notNull().unique().default('x').pipe(ax.operator((v: string) => v.length))
+        const col = lite
+            .text()
+            .notNull()
+            .unique()
+            .default('x')
+            .pipe(ax.operator((v: string) => v.length))
         expect(col.state.notNull).toBe(true)
         expect(col.state.unique).toBe(true)
         expect(col.state.default).toBe('x')

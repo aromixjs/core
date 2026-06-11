@@ -71,7 +71,14 @@ const Tag = Sqlite.entity({
     adapter: db,
     columns: {
         id: lite.int().primaryKey().autoIncrement(),
-        label: lite.text().notNull().pipe(ax.operator((value)=>{ return [value]})),
+        label: lite
+            .text()
+            .notNull()
+            .pipe(
+                ax.operator((value) => {
+                    return [value]
+                }),
+            ),
         color: lite.text().default('#000000'),
         sortOrder: lite.int().default(0),
         userId: lite.int().references(User.col('id')),
@@ -187,7 +194,7 @@ console.log('PostTag insert parse:', ptInsert.parse({ postId: 1, tagId: 2 }))
 
 // ── Pipe transformation tests ──
 const toUpper = ax.operator((v: string) => v.toUpperCase())
-const toArray = ax.operator((v: string) => v.split(',').map(s => s.trim()))
+const toArray = ax.operator((v: string) => v.split(',').map((s) => s.trim()))
 
 // Pipe on lite text: transforms string input to uppercase
 const upperCol = lite.text().pipe(toUpper).notNull()

@@ -214,7 +214,12 @@ describe('liteToAx — defaults', () => {
 
     it('defaultFn provides lazy default', () => {
         let counter = 0
-        const s = liteToAx(lite.int().notNull().defaultFn(() => ++counter))
+        const s = liteToAx(
+            lite
+                .int()
+                .notNull()
+                .defaultFn(() => ++counter),
+        )
         expect(s.parse(undefined)).toBe(1)
         expect(s.parse(undefined)).toBe(2)
     })
@@ -235,7 +240,7 @@ describe('liteToAx — defaults', () => {
 
 describe('liteToAx — pipes (transformations)', () => {
     const toUpper = ax.operator((v: string) => v.toUpperCase())
-    const toArray = ax.operator((v: string) => v.split(',').map(s => s.trim()))
+    const toArray = ax.operator((v: string) => v.split(',').map((s) => s.trim()))
 
     it('pipe transforms output', () => {
         const s = liteToAx(lite.text().notNull().pipe(toUpper))
