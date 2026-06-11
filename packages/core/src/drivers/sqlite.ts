@@ -1,7 +1,7 @@
-import { CheckExpression, ColumnKey, ColumnReference, ColumnState, TableOptionsCtx, TableState, UniqueConflict } from '../lite'
+import { Chain, CheckExpression, ColumnReference, ColumnState, TableOptionsCtx, UniqueConflict } from '../lite'
 import { ax, Schema, AnySchema } from '@aromix/validator'
 import { liteToAx } from '../convert/def'
-import type { EntitySelectOutput, EntityInsertOutput, EntityUpdateOutput } from '../convert/types'
+import type { LiteToAxOutput } from '../convert/types'
 
 export namespace Sqlite {
     // Data Adapters
@@ -14,16 +14,16 @@ export namespace Sqlite {
     }
 
     // Data Definition Entity
-    export interface EntityInput<State extends TableState> {
+    export interface EntityInput<State extends Record<string, Chain<any, any, boolean, boolean, any>>> {
         name: string
         adapter: Sqlite.Adapter
         columns: State
-        options(ctx: TableOptionsCtx<State>): void
+        options(ctx: TableOptionsCtx<keyof State & string>): void
     }
 
-    export interface EntityState<State extends TableState> {
+    export interface EntityState {
         name: string
-        columns: { [Key in keyof State]: State[Key]['state'] }
+        columns: Record<string, ColumnState>
         unique: { cols: string[]; conflict?: UniqueConflict }[]
         primaryKey: { cols: string[] }[]
         index: { cols: string[] }[]
@@ -31,14 +31,27 @@ export namespace Sqlite {
         checks: CheckExpression[]
         withoutRowId: boolean
     }
-    type ColumnsOf<T extends TableState> = { [K in keyof T]: T[K]['state'] }
 
-    export interface EntityOutput<State extends TableState> {
-        state: Sqlite.EntityState<State>
-        col(columnName: ColumnKey<State>): ColumnReference
-        toSelectSchema(): Schema<EntitySelectOutput<ColumnsOf<State>>>
-        toInsertSchema(): Schema<EntityInsertOutput<ColumnsOf<State>>>
-        toUpdateSchema(): Schema<EntityUpdateOutput<ColumnsOf<State>>>
+    // Local entity-level helpers
+    type ChainNotNull<C extends Chain<any, any, boolean, boolean, any>> =
+        C extends Chain<any, any, infer N, any, any> ? N : false
+
+    type ChainAutoInc<C extends Chain<any, any, boolean, boolean, any>> =
+        C extends Chain<any, any, any, infer A, any> ? A : false
+
+    type InsertOutput<S extends Record<string, Chain<any, any, boolean, boolean, any>>> = {
+        [K in keyof S as ChainAutoInc<S[K]> extends true ? never : K]:
+            ChainNotNull<S[K]> extends true
+                ? LiteToAxOutput<S[K]>
+                : LiteToAxOutput<S[K]> | undefined
+    }
+
+    export interface EntityOutput<State extends Record<string, Chain<any, any, boolean, boolean, any>>> {
+        state: Sqlite.EntityState
+        col(columnName: keyof State & string): ColumnReference
+        toSelectSchema(): Schema<{ [K in keyof State]: LiteToAxOutput<State[K]> }>
+        toInsertSchema(): Schema<InsertOutput<State>>
+        toUpdateSchema(): Schema<{ [K in keyof State]: LiteToAxOutput<State[K]> | undefined }>
     }
 
     // ── Schema builder helpers ──────────────────────────────────────────────────
@@ -75,18 +88,18 @@ export namespace Sqlite {
 
     // ── Entity builder ─────────────────────────────────────────────────────────
 
-    export function entity<State extends TableState>(input: Sqlite.EntityInput<State>): Sqlite.EntityOutput<State> & {
-        readonly $inferSelect: EntitySelectOutput<ColumnsOf<State>>
-        readonly $inferInsert: EntityInsertOutput<ColumnsOf<State>>
-        readonly $inferUpdate: EntityUpdateOutput<ColumnsOf<State>>
+    export function entity<State extends Record<string, Chain<any, any, boolean, boolean, any>>>(input: Sqlite.EntityInput<State>): Sqlite.EntityOutput<State> & {
+        readonly $inferSelect: { [K in keyof State]: LiteToAxOutput<State[K]> }
+        readonly $inferInsert: InsertOutput<State>
+        readonly $inferUpdate: { [K in keyof State]: LiteToAxOutput<State[K]> | undefined }
     } {
-        const columns: any = {}
+        const columns: Record<string, ColumnState> = {}
 
         for (const key of Object.keys(input.columns)) {
             columns[key] = input.columns[key].state
         }
 
-        const state: Sqlite.EntityState<State> = {
+        const state: Sqlite.EntityState = {
             name: input.name,
             columns,
             unique: [],
@@ -129,11 +142,6 @@ export namespace Sqlite {
                 state.withoutRowId = true
             },
         })
-
-
-
-
-
 
         const selectSchema = buildSelectSchema(columns)
         const insertSchema = buildInsertSchema(columns)

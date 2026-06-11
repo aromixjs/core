@@ -19,7 +19,7 @@ const User = Sqlite.entity({
         age: lite.int().default(0),
         score: lite.real().default(0.0),
         bio: lite.text().default(''),
-        avatar: lite.blob(),
+        avatar: lite.blob().notNull(),
         role: lite.text().notNull().default('user'),
     },
     options(ctx) {
@@ -29,9 +29,6 @@ const User = Sqlite.entity({
         ctx.uniqueIndex(['name', 'email'])
     },
 })
-
-
-type USer = typeof User.$inferSelect
 
 // ── Post ──
 const Post = Sqlite.entity({
@@ -86,13 +83,8 @@ const Tag = Sqlite.entity({
     },
 })
 
-
-
-
-const schema =Tag.toSelectSchema()
-
+const schema = Tag.toSelectSchema()
 type TestS = typeof schema.$infer
-
 
 // ── PostTag (join table) ──
 const PostTag = Sqlite.entity({
@@ -126,34 +118,33 @@ console.dir(Tag.state)
 console.log('\n── PostTag ──')
 console.dir(PostTag.state)
 
-
-
 // ── liteToAx type inference tests ──
-const intNotNull = liteToAx(lite.int().notNull().state)
+// liteToAx now accepts a Chain directly for precise type inference
+const intNotNull = liteToAx(lite.int().notNull())
 type T1 = typeof intNotNull.$infer
 //   ^? number  — int + notNull → required number
 
-const intNullable = liteToAx(lite.int().state)
+const intNullable = liteToAx(lite.int())
 type T2 = typeof intNullable.$infer
 //   ^? number | null  — int, no notNull → nullable number
 
-const textNotNull = liteToAx(lite.text().notNull().state)
+const textNotNull = liteToAx(lite.text().notNull())
 type T3 = typeof textNotNull.$infer
 //   ^? string  — text + notNull → required string
 
-const textNullable = liteToAx(lite.text().state)
+const textNullable = liteToAx(lite.text())
 type T4 = typeof textNullable.$infer
 //   ^? string | null  — text, no notNull → nullable string
 
-const realDefault = liteToAx(lite.real().default(0.0).notNull().state)
+const realDefault = liteToAx(lite.real().default(0.0).notNull())
 type T5 = typeof realDefault.$infer
 //   ^? number  — real + notNull → required number, default 0.0
 
-const blobNotNull = liteToAx(lite.blob().notNull().state)
+const blobNotNull = liteToAx(lite.blob().notNull())
 type T6 = typeof blobNotNull.$infer
 //   ^? Uint8Array  — blob + notNull → required Uint8Array
 
-const blobNullable = liteToAx(lite.blob().state)
+const blobNullable = liteToAx(lite.blob())
 type T7 = typeof blobNullable.$infer
 //   ^? Uint8Array | null  — blob, no notNull → nullable Uint8Array
 
@@ -170,7 +161,7 @@ type SelectUser = typeof userSelect.$infer
 
 const userInsert = User.toInsertSchema()
 type InsertUser = typeof userInsert.$infer
-//   ^? { name: string; email: string; age?: number | undefined; score?: number | undefined; bio?: string | undefined; avatar?: Uint8Array | null | undefined; role?: string | undefined }
+//   ^? { name: string; email: string; age?: number | null | undefined; score?: number | null | undefined; bio?: string | null | undefined; avatar?: Uint8Array | null | undefined; role?: string | undefined }
 //   id is excluded (autoIncrement), fields with defaults are optional
 
 const userUpdate = User.toUpdateSchema()
@@ -200,14 +191,14 @@ const toArray = ax.operator((v: string) => v.split(',').map(s => s.trim()))
 
 // Pipe on lite text: transforms string input to uppercase
 const upperCol = lite.text().pipe(toUpper).notNull()
-const upperSchema = liteToAx(upperCol.state)
+const upperSchema = liteToAx(upperCol)
 type UpperType = typeof upperSchema.$infer
 //   ^? string  — pipe transforms string→string (uppercase)
 console.log('upper pipe parse("hello"):', upperSchema.parse('hello'))
 
 // Pipe that changes type: string → string[]
 const arrayCol = lite.text().pipe(toArray).notNull()
-const arraySchema = liteToAx(arrayCol.state)
+const arraySchema = liteToAx(arrayCol)
 type ArrayType = typeof arraySchema.$infer
 //   ^? string[]  — pipe transforms string→string[]
 console.log('array pipe parse("a,b,c"):', arraySchema.parse('a,b,c'))

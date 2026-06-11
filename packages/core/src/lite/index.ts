@@ -1,8 +1,6 @@
 import { Column } from './column'
 
-export { Chain } from './types/chain.d'
-export { TableState, TableOptionsCtx, CheckExpression, ColumnKey } from './types/context.d'
-export { ColumnState, UniqueConflict, ColumnReference } from './types/column.d'
+export * from './types'
 export { Column } from './column'
 export const lite = {
     int() {

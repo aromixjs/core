@@ -1,12 +1,14 @@
-
 import { ax } from '@aromix/validator'
+import type { Schema } from '@aromix/validator'
 import { ColumnState } from '../lite'
 import type { LiteToAx } from './types'
+import type { Chain } from '../lite'
 
-// ─── Runtime: ColumnState -> Schema instance ────────────────────────────────────
-// Branch structure mirrors LiteToAxOutput in types.ts — keep them in sync.
+export function liteToAx<C extends Chain<any, any, boolean, boolean, any>>(chain: C): LiteToAx<C>
+export function liteToAx(state: ColumnState): Schema<unknown>
 
-export function liteToAx<S extends ColumnState>(state: S): LiteToAx<S> {
+export function liteToAx(arg: any): any {
+    const state: ColumnState = arg.state ?? arg
     let schema: any
 
     switch (state.colType) {
@@ -63,7 +65,6 @@ export function liteToAx<S extends ColumnState>(state: S): LiteToAx<S> {
         }
     }
 
-    // Apply user-defined pipes (transformations / validations)
     for (const op of state.pipes) {
         schema = schema.pipe(op)
     }
@@ -78,5 +79,5 @@ export function liteToAx<S extends ColumnState>(state: S): LiteToAx<S> {
         schema = schema.defaultFn(state.defaultFn)
     }
 
-    return schema as LiteToAx<S>
+    return schema
 }
