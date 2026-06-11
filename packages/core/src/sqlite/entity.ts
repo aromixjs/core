@@ -1,7 +1,7 @@
-import { Column } from "./ddl/column"
-import { ColumnState } from "./ddl/column.d"
-import { SqliteEntityInput, SqliteEntityOutput, SqliteEntityState } from "./entity.d"
-
+import { Column } from './ddl/column'
+import { ColumnState } from './ddl/column.d'
+import { Convert } from './ddl/convert'
+import { SqliteEntityInput, SqliteEntityOutput, SqliteEntityState } from './entity.d'
 
 export function SqliteEntity<State extends Record<string, Column>>(input: SqliteEntityInput<State>): SqliteEntityOutput<State> {
     const columns: Record<string, ColumnState> = {}
@@ -22,7 +22,7 @@ export function SqliteEntity<State extends Record<string, Column>>(input: Sqlite
     }
 
     input.options({
-        unique(cols:string[], conflict) {
+        unique(cols: string[], conflict) {
             state.unique.push({ cols: cols, conflict })
         },
         primaryKey(cols) {
@@ -62,6 +62,15 @@ export function SqliteEntity<State extends Record<string, Column>>(input: Sqlite
                 columnName: columnName,
                 tableState: columns,
             }
+        },
+        toSelectSchema() {
+            return Convert.select(columns)
+        },
+        toInsertSchema() {
+            return Convert.insert(columns)
+        },
+        toUpdateSchema() {
+            return Convert.update(columns)
         },
     }
 }

@@ -19,40 +19,37 @@ export interface SqliteEntityOptionsCtx<ColName extends string = string> {
     withoutRowId(): void
 }
 
-
-
 export interface SqliteEntityInput<State> {
-   name: string
-   adapter: SqliteAdapter
-   columns: State
-   options(ctx: SqliteEntityOptionsCtx<keyof State>): void
+    name: string
+    adapter: SqliteAdapter
+    columns: State
+    options(ctx: SqliteEntityOptionsCtx<keyof State>): void
 }
 
 export interface SqliteEntityState {
-   name: string
-   columns: Record<string, ColumnState>
+    name: string
+    columns: Record<string, ColumnState>
     unique: Array<{
-       cols: string[]
-       conflict?: UniqueConflict
+        cols: string[]
+        conflict: UniqueConflict
     }>
-   primaryKey: Array<{
-      cols: string[]
-   }>
-   index: Array<{
-      cols: string[]
-   }>
-   uniqueIndex: Array<{
-      cols: string[]
-   }>
-   checks: CheckExpression[]
-   withoutRowId: boolean
+    primaryKey: Array<{
+        cols: string[]
+    }>
+    index: Array<{
+        cols: string[]
+    }>
+    uniqueIndex: Array<{
+        cols: string[]
+    }>
+    checks: CheckExpression[]
+    withoutRowId: boolean
 }
-
 
 export interface SqliteEntityOutput<State> {
     state: SqliteEntityState
     col(columnName: keyof State): ColumnReference
+    toSelectSchema(): any
+    toInsertSchema(): any
+    toUpdateSchema(): any
 }
-
-
-

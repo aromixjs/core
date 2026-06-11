@@ -1,5 +1,5 @@
 import type { Operator } from '@aromix/validator'
-import { Chain, Collation, ColumnReference, ColumnState, ColumnType, ReferenceAction, UniqueConflict } from "./column.d";
+import { Chain, Collation, ColumnReference, ColumnState, ColumnType, ReferenceAction, UniqueConflict } from './column.d'
 export class Column {
     readonly state: ColumnState
 
