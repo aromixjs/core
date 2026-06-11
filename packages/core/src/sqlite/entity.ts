@@ -1,10 +1,8 @@
-import { Column } from './ddl/column'
-import { ColumnState } from './ddl/column.d'
 import { Convert } from './ddl/convert'
-import { SqliteEntityInput, SqliteEntityOutput, SqliteEntityState } from './entity.d'
+import {  SqliteEntityInput, SqliteEntityOutput, SqliteEntityState } from './entity.d'
 
-export function SqliteEntity<State extends Record<string, Column>>(input: SqliteEntityInput<State>): SqliteEntityOutput<State> {
-    const columns: Record<string, ColumnState> = {}
+export function SqliteEntity<State extends Record<string, any>>(input: SqliteEntityInput<State>): SqliteEntityOutput<State> {
+    const columns: any = {}
 
     for (const key of Object.keys(input.columns)) {
         columns[key] = input.columns[key].state
@@ -22,32 +20,32 @@ export function SqliteEntity<State extends Record<string, Column>>(input: Sqlite
     }
 
     input.options({
-        unique(cols: string[], conflict) {
-            state.unique.push({ cols: cols, conflict })
+        unique(cols, conflict) {
+            state.unique.push({ cols, conflict })
         },
         primaryKey(cols) {
-            state.primaryKey.push({ cols: cols as string[] })
+            state.primaryKey.push({ cols })
         },
         index(cols) {
-            state.index.push({ cols: cols as string[] })
+            state.index.push({ cols })
         },
         uniqueIndex(cols) {
-            state.uniqueIndex.push({ cols: cols as string[] })
+            state.uniqueIndex.push({ cols })
         },
         checks(exprs) {
             state.checks = exprs
         },
         gt(left, right) {
-            return { left: left as string, op: 'gt', right: right as string }
+            return { left, op: 'gt', right }
         },
         gte(left, right) {
-            return { left: left as string, op: 'gte', right: right as string }
+            return { left, op: 'gte', right }
         },
         lt(left, right) {
-            return { left: left as string, op: 'lt', right: right as string }
+            return { left, op: 'lt', right }
         },
         lte(left, right) {
-            return { left: left as string, op: 'lte', right: right as string }
+            return { left, op: 'lte', right }
         },
         withoutRowId() {
             state.withoutRowId = true
@@ -72,5 +70,5 @@ export function SqliteEntity<State extends Record<string, Column>>(input: Sqlite
         toUpdateSchema() {
             return Convert.update(columns)
         },
-    }
+    } as any
 }

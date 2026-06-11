@@ -54,7 +54,8 @@ export interface ColumnState {
 
 export type Chain<Type extends ColumnType, Used extends string = never> = Omit<
     {
-        primaryKey(): Chain<Type, Used | 'primaryKey'>
+        readonly state: ColumnState
+        primaryKey(): Chain<Type, Used | 'primaryKey' | 'notNull'>
         autoIncrement(): Chain<Type, Used | 'autoIncrement'>
         notNull(): Chain<Type, Used | 'notNull'>
         unique(conflict: UniqueConflict): Chain<Type, Used | 'unique'>

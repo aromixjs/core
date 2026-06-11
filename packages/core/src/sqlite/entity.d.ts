@@ -1,5 +1,6 @@
+import { Schema } from '@aromix/validator'
 import { SqliteAdapter } from './adapter'
-import { ColumnReference, ColumnState, UniqueConflict } from './ddl/column'
+import { Chain, ColumnReference, ColumnState, ColumnTypeMap, UniqueConflict } from './ddl/column'
 
 export interface CheckExpression {
     left: string
@@ -23,7 +24,7 @@ export interface SqliteEntityInput<State> {
     name: string
     adapter: SqliteAdapter
     columns: State
-    options(ctx: SqliteEntityOptionsCtx<keyof State>): void
+    options(ctx: SqliteEntityOptionsCtx<keyof State & string>): void
 }
 
 export interface SqliteEntityState {
@@ -46,10 +47,39 @@ export interface SqliteEntityState {
     withoutRowId: boolean
 }
 
+
+type EntityType<C> = C extends Chain<infer T, any> ? T : never
+type EntityUsed<C> = C extends Chain<any, infer U> ? U : never
+type EntityOutput<C> = ColumnTypeMap[EntityType<C>]
+type EntityNotNull<C> = 'notNull' extends EntityUsed<C> ? true : false
+type EntityAutoInc<C> = 'autoIncrement' extends EntityUsed<C> ? true : false
+type EntityHasDefault<C> = 'default' extends EntityUsed<C> ? true : 'defaultFn' extends EntityUsed<C> ? true : false
+
+type EntitySelectNotNull<C> = EntityNotNull<C> extends true ? true : EntityHasDefault<C> extends true ? true : false
+
+type EntityRequiredForInsert<C> = EntityNotNull<C> extends true ? (EntityHasDefault<C> extends true ? false : true) : false
+
+type EntitySelect<State> = {
+    [K in keyof State]: EntitySelectNotNull<State[K]> extends true ? EntityOutput<State[K]> : EntityOutput<State[K]> | null
+}
+
+type EntityInsert<State> = {
+    [K in keyof State as EntityAutoInc<State[K]> extends true ? never : K]: EntityRequiredForInsert<State[K]> extends true ? EntityOutput<State[K]> : EntityOutput<State[K]> | undefined
+}
+
+type EntityUpdate<State> = {
+    [K in keyof State]: EntityOutput<State[K]> | undefined
+}
+
+
+
 export interface SqliteEntityOutput<State> {
     state: SqliteEntityState
     col(columnName: keyof State): ColumnReference
-    toSelectSchema(): any
-    toInsertSchema(): any
-    toUpdateSchema(): any
+    toSelectSchema(): Schema<EntitySelect<State>>
+    toInsertSchema(): Schema<EntityInsert<State>>
+    toUpdateSchema(): Schema<EntityUpdate<State>>
+    readonly $inferSelect: EntitySelect<State>
+    readonly $inferInsert: EntityInsert<State>
+    readonly $inferUpdate: EntityUpdate<State>
 }

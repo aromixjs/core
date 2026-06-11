@@ -142,7 +142,7 @@ export namespace Convert {
         return schema
     }
 
-    export function select(cols: Record<string, ColumnState>) {
+    export function select(cols: Record<string, ColumnState>): any {
         const shape: Record<string, AnySchema> = {}
         for (const [key, col] of Object.entries(cols)) {
             shape[key] = column(col)
@@ -150,7 +150,7 @@ export namespace Convert {
         return ax.object(shape)
     }
 
-    export function insert(cols: Record<string, ColumnState>) {
+    export function insert(cols: Record<string, ColumnState>): any {
         const shape: Record<string, AnySchema> = {}
 
         for (const [key, col] of Object.entries(cols)) {
@@ -167,7 +167,7 @@ export namespace Convert {
         return ax.object(shape)
     }
 
-    export function update(cols: Record<string, ColumnState>) {
+    export function update(cols: Record<string, ColumnState>): any {
         const shape: Record<string, AnySchema> = {}
 
         for (const [key, col] of Object.entries(cols)) {

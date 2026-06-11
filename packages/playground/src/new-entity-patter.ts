@@ -1,15 +1,15 @@
-import { lite, liteToAx, Sqlite } from '@aromix/core'
+import { createSqliteAdapter, lite, SqliteEntity } from '@aromix/core'
 import { ax } from '@aromix/validator'
 import { createServer } from 'http'
 
-const db = Sqlite.adapter({
+const db = createSqliteAdapter({
     async query(sql) {
         return sql
     },
 })
 
 // ── User ──
-const User = Sqlite.entity({
+const User = SqliteEntity({
     name: 'users',
     adapter: db,
     columns: {
