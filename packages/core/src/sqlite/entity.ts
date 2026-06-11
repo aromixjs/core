@@ -1,7 +1,9 @@
-import { ColumnState } from "./ddl/column.d";
-import { SqliteEntityInput, SqliteEntityOutput, SqliteEntityState } from "./entity.d";
+import { Column } from "./ddl/column"
+import { ColumnState } from "./ddl/column.d"
+import { SqliteEntityInput, SqliteEntityOutput, SqliteEntityState } from "./entity.d"
 
-export function SqliteEntity<State>(input: SqliteEntityInput<State>): SqliteEntityOutput<State> {
+
+export function SqliteEntity<State extends Record<string, Column>>(input: SqliteEntityInput<State>): SqliteEntityOutput<State> {
     const columns: Record<string, ColumnState> = {}
 
     for (const key of Object.keys(input.columns)) {
@@ -20,60 +22,46 @@ export function SqliteEntity<State>(input: SqliteEntityInput<State>): SqliteEnti
     }
 
     input.options({
-        unique(cols, conflict) {
-            state.unique.push({ cols, conflict })
+        unique(cols:string[], conflict) {
+            state.unique.push({ cols: cols, conflict })
         },
         primaryKey(cols) {
-            state.primaryKey.push({ cols })
+            state.primaryKey.push({ cols: cols as string[] })
         },
         index(cols) {
-            state.index.push({ cols })
+            state.index.push({ cols: cols as string[] })
         },
         uniqueIndex(cols) {
-            state.uniqueIndex.push({ cols })
+            state.uniqueIndex.push({ cols: cols as string[] })
         },
         checks(exprs) {
             state.checks = exprs
         },
         gt(left, right) {
-            return { left, op: 'gt', right }
+            return { left: left as string, op: 'gt', right: right as string }
         },
         gte(left, right) {
-            return { left, op: 'gte', right }
+            return { left: left as string, op: 'gte', right: right as string }
         },
         lt(left, right) {
-            return { left, op: 'lt', right }
+            return { left: left as string, op: 'lt', right: right as string }
         },
         lte(left, right) {
-            return { left, op: 'lte', right }
+            return { left: left as string, op: 'lte', right: right as string }
         },
         withoutRowId() {
             state.withoutRowId = true
         },
     })
 
-    const selectSchema = buildSelectSchema(columns)
-    const insertSchema = buildInsertSchema(columns)
-    const updateSchema = buildUpdateSchema(columns)
-
-    const result: Sqlite.EntityOutput<State> = {
+    return {
         state,
-        col(columnName) {
+        col(columnName: keyof State) {
             return {
                 entityName: input.name,
-                columnName,
+                columnName: columnName,
                 tableState: columns,
             }
         },
-        toSelectSchema() {
-            return selectSchema
-        },
-        toInsertSchema() {
-            return insertSchema
-        },
-        toUpdateSchema() {
-            return updateSchema
-        },
     }
-    return result as any
 }

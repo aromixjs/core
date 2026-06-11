@@ -1,7 +1,6 @@
 import { SqliteAdapter } from './adapter'
-import { CheckExpression, ColumnReference, ColumnState, TableOptionsCtx, UniqueConflict } from './ddl/lite'
+import { ColumnReference, ColumnState, UniqueConflict } from './ddl/column'
 
-// Used in options method 
 export interface CheckExpression {
     left: string
     op: 'gt' | 'gte' | 'lt' | 'lte'
@@ -32,10 +31,10 @@ export interface SqliteEntityInput<State> {
 export interface SqliteEntityState {
    name: string
    columns: Record<string, ColumnState>
-   unique: Array<{
-      cols: string[]
-      conflict: UniqueConflict
-   }>
+    unique: Array<{
+       cols: string[]
+       conflict?: UniqueConflict
+    }>
    primaryKey: Array<{
       cols: string[]
    }>

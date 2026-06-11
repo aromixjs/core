@@ -69,8 +69,8 @@ export type Chain<Type extends ColumnType, Used extends string = never> = Omit<
       maxLength(value: number): Chain<Type, Used>
       in(values: string[]): Chain<Type, Used | 'in'>
       references(col: unknown, actions?: ReferenceAction[]): Chain<Type, Used | 'references'>
-      default(value: Output): Chain<Type, Used | 'default'>
-      defaultFn(fn: () => Output): Chain<Type, Used | 'defaultFn'>
-      onUpdate(fn: () => Output): Chain<Type, Used | 'onUpdate'>
-      pipe<Next>(operator: Operator<Output, Next>): Chain<Type, Used>
+      default(value: ColumnTypeMap[Type]): Chain<Type, Used | 'default'>
+      defaultFn(fn: () => ColumnTypeMap[Type]): Chain<Type, Used | 'defaultFn'>
+      onUpdate(fn: () => ColumnTypeMap[Type]): Chain<Type, Used | 'onUpdate'>
+      pipe<Next>(operator: Operator<ColumnTypeMap[Type], Next>): Chain<Type, Used>
    }, Used>
