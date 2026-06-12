@@ -48,27 +48,51 @@ export interface SqliteEntityState {
 }
 
 
-type EntityType<C> = C extends Chain<infer T, any> ? T : never
-type EntityUsed<C> = C extends Chain<any, infer U> ? U : never
-type EntityOutput<C> = ColumnTypeMap[EntityType<C>]
-type EntityNotNull<C> = 'notNull' extends EntityUsed<C> ? true : false
-type EntityAutoInc<C> = 'autoIncrement' extends EntityUsed<C> ? true : false
-type EntityHasDefault<C> = 'default' extends EntityUsed<C> ? true : 'defaultFn' extends EntityUsed<C> ? true : false
+// Each column is Chain<ColumnKind, UsedFlags>, where ColumnKind is the
+// SQL type ('int'|'real'|'text'|'blob') and UsedFlags is a union of
+// method-call markers like 'notNull'|'default'|'autoIncrement'.
 
-type EntitySelectNotNull<C> = EntityNotNull<C> extends true ? true : EntityHasDefault<C> extends true ? true : false
+// SELECT → nullable unless notNull, default, or defaultFn was set.
+type ResolveSelectType<Column> =
+    Column extends Chain<infer ColumnKind, infer UsedFlags>
+        ? ColumnTypeMap[ColumnKind] | (
+            'notNull' extends UsedFlags ? never
+            : 'default' extends UsedFlags ? never
+            : 'defaultFn' extends UsedFlags ? never
+            : null
+        )
+        : never
 
-type EntityRequiredForInsert<C> = EntityNotNull<C> extends true ? (EntityHasDefault<C> extends true ? false : true) : false
+// INSERT → autoIncrement columns are excluded (key becomes never).
+//           Required only when notNull AND no default/defaultFn.
+type ResolveInsertType<Column> =
+    Column extends Chain<infer ColumnKind, infer UsedFlags>
+        ? 'autoIncrement' extends UsedFlags ? never
+        : ColumnTypeMap[ColumnKind] | (
+            'default' extends UsedFlags ? undefined
+            : 'defaultFn' extends UsedFlags ? undefined
+            : 'notNull' extends UsedFlags ? never
+            : undefined
+        )
+        : never
+
+// UPDATE → every column is optional (partial update).
+type ResolveUpdateType<Column> =
+    Column extends Chain<infer ColumnKind, any>
+        ? ColumnTypeMap[ColumnKind] | undefined
+        : never
 
 type EntitySelect<State> = {
-    [K in keyof State]: EntitySelectNotNull<State[K]> extends true ? EntityOutput<State[K]> : EntityOutput<State[K]> | null
+    [Key in keyof State]: ResolveSelectType<State[Key]>
 }
 
 type EntityInsert<State> = {
-    [K in keyof State as EntityAutoInc<State[K]> extends true ? never : K]: EntityRequiredForInsert<State[K]> extends true ? EntityOutput<State[K]> : EntityOutput<State[K]> | undefined
+    [Key in keyof State as ResolveInsertType<State[Key]> extends never ? never : Key]:
+        ResolveInsertType<State[Key]>
 }
 
 type EntityUpdate<State> = {
-    [K in keyof State]: EntityOutput<State[K]> | undefined
+    [Key in keyof State]: ResolveUpdateType<State[Key]>
 }
 
 

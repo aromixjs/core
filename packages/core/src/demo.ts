@@ -20,6 +20,8 @@ const entity = SqliteEntity({
     },
 })
 
+
+
 type EntityType = typeof entity.$inferSelect
 type entityInsert = typeof entity.$inferInsert
 const axInsert = entity.toInsertSchema()
