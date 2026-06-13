@@ -1,7 +1,6 @@
 import type { AnySchema } from '@aromix/validator'
 import { KvAdapter } from './adapter'
 
-
 export interface KvEntityInput<Schema extends AnySchema> {
     name: string
     adapter: KvAdapter

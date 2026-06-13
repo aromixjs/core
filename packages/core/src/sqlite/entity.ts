@@ -1,5 +1,5 @@
 import { Convert } from './ddl/convert'
-import {  SqliteEntityInput, SqliteEntityOutput, SqliteEntityState } from './entity.d'
+import { SqliteEntityInput, SqliteEntityOutput, SqliteEntityState } from './entity.d'
 
 export function SqliteEntity<State extends Record<string, any>>(input: SqliteEntityInput<State>): SqliteEntityOutput<State> {
     const columns: any = {}
@@ -20,17 +20,17 @@ export function SqliteEntity<State extends Record<string, any>>(input: SqliteEnt
     }
 
     input.options({
-        unique(cols, conflict) {
-            state.unique.push({ cols, conflict })
+        unique(uniqueOptions) {
+            state.unique.push(uniqueOptions)
         },
         primaryKey(cols) {
             state.primaryKey.push({ cols })
         },
-        index(cols) {
-            state.index.push({ cols })
+        index(options) {
+            state.index.push(options)
         },
-        uniqueIndex(cols) {
-            state.uniqueIndex.push({ cols })
+        uniqueIndex(options) {
+            state.uniqueIndex.push(options)
         },
         checks(exprs) {
             state.checks = exprs

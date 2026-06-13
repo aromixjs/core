@@ -8,10 +8,10 @@ export interface CheckExpression {
     right: string
 }
 export interface SqliteEntityOptionsCtx<ColName extends string = string> {
-    unique(cols: ColName[], conflict: UniqueConflict): void
+    unique(options: { name: string; cols: ColName[]; conflict: UniqueConflict }): void
     primaryKey(cols: ColName[]): void
-    index(cols: ColName[]): void
-    uniqueIndex(cols: ColName[]): void
+    index(options: { cols: ColName[]; name: string }): void
+    uniqueIndex(options: { cols: ColName[]; name: string }): void
     checks(exprs: CheckExpression[]): void
     gt(left: ColName, right: ColName): CheckExpression
     gte(left: ColName, right: ColName): CheckExpression
@@ -33,20 +33,26 @@ export interface SqliteEntityState {
     unique: Array<{
         cols: string[]
         conflict: UniqueConflict
+        name: string
     }>
     primaryKey: Array<{
         cols: string[]
     }>
     index: Array<{
+        name: string
         cols: string[]
     }>
     uniqueIndex: Array<{
         cols: string[]
+        name: string
     }>
     checks: CheckExpression[]
     withoutRowId: boolean
 }
 
+// TODO:: replace this part of the code
+// NOTE: this code is generated via ai, i have no clue how its working but it works its good for now, comments were made to get some idea about that code
+//==== start of ai code ====
 
 // Each column is Chain<ColumnKind, UsedFlags>, where ColumnKind is the
 // SQL type ('int'|'real'|'text'|'blob') and UsedFlags is a union of
@@ -55,47 +61,33 @@ export interface SqliteEntityState {
 // SELECT → nullable unless notNull, default, or defaultFn was set.
 type ResolveSelectType<Column> =
     Column extends Chain<infer ColumnKind, infer UsedFlags>
-        ? ColumnTypeMap[ColumnKind] | (
-            'notNull' extends UsedFlags ? never
-            : 'default' extends UsedFlags ? never
-            : 'defaultFn' extends UsedFlags ? never
-            : null
-        )
+        ? ColumnTypeMap[ColumnKind] | ('notNull' extends UsedFlags ? never : 'default' extends UsedFlags ? never : 'defaultFn' extends UsedFlags ? never : null)
         : never
 
 // INSERT → autoIncrement columns are excluded (key becomes never).
 //           Required only when notNull AND no default/defaultFn.
 type ResolveInsertType<Column> =
     Column extends Chain<infer ColumnKind, infer UsedFlags>
-        ? 'autoIncrement' extends UsedFlags ? never
-        : ColumnTypeMap[ColumnKind] | (
-            'default' extends UsedFlags ? undefined
-            : 'defaultFn' extends UsedFlags ? undefined
-            : 'notNull' extends UsedFlags ? never
-            : undefined
-        )
+        ? 'autoIncrement' extends UsedFlags
+            ? never
+            : ColumnTypeMap[ColumnKind] | ('default' extends UsedFlags ? undefined : 'defaultFn' extends UsedFlags ? undefined : 'notNull' extends UsedFlags ? never : undefined)
         : never
 
 // UPDATE → every column is optional (partial update).
-type ResolveUpdateType<Column> =
-    Column extends Chain<infer ColumnKind, any>
-        ? ColumnTypeMap[ColumnKind] | undefined
-        : never
+type ResolveUpdateType<Column> = Column extends Chain<infer ColumnKind, any> ? ColumnTypeMap[ColumnKind] | undefined : never
 
 type EntitySelect<State> = {
     [Key in keyof State]: ResolveSelectType<State[Key]>
 }
 
 type EntityInsert<State> = {
-    [Key in keyof State as ResolveInsertType<State[Key]> extends never ? never : Key]:
-        ResolveInsertType<State[Key]>
+    [Key in keyof State as ResolveInsertType<State[Key]> extends never ? never : Key]: ResolveInsertType<State[Key]>
 }
 
 type EntityUpdate<State> = {
     [Key in keyof State]: ResolveUpdateType<State[Key]>
 }
-
-
+// =======  end of ai code ======
 
 export interface SqliteEntityOutput<State> {
     state: SqliteEntityState

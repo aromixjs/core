@@ -1,12 +1,10 @@
 export interface KvAdapter {
-   get(key: string): Promise<unknown>
-   set(key: string, value: unknown): Promise<void>
-   delete(key: string): Promise<void>
-   has(key: string): Promise<boolean>
+    get(key: string): Promise<unknown>
+    set(key: string, value: unknown): Promise<void>
+    delete(key: string): Promise<void>
+    has(key: string): Promise<boolean>
 }
 
-
-
 export function createKvAdapter(adapter: KvAdapter) {
-   return adapter
+    return adapter
 }

@@ -17,13 +17,19 @@ const entity = SqliteEntity({
     },
     options(c) {
         c.primaryKey(['id'])
+        c.unique({
+            name: 'test',
+            cols: ['age', 'email'],
+            conflict: 'conflict:error',
+        })
+        c.index({
+            name: 'userId',
+            cols: ['age', 'id'],
+        })
     },
 })
-
-
 
 type EntityType = typeof entity.$inferSelect
 type entityInsert = typeof entity.$inferInsert
 const axInsert = entity.toInsertSchema()
-
 type Test = typeof axInsert.$infer
