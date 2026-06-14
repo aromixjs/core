@@ -1,12 +1,15 @@
 import type { Operator } from '@aromix/validator'
-import type { Chain } from './types/chain'
-import type { Collation, ColumnReference, ColumnState, ColumnType, ColumnTypeMap, ReferenceAction, UniqueConflict } from './types/column'
+import { Chain, Collation, ColumnReference, ColumnState, ColumnType, ColumnTypeMap, ReferenceAction, UniqueConflict } from './column.types'
+export type { Chain, Collation, ColumnReference, ColumnState, ColumnType, ColumnTypeMap, ReferenceAction, UniqueConflict }
+export class Column {
+    readonly state: ColumnState
 
-export class Column<Type extends ColumnType> {
-    private constructor(readonly state: ColumnState) {}
+    private constructor(state: ColumnState) {
+        this.state = state
+    }
 
     static create<Type extends ColumnType>(colType: Type): Chain<Type> {
-        return new Column<Type>({
+        return new Column({
             colType,
             primaryKey: false,
             autoIncrement: false,
@@ -22,12 +25,15 @@ export class Column<Type extends ColumnType> {
 
     primaryKey() {
         this.state.primaryKey = true
+        this.state.notNull = true
         return this
     }
+
     autoIncrement() {
         this.state.autoIncrement = true
         return this
     }
+
     notNull() {
         this.state.notNull = true
         return this
@@ -43,6 +49,7 @@ export class Column<Type extends ColumnType> {
         this.state.index = true
         return this
     }
+
     collate(value: Collation) {
         this.state.collate = value
         return this
@@ -52,22 +59,27 @@ export class Column<Type extends ColumnType> {
         this.state.checks.push({ op: 'gt', val: value })
         return this
     }
+
     gte(value: number) {
         this.state.checks.push({ op: 'gte', val: value })
         return this
     }
+
     lt(value: number) {
         this.state.checks.push({ op: 'lt', val: value })
         return this
     }
+
     lte(value: number) {
         this.state.checks.push({ op: 'lte', val: value })
         return this
     }
+
     minLength(value: number) {
         this.state.checks.push({ op: 'minLength', val: value })
         return this
     }
+
     maxLength(value: number) {
         this.state.checks.push({ op: 'maxLength', val: value })
         return this
@@ -83,22 +95,22 @@ export class Column<Type extends ColumnType> {
         return this
     }
 
-    default(value: ColumnTypeMap[Type]) {
+    default(value: unknown) {
         this.state.default = value
         return this
     }
 
-    defaultFn(fn: () => ColumnTypeMap[Type]) {
+    defaultFn(fn: () => unknown) {
         this.state.defaultFn = fn
         return this
     }
 
-    onUpdate(fn: () => ColumnTypeMap[Type]) {
+    onUpdate(fn: () => unknown) {
         this.state.onUpdate = fn
         return this
     }
 
-    pipe<Next>(operator: Operator<ColumnTypeMap[Type], Next>) {
+    pipe(operator: Operator<any, any>) {
         this.state.pipes.push(operator)
         return this
     }

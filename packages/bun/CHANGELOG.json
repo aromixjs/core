@@ -1,20 +1,20 @@
 {
-  "name": "@aromix/bun",
-  "entries": [
-    {
-      "date": "Tue, 09 Jun 2026 12:28:45 GMT",
-      "version": "0.1.1",
-      "tag": "@aromix/bun_v0.1.1",
-      "comments": {
-        "patch": [
-          {
-            "author": "beachball",
-            "package": "@aromix/bun",
-            "comment": "Bump @aromix/core to v0.2.0",
-            "commit": "not available"
-          }
-        ]
-      }
-    }
-  ]
+    "name": "@aromix/bun",
+    "entries": [
+        {
+            "date": "Tue, 09 Jun 2026 12:28:45 GMT",
+            "version": "0.1.1",
+            "tag": "@aromix/bun_v0.1.1",
+            "comments": {
+                "patch": [
+                    {
+                        "author": "beachball",
+                        "package": "@aromix/bun",
+                        "comment": "Bump @aromix/core to v0.2.0",
+                        "commit": "not available"
+                    }
+                ]
+            }
+        }
+    ]
 }

@@ -1,16 +1,16 @@
 {
-  "name": "playground",
-  "version": "0.0.0",
-  "private": true,
-  "type": "module",
-  "dependencies": {
-    "@aromix/bun": "workspace:^",
-    "@aromix/core": "workspace:^",
-    "@aromix/validator": "workspace:^"
-  },
-  "devDependencies": {
-    "@types/bun": "^1.1.13",
-    "tsup": "catalog:",
-    "typescript": "catalog:"
-  }
+    "name": "playground",
+    "version": "0.0.0",
+    "private": true,
+    "type": "module",
+    "dependencies": {
+        "@aromix/bun": "workspace:^",
+        "@aromix/core": "workspace:^",
+        "@aromix/validator": "workspace:^"
+    },
+    "devDependencies": {
+        "@types/bun": "^1.1.13",
+        "tsup": "catalog:",
+        "typescript": "catalog:"
+    }
 }

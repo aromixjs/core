@@ -1,20 +1,20 @@
 {
-  "name": "@aromix/validator",
-  "entries": [
-    {
-      "date": "Tue, 09 Jun 2026 12:28:45 GMT",
-      "version": "0.2.0",
-      "tag": "@aromix/validator_v0.2.0",
-      "comments": {
-        "minor": [
-          {
-            "author": "istiuak.0@gmail.com",
-            "package": "@aromix/validator",
-            "commit": "87d2022a163b5ca0b70285ce078f29b7fea27618",
-            "comment": "feat(validator): add instance schema and migrate tests to vitest"
-          }
-        ]
-      }
-    }
-  ]
+    "name": "@aromix/validator",
+    "entries": [
+        {
+            "date": "Tue, 09 Jun 2026 12:28:45 GMT",
+            "version": "0.2.0",
+            "tag": "@aromix/validator_v0.2.0",
+            "comments": {
+                "minor": [
+                    {
+                        "author": "istiuak.0@gmail.com",
+                        "package": "@aromix/validator",
+                        "commit": "87d2022a163b5ca0b70285ce078f29b7fea27618",
+                        "comment": "feat(validator): add instance schema and migrate tests to vitest"
+                    }
+                ]
+            }
+        }
+    ]
 }

@@ -1,46 +1,46 @@
 {
-  "name": "@aromix/validator",
-  "version": "0.2.0",
-  "description": "Schema validation library for Aromix",
-  "type": "module",
-  "license": "MIT",
-  "homepage": "https://aromixjs.github.io/aromix",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/aromixjs/aromix.git",
-    "directory": "packages/validator"
-  },
-  "bugs": {
-    "url": "https://github.com/aromixjs/aromix/issues"
-  },
-  "keywords": [
-    "aromix",
-    "schema",
-    "validation",
-    "typescript"
-  ],
-  "files": [
-    "dist"
-  ],
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
+    "name": "@aromix/validator",
+    "version": "0.2.0",
+    "description": "Schema validation library for Aromix",
+    "type": "module",
+    "license": "MIT",
+    "homepage": "https://aromixjs.github.io/aromix",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/aromixjs/aromix.git",
+        "directory": "packages/validator"
+    },
+    "bugs": {
+        "url": "https://github.com/aromixjs/aromix/issues"
+    },
+    "keywords": [
+        "aromix",
+        "schema",
+        "validation",
+        "typescript"
+    ],
+    "files": [
+        "dist"
+    ],
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": "./dist/index.js"
+        }
+    },
+    "publishConfig": {
+        "access": "public",
+        "registry": "https://registry.npmjs.org"
+    },
+    "scripts": {
+        "build": "tsup",
+        "dev": "tsup --watch",
+        "test": "vitest run",
+        "typecheck": "tsc --noEmit"
+    },
+    "devDependencies": {
+        "@types/node": "catalog:",
+        "tsup": "catalog:",
+        "typescript": "catalog:"
     }
-  },
-  "publishConfig": {
-    "access": "public",
-    "registry": "https://registry.npmjs.org"
-  },
-  "scripts": {
-    "build": "tsup",
-    "dev": "tsup --watch",
-    "test": "vitest run",
-    "typecheck": "tsc --noEmit"
-  },
-  "devDependencies": {
-    "@types/node": "catalog:",
-    "tsup": "catalog:",
-    "typescript": "catalog:"
-  }
 }

@@ -31,7 +31,7 @@ for (const line of lines) {
         })
         publishedCount++
     } catch (e) {
-        const stderr = (e.stderr?.toString() || '')
+        const stderr = e.stderr?.toString() || ''
 
         if (stderr.includes('You cannot publish over the previously published version')) {
             console.log(`${name}@${version} already published, skipping`)
