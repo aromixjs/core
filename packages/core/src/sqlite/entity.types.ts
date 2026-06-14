@@ -1,6 +1,6 @@
 import { Schema } from '@aromix/validator'
 import { SqliteAdapter } from './adapter'
-import { Chain, ColumnReference, ColumnState, ColumnTypeMap, UniqueConflict } from './ddl/column'
+import { Chain, ColumnReference, ColumnState, ColumnType, ColumnTypeMap, UniqueConflict } from './ddl/column'
 
 export interface CheckExpression {
     left: string
@@ -50,46 +50,67 @@ export interface SqliteEntityState {
     withoutRowId: boolean
 }
 
-// TODO:: replace this part of the code
-//==== start of ai code ====
+type Prettify<T> = { [K in keyof T]: T[K] } & {}
 
-// Each column is Chain<ColumnKind, UsedFlags>, where ColumnKind is the
-// SQL type ('int'|'real'|'text'|'blob') and UsedFlags is a union of
-// method-call markers like 'notNull'|'default'|'autoIncrement'.
+type ColKind<C> = C extends { gt(value: number): Chain<infer T, any> }
+    ? T extends ColumnType ? T : never
+    : never
 
-// SELECT → nullable unless notNull, default, or defaultFn was set.
-type ResolveSelectType<Column> =
-    Column extends Chain<infer ColumnKind, infer UsedFlags>
-        ? ColumnTypeMap[ColumnKind] | ('notNull' extends UsedFlags ? never : 'default' extends UsedFlags ? never : 'defaultFn' extends UsedFlags ? never : null)
-        : never
+type ColTypeOf<C> = ColKind<C> extends ColumnType ? ColumnTypeMap[ColKind<C>] : never
 
-// INSERT → autoIncrement columns are excluded (key becomes never).
-//           Required only when notNull AND no default/defaultFn.
-type ResolveInsertType<Column> =
-    Column extends Chain<infer ColumnKind, infer UsedFlags>
-        ? 'autoIncrement' extends UsedFlags
-            ? never
-            : ColumnTypeMap[ColumnKind] | ('default' extends UsedFlags ? undefined : 'defaultFn' extends UsedFlags ? undefined : 'notNull' extends UsedFlags ? never : undefined)
-        : never
+type MethodCalled<C, K extends string> = K extends keyof C ? false : true
 
-// UPDATE → every column is optional (partial update).
-type ResolveUpdateType<Column> = Column extends Chain<infer ColumnKind, any> ? ColumnTypeMap[ColumnKind] | undefined : never
+type ColIsAutoIncrement<C> = MethodCalled<C, 'autoIncrement'>
+type ColIsNotNull<C> = MethodCalled<C, 'notNull'>
+type ColHasDefault<C> = MethodCalled<C, 'default'>
+type ColHasDefaultFn<C> = MethodCalled<C, 'defaultFn'>
+
+type ColSelectType<C> =
+    ColIsNotNull<C> extends true ? ColTypeOf<C>
+        : ColHasDefault<C> extends true ? ColTypeOf<C>
+            : ColHasDefaultFn<C> extends true ? ColTypeOf<C>
+                : ColTypeOf<C> | null
+
+type ColInsertType<C> =
+    ColIsAutoIncrement<C> extends true ? never
+        : ColIsNotNull<C> extends true
+            ? ColHasDefault<C> extends true ? ColTypeOf<C>
+                : ColHasDefaultFn<C> extends true ? ColTypeOf<C>
+                    : ColTypeOf<C>
+            : ColTypeOf<C>
+
+type ColInsertIsOptional<C> =
+    ColIsAutoIncrement<C> extends true ? false
+        : ColIsNotNull<C> extends true
+            ? ColHasDefault<C> extends true ? true
+                : ColHasDefaultFn<C> extends true ? true
+                    : false
+            : true
+
+type ColUpdateType<C> = ColTypeOf<C>
 
 export type EntitySelect<State> = {
-    [Key in keyof State]: ResolveSelectType<State[Key]>
+    [Key in keyof State]: ColSelectType<State[Key]>
 }
 
-export type EntityInsert<State> = {
-    [Key in keyof State as ResolveInsertType<State[Key]> extends never ? never : Key]: ResolveInsertType<State[Key]>
-}
+export type EntityInsert<State> = Prettify<{
+    [Key in keyof State as
+        ColInsertType<State[Key]> extends never ? never :
+        ColInsertIsOptional<State[Key]> extends true ? never : Key
+    ]: ColInsertType<State[Key]>
+} & {
+    [Key in keyof State as
+        ColInsertType<State[Key]> extends never ? never :
+        ColInsertIsOptional<State[Key]> extends true ? Key : never
+    ]?: ColInsertType<State[Key]>
+}>
 
 export type EntityUpdate<State> = {
-    [Key in keyof State]: ResolveUpdateType<State[Key]>
+    [Key in keyof State]?: ColUpdateType<State[Key]>
 }
-// =======  end of ai code ======
 
 export type Where<State> = {
-    [Key in keyof EntitySelect<State>]?: EntitySelect<State>[Key] | WhereOperators<EntitySelect<State>[Key]>
+    [Key in keyof Prettify<EntitySelect<State>>]?: Prettify<EntitySelect<State>>[Key] | WhereOperators<Prettify<EntitySelect<State>>[Key]>
 }
 
 export interface WhereOperators<T> {
@@ -109,7 +130,7 @@ export interface PaginateOptions {
 }
 
 export interface PaginateResult<State> {
-    data: EntitySelect<State>[]
+    data: Prettify<EntitySelect<State>>[]
     total: number
     page: number
     pageSize: number
@@ -119,23 +140,23 @@ export interface PaginateResult<State> {
 export interface SqliteEntityOutput<State> {
     state: SqliteEntityState
     col(columnName: keyof State): ColumnReference
-    toSelectSchema(): Schema<EntitySelect<State>>
-    toInsertSchema(): Schema<EntityInsert<State>>
-    toUpdateSchema(): Schema<EntityUpdate<State>>
+    toSelectSchema(): Schema<Prettify<EntitySelect<State>>>
+    toInsertSchema(): Schema<Prettify<EntityInsert<State>>>
+    toUpdateSchema(): Schema<Prettify<EntityUpdate<State>>>
     toSql(): string
-    readonly $inferSelect: EntitySelect<State>
-    readonly $inferInsert: EntityInsert<State>
-    readonly $inferUpdate: EntityUpdate<State>
+    readonly $inferSelect: Prettify<EntitySelect<State>>
+    readonly $inferInsert: Prettify<EntityInsert<State>>
+    readonly $inferUpdate: Prettify<EntityUpdate<State>>
 
-    findById(id: string | number): Promise<EntitySelect<State> | null>
-    findOne(filter?: Where<State>): Promise<EntitySelect<State> | null>
-    findMany(filter?: Where<State>): Promise<EntitySelect<State>[]>
+    findById(id: string | number): Promise<Prettify<EntitySelect<State>> | null>
+    findOne(filter?: Where<State>): Promise<Prettify<EntitySelect<State>> | null>
+    findMany(filter?: Where<State>): Promise<Prettify<EntitySelect<State>>[]>
     count(filter?: Where<State>): Promise<number>
     exist(filter?: Where<State>): Promise<boolean>
-    insert(data: EntityInsert<State>): Promise<EntitySelect<State>>
-    update(filter: Where<State>, data: EntityUpdate<State>): Promise<EntitySelect<State>[]>
-    upsert(data: EntityInsert<State>, conflictColumns?: (keyof State)[]): Promise<EntitySelect<State>>
-    delete(filter: Where<State>): Promise<EntitySelect<State>[]>
-    deleteById(id: string | number): Promise<EntitySelect<State> | null>
-    paginate(filter: Where<State> | undefined, options: PaginateOptions): Promise<PaginateResult<State>>
+    insert(data: Prettify<EntityInsert<State>>): Promise<Prettify<EntitySelect<State>>>
+    update(filter: Where<State>, data: Prettify<EntityUpdate<State>>): Promise<Prettify<EntitySelect<State>>[]>
+    upsert(data: Prettify<EntityInsert<State>>, conflictColumns?: (keyof State)[]): Promise<Prettify<EntitySelect<State>>>
+    delete(filter: Where<State>): Promise<Prettify<EntitySelect<State>>[]>
+    deleteById(id: string | number): Promise<Prettify<EntitySelect<State>> | null>
+    paginate(filter: Where<State> | undefined, options: PaginateOptions): Promise<Prettify<PaginateResult<State>>>
 }
