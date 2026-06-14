@@ -43,7 +43,7 @@ export interface ColumnState {
     uniqueConflict: UniqueConflict
     index: boolean
     checks: CheckEntry[]
-    in: (string | number | Uint8Array)[]
+    in: ColumnType[]
     collate?: Collation
     references?: { col: ColumnReference; actions: ReferenceAction[] }
     default?: unknown
@@ -67,7 +67,7 @@ export type Chain<Type extends ColumnType, Used extends string = never> = Omit<
         lte(value: number): Chain<Type, Used>
         minLength(value: number): Chain<Type, Used>
         maxLength(value: number): Chain<Type, Used>
-        in(values: ColumnTypeMap[Type][]): Chain<Type, Used | 'in'>
+        in(values: ColumnType[]): Chain<Type, Used | 'in'>
         references(col: unknown, actions?: ReferenceAction[]): Chain<Type, Used | 'references'>
         default(value: ColumnTypeMap[Type]): Chain<Type, Used | 'default'>
         defaultFn(fn: () => ColumnTypeMap[Type]): Chain<Type, Used | 'defaultFn'>
