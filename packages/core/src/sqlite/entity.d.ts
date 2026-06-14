@@ -51,7 +51,6 @@ export interface SqliteEntityState {
 }
 
 // TODO:: replace this part of the code
-// NOTE: this code is generated via ai, i have no clue how its working but it works its good for now, comments were made to get some idea about that code
 //==== start of ai code ====
 
 // Each column is Chain<ColumnKind, UsedFlags>, where ColumnKind is the
@@ -95,6 +94,7 @@ export interface SqliteEntityOutput<State> {
     toSelectSchema(): Schema<EntitySelect<State>>
     toInsertSchema(): Schema<EntityInsert<State>>
     toUpdateSchema(): Schema<EntityUpdate<State>>
+    toSql(): string
     readonly $inferSelect: EntitySelect<State>
     readonly $inferInsert: EntityInsert<State>
     readonly $inferUpdate: EntityUpdate<State>

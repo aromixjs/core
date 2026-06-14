@@ -1,4 +1,5 @@
-import { Convert } from './ddl/convert'
+import { AxConverter } from './converter/ax'
+import { SqlConverter } from './converter/sql'
 import { SqliteEntityInput, SqliteEntityOutput, SqliteEntityState } from './entity.d'
 
 export function SqliteEntity<State extends Record<string, any>>(input: SqliteEntityInput<State>): SqliteEntityOutput<State> {
@@ -62,13 +63,16 @@ export function SqliteEntity<State extends Record<string, any>>(input: SqliteEnt
             }
         },
         toSelectSchema() {
-            return Convert.select(columns)
+            return AxConverter.select(columns)
         },
         toInsertSchema() {
-            return Convert.insert(columns)
+            return AxConverter.insert(columns)
         },
         toUpdateSchema() {
-            return Convert.update(columns)
+            return AxConverter.update(columns)
+        },
+        toSql() {
+            return new SqlConverter(state).toSql()
         },
     } as any
 }

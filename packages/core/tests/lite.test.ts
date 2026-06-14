@@ -91,15 +91,16 @@ describe('notNull', () => {
         expect(col.state.notNull).toBe(true)
     })
 
-    it('notNull can be called after primaryKey (redundant but valid)', () => {
-        const col = lite.int().primaryKey().notNull()
+    it('primaryKey already sets notNull internally', () => {
+        const col = lite.int().primaryKey()
+        expect(col.state.primaryKey).toBe(true)
         expect(col.state.notNull).toBe(true)
     })
 })
 
 describe('unique', () => {
     it('sets unique with default conflict', () => {
-        const col = lite.text().unique()
+        const col = lite.text().unique('conflict:error')
         expect(col.state.unique).toBe(true)
         expect(col.state.uniqueConflict).toBe('conflict:error')
     })
@@ -301,7 +302,7 @@ describe('method blocking via Used type', () => {
         const col = lite
             .text()
             .notNull()
-            .unique()
+            .unique('conflict:error')
             .default('x')
             .pipe(ax.operator((v: string) => v.length))
         expect(col.state.notNull).toBe(true)

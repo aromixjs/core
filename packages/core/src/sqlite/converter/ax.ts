@@ -1,7 +1,7 @@
-import { ax, AnySchema, Operator, Schema } from '@aromix/validator'
-import { ColumnState } from './column.d'
+import { AnySchema, ax, Operator, Schema } from '@aromix/validator'
+import { ColumnState } from '../ddl/column'
 
-export namespace Convert {
+export namespace AxConverter {
     export function gt(minValue: number): Operator<number, number> {
         return ax.operator((value: number) => {
             if (value <= minValue) {

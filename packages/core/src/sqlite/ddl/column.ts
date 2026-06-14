@@ -85,7 +85,7 @@ export class Column {
         return this
     }
 
-    in(values: string[]) {
+    in(values: (string | number | Uint8Array)[]) {
         this.state.in = values
         return this
     }
