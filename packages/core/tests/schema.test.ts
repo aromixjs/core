@@ -175,7 +175,12 @@ describe('entity insert schema — defaults', () => {
 
     it('defaultFn provides lazy default on insert', () => {
         let counter = 0
-        const s = makeEntity({ val: lite.int().notNull().defaultFn(() => ++counter) }).toInsertSchema()
+        const s = makeEntity({
+            val: lite
+                .int()
+                .notNull()
+                .defaultFn(() => ++counter),
+        }).toInsertSchema()
         expect(s.parse({}).val).toBe(1)
         expect(s.parse({}).val).toBe(2)
     })

@@ -769,7 +769,7 @@ describe('SqliteEntity — toSql()', () => {
         expect(sql).toContain('userId INTEGER NOT NULL')
         expect(sql).toContain('total REAL NOT NULL')
         expect(sql).toContain('status TEXT NOT NULL')
-        expect(sql).toContain("CHECK (status IN (\"pending\", \"shipped\", \"delivered\"))")
+        expect(sql).toContain('CHECK (status IN ("pending", "shipped", "delivered"))')
         expect(sql).toContain('COLLATE RTRIM')
         expect(sql).toContain('CHECK (total > 0)')
         expect(sql).toContain('CONSTRAINT u_order UNIQUE (id, userId)')
@@ -935,7 +935,7 @@ describe('SqliteEntity — complex multi-entity schema', () => {
         const postSql = Post.toSql()
         expect(postSql).toContain('CREATE TABLE IF NOT EXISTS posts (')
         expect(postSql).toContain('authorId INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE')
-        expect(postSql).toContain("CHECK (published IN (\"0\", \"1\"))")
+        expect(postSql).toContain('CHECK (published IN ("0", "1"))')
         expect(postSql).toContain('CHECK (length(title) >= 1)')
         expect(postSql).toContain('CHECK (length(title) <= 255)')
         expect(postSql).toContain('CREATE INDEX IF NOT EXISTS idx_authorId ON posts (authorId);')
@@ -945,7 +945,7 @@ describe('SqliteEntity — complex multi-entity schema', () => {
         expect(commentSql).toContain('postId INTEGER NOT NULL REFERENCES posts(id) ON DELETE CASCADE')
         expect(commentSql).toContain('authorId INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE')
         expect(commentSql).toContain('CHECK (length(content) >= 1)')
-        expect(commentSql).toContain("CHECK (moderated IN (\"0\", \"1\"))")
+        expect(commentSql).toContain('CHECK (moderated IN ("0", "1"))')
         expect(commentSql).toContain('CREATE UNIQUE INDEX IF NOT EXISTS uidx_comment ON comments (postId, id);')
 
         // --- Index and uniqueIndex in comment ---

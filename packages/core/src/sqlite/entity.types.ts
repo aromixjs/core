@@ -75,18 +75,46 @@ type ResolveInsertType<Column> =
 // UPDATE → every column is optional (partial update).
 type ResolveUpdateType<Column> = Column extends Chain<infer ColumnKind, any> ? ColumnTypeMap[ColumnKind] | undefined : never
 
-type EntitySelect<State> = {
+export type EntitySelect<State> = {
     [Key in keyof State]: ResolveSelectType<State[Key]>
 }
 
-type EntityInsert<State> = {
+export type EntityInsert<State> = {
     [Key in keyof State as ResolveInsertType<State[Key]> extends never ? never : Key]: ResolveInsertType<State[Key]>
 }
 
-type EntityUpdate<State> = {
+export type EntityUpdate<State> = {
     [Key in keyof State]: ResolveUpdateType<State[Key]>
 }
 // =======  end of ai code ======
+
+export type Where<State> = {
+    [Key in keyof EntitySelect<State>]?: EntitySelect<State>[Key] | WhereOperators<EntitySelect<State>[Key]>
+}
+
+export interface WhereOperators<T> {
+    eq?: T
+    ne?: T
+    gt?: T
+    gte?: T
+    lt?: T
+    lte?: T
+    in?: T[]
+    like?: string
+}
+
+export interface PaginateOptions {
+    page: number
+    pageSize: number
+}
+
+export interface PaginateResult<State> {
+    data: EntitySelect<State>[]
+    total: number
+    page: number
+    pageSize: number
+    totalPages: number
+}
 
 export interface SqliteEntityOutput<State> {
     state: SqliteEntityState
@@ -98,4 +126,16 @@ export interface SqliteEntityOutput<State> {
     readonly $inferSelect: EntitySelect<State>
     readonly $inferInsert: EntityInsert<State>
     readonly $inferUpdate: EntityUpdate<State>
+
+    findById(id: string | number): Promise<EntitySelect<State> | null>
+    findOne(filter?: Where<State>): Promise<EntitySelect<State> | null>
+    findMany(filter?: Where<State>): Promise<EntitySelect<State>[]>
+    count(filter?: Where<State>): Promise<number>
+    exist(filter?: Where<State>): Promise<boolean>
+    insert(data: EntityInsert<State>): Promise<EntitySelect<State>>
+    update(filter: Where<State>, data: EntityUpdate<State>): Promise<EntitySelect<State>[]>
+    upsert(data: EntityInsert<State>, conflictColumns?: (keyof State)[]): Promise<EntitySelect<State>>
+    delete(filter: Where<State>): Promise<EntitySelect<State>[]>
+    deleteById(id: string | number): Promise<EntitySelect<State> | null>
+    paginate(filter: Where<State> | undefined, options: PaginateOptions): Promise<PaginateResult<State>>
 }

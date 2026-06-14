@@ -1,6 +1,8 @@
 import { AxConverter } from './converter/ax'
 import { SqlConverter } from './converter/sql'
-import { SqliteEntityInput, SqliteEntityOutput, SqliteEntityState } from './entity.types'
+import { SqliteEntityDml } from './dml/impl'
+import { PaginateOptions, Where } from './dml/types'
+import { EntityInsert, EntityUpdate, SqliteEntityInput, SqliteEntityOutput, SqliteEntityState } from './entity.types'
 
 export function SqliteEntity<State extends Record<string, any>>(input: SqliteEntityInput<State>): SqliteEntityOutput<State> {
     const columns: any = {}
@@ -55,6 +57,7 @@ export function SqliteEntity<State extends Record<string, any>>(input: SqliteEnt
         })
     }
 
+    const dml = new SqliteEntityDml<State>(state, input.adapter)
 
     return {
         state,
@@ -77,5 +80,16 @@ export function SqliteEntity<State extends Record<string, any>>(input: SqliteEnt
         toSql() {
             return new SqlConverter(state).toSql()
         },
+        findById: (id: string | number) => dml.findById(id),
+        findOne: (filter?: Where<State>) => dml.findOne(filter as any),
+        findMany: (filter?: Where<State>) => dml.findMany(filter as any),
+        count: (filter?: Where<State>) => dml.count(filter as any),
+        exist: (filter?: Where<State>) => dml.exist(filter as any),
+        insert: (data: EntityInsert<State>) => dml.insert(data),
+        update: (filter: Where<State>, data: EntityUpdate<State>) => dml.update(filter as any, data),
+        upsert: (data: EntityInsert<State>, conflictColumns?: (keyof State)[]) => dml.upsert(data, conflictColumns),
+        delete: (filter: Where<State>) => dml.delete(filter as any),
+        deleteById: (id: string | number) => dml.deleteById(id),
+        paginate: (filter: Where<State> | undefined, options: PaginateOptions) => dml.paginate(filter as any, options),
     } as any
 }
