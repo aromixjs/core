@@ -1,5 +1,5 @@
 import { Collation, ColumnState, ColumnType, ReferenceAction, UniqueConflict } from '../ddl/column'
-import { SqliteEntityState } from '../entity.d'
+import { SqliteEntityState } from '../entity.types'
 
 const columnType: Record<ColumnType, string> = {
     int: 'INTEGER',

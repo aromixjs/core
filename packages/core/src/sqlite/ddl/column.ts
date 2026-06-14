@@ -1,5 +1,5 @@
 import type { Operator } from '@aromix/validator'
-import { Chain, Collation, ColumnReference, ColumnState, ColumnType, ColumnTypeMap, ReferenceAction, UniqueConflict } from './column.d'
+import { Chain, Collation, ColumnReference, ColumnState, ColumnType, ColumnTypeMap, ReferenceAction, UniqueConflict } from './column.types'
 export type { Chain, Collation, ColumnReference, ColumnState, ColumnType, ColumnTypeMap, ReferenceAction, UniqueConflict }
 export class Column {
     readonly state: ColumnState
@@ -85,7 +85,7 @@ export class Column {
         return this
     }
 
-    in(values: ColumnType[]) {
+    in(values: string[]) {
         this.state.in = values
         return this
     }

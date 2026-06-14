@@ -5,8 +5,8 @@ export * from './sqlite/adapter';
 export * from './sqlite/converter/ax';
 export * from './sqlite/converter/sql';
 export * from './sqlite/ddl/column';
-export * from './sqlite/ddl/column.d';
+export * from './sqlite/ddl/column.types';
 export * from './sqlite/ddl/lite';
 export * from './sqlite/entity';
-export * from './sqlite/entity.d';
+export * from './sqlite/entity.types';
 

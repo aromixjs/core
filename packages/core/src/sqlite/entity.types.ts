@@ -24,7 +24,7 @@ export interface SqliteEntityInput<State> {
     name: string
     adapter: SqliteAdapter
     columns: State
-    options(ctx: SqliteEntityOptionsCtx<keyof State & string>): void
+    options?(ctx: SqliteEntityOptionsCtx<keyof State & string>): void
 }
 
 export interface SqliteEntityState {

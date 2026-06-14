@@ -19,7 +19,7 @@ export interface KvEntityOutput<Schema extends AnySchema> {
     }
 }
 
-export function entity<Schema extends AnySchema>(input: KvEntityInput<Schema>): KvEntityOutput<Schema> {
+export function KvEntity<Schema extends AnySchema>(input: KvEntityInput<Schema>): KvEntityOutput<Schema> {
     const adapter = input.adapter
 
     return {

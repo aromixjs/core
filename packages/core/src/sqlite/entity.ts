@@ -1,6 +1,6 @@
 import { AxConverter } from './converter/ax'
 import { SqlConverter } from './converter/sql'
-import { SqliteEntityInput, SqliteEntityOutput, SqliteEntityState } from './entity.d'
+import { SqliteEntityInput, SqliteEntityOutput, SqliteEntityState } from './entity.types'
 
 export function SqliteEntity<State extends Record<string, any>>(input: SqliteEntityInput<State>): SqliteEntityOutput<State> {
     const columns: any = {}
@@ -20,38 +20,41 @@ export function SqliteEntity<State extends Record<string, any>>(input: SqliteEnt
         withoutRowId: false,
     }
 
-    input.options({
-        unique(uniqueOptions) {
-            state.unique.push(uniqueOptions)
-        },
-        primaryKey(cols) {
-            state.primaryKey.push({ cols })
-        },
-        index(options) {
-            state.index.push(options)
-        },
-        uniqueIndex(options) {
-            state.uniqueIndex.push(options)
-        },
-        checks(exprs) {
-            state.checks = exprs
-        },
-        gt(left, right) {
-            return { left, op: 'gt', right }
-        },
-        gte(left, right) {
-            return { left, op: 'gte', right }
-        },
-        lt(left, right) {
-            return { left, op: 'lt', right }
-        },
-        lte(left, right) {
-            return { left, op: 'lte', right }
-        },
-        withoutRowId() {
-            state.withoutRowId = true
-        },
-    })
+    if (input.options) {
+        input.options({
+            unique(uniqueOptions) {
+                state.unique.push(uniqueOptions)
+            },
+            primaryKey(cols) {
+                state.primaryKey.push({ cols })
+            },
+            index(options) {
+                state.index.push(options)
+            },
+            uniqueIndex(options) {
+                state.uniqueIndex.push(options)
+            },
+            checks(exprs) {
+                state.checks = exprs
+            },
+            gt(left, right) {
+                return { left, op: 'gt', right }
+            },
+            gte(left, right) {
+                return { left, op: 'gte', right }
+            },
+            lt(left, right) {
+                return { left, op: 'lt', right }
+            },
+            lte(left, right) {
+                return { left, op: 'lte', right }
+            },
+            withoutRowId() {
+                state.withoutRowId = true
+            },
+        })
+    }
+
 
     return {
         state,
