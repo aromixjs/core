@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blog Admin</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: system-ui, sans-serif; background: #f5f5f5; padding: 20px; color: #333; }
+h1 { margin-bottom: 20px; }
+.layout { display: grid; grid-template-columns: 300px 1fr 1fr; gap: 20px; }
+.card { background: white; border-radius: 8px; padding: 16px; box-shadow: 0 1px 3px rgba(0,0,0,.1); }
+.card h2 { font-size: 16px; margin-bottom: 12px; color: #555; border-bottom: 1px solid #eee; padding-bottom: 8px; }
+form { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
+input, select, textarea { padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; }
+textarea { resize: vertical; min-height: 60px; }
+button { padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; }
+.btn-primary { background: #0066ff; color: white; }
+.btn-primary:hover { background: #0052cc; }
+.btn-danger { background: #dc3545; color: white; }
+.btn-danger:hover { background: #b02a37; }
+.btn-small { padding: 4px 8px; font-size: 12px; }
+.item { padding: 8px; border-bottom: 1px solid #f0f0f0; font-size: 14px; }
+.item:last-child { border-bottom: none; }
+.item .meta { font-size: 12px; color: #888; margin-top: 4px; }
+.item .actions { margin-top: 4px; display: flex; gap: 4px; }
+.tab-bar { display: flex; gap: 4px; margin-bottom: 12px; }
+.tab-bar button { flex: 1; background: #eee; color: #555; }
+.tab-bar button.active { background: #0066ff; color: white; }
+#status { position: fixed; bottom: 20px; right: 20px; padding: 8px 16px; border-radius: 20px; font-size: 13px; }
+.status-ok { background: #d4edda; color: #155724; }
+.status-err { background: #f8d7da; color: #721c24; }
+</style>
+</head>
+<body>
+<h1>📝 Blog Admin</h1>
+<div class="layout">
+  <div class="card">
+    <h2>Users</h2>
+    <form id="userForm">
+      <input name="name" placeholder="Name" required>
+      <input name="email" type="email" placeholder="Email" required>
+      <button class="btn-primary" type="submit">Create User</button>
+    </form>
+    <div id="usersList"></div>
+  </div>
+  <div class="card">
+    <h2>Posts</h2>
+    <form id="postForm">
+      <input name="title" placeholder="Title" required>
+      <textarea name="body" placeholder="Body" required></textarea>
+      <select name="authorId" required><option value="">Select author</option></select>
+      <select name="status"><option value="draft">Draft</option><option value="published">Published</option></select>
+      <button class="btn-primary" type="submit">Create Post</button>
+    </form>
+    <div id="postsList"></div>
+  </div>
+  <div class="card">
+    <h2>Comments</h2>
+    <form id="commentForm">
+      <textarea name="content" placeholder="Comment" required></textarea>
+      <select name="postId" required><option value="">Select post</option></select>
+      <select name="authorId" required><option value="">Select author</option></select>
+      <button class="btn-primary" type="submit">Add Comment</button>
+    </form>
+    <div id="commentsList"></div>
+  </div>
+</div>
+<div id="status">Disconnected</div>
+
+<script type="module">
+import { encode, decode } from 'https://esm.sh/@msgpack/msgpack@3.1.3'
+
+const WS_URL = `ws://${location.host}`
+const statusEl = document.getElementById('status')
+let ws
+
+function connect() {
+  ws = new WebSocket(WS_URL)
+  ws.binaryType = 'arraybuffer'
+  ws.onopen = () => setStatus('Connected', true)
+  ws.onclose = () => setStatus('Disconnected', false)
+  ws.onerror = () => setStatus('Error', false)
+  ws.onmessage = (event) => {
+    const res = decode(new Uint8Array(event.data))
+    pending.get(res.route)?.(res)
+  }
+}
+
+function setStatus(msg, ok) {
+  statusEl.textContent = msg
+  statusEl.className = ok ? 'status-ok' : 'status-err'
+}
+
+const pending = new Map()
+let msgId = 0
+
+function send(route, data) {
+  return new Promise((resolve, reject) => {
+    const id = route // we reuse route as correlation id
+    pending.set(route, (res) => {
+      pending.delete(route)
+      if (res.error) reject(new Error(res.error))
+      else resolve(res.data)
+    })
+    ws.send(encode({ route, data }))
+    setTimeout(() => {
+      if (pending.has(route)) {
+        pending.delete(route)
+        reject(new Error('Timeout'))
+      }
+    }, 5000)
+  })
+}
+
+// ── Users ──
+async function loadUsers() {
+  try {
+    const users = await send('users.findMany')
+    const list = document.getElementById('usersList')
+    list.innerHTML = users.map(u => `<div class="item">
+      <strong>${u.name}</strong> <span class="meta">${u.email}</span>
+      <div class="actions"><button class="btn-small btn-danger" onclick="deleteUser(${u.id})">Delete</button></div>
+    </div>`).join('')
+    const authorSelects = document.querySelectorAll('select[name="authorId"]')
+    authorSelects.forEach(s => {
+      const cur = s.value
+      s.innerHTML = `<option value="">Select author</option>` + users.map(u => `<option value="${u.id}">${u.name}</option>`).join('')
+      if (cur) s.value = cur
+    })
+    return users
+  } catch (e) { console.error(e); return [] }
+}
+
+window.deleteUser = async (id) => {
+  await send('users.deleteById', id)
+  loadUsers()
+  loadPosts()
+  loadComments()
+}
+
+document.getElementById('userForm').onsubmit = async (e) => {
+  e.preventDefault()
+  const fd = new FormData(e.target)
+  try {
+    await send('users.insert', Object.fromEntries(fd))
+    e.target.reset()
+    loadUsers()
+  } catch (err) { alert(err.message) }
+}
+
+// ── Posts ──
+async function loadPosts() {
+  try {
+    const posts = await send('posts.findMany')
+    document.getElementById('postsList').innerHTML = posts.map(p => `<div class="item">
+      <strong>${p.title}</strong> <span class="meta">${p.status} · by user ${p.authorId}</span>
+      <div class="actions">
+        <button class="btn-small btn-primary" onclick="publishPost(${p.id})">Publish</button>
+        <button class="btn-small btn-danger" onclick="deletePost(${p.id})">Delete</button>
+      </div>
+    </div>`).join('')
+    document.querySelector('select[name="postId"]').innerHTML =
+      `<option value="">Select post</option>` + posts.map(p => `<option value="${p.id}">${p.title}</option>`).join('')
+    return posts
+  } catch (e) { console.error(e); return [] }
+}
+
+window.publishPost = async (id) => {
+  await send('posts.update', [{ id }, { status: 'published' }])
+  loadPosts()
+}
+
+window.deletePost = async (id) => {
+  await send('posts.deleteById', id)
+  loadPosts()
+  loadComments()
+}
+
+document.getElementById('postForm').onsubmit = async (e) => {
+  e.preventDefault()
+  const fd = new FormData(e.target)
+  try {
+    await send('posts.insert', Object.fromEntries(fd))
+    e.target.reset()
+    loadPosts()
+  } catch (err) { alert(err.message) }
+}
+
+// ── Comments ──
+async function loadComments() {
+  try {
+    const comments = await send('comments.findMany')
+    document.getElementById('commentsList').innerHTML = comments.map(c => `<div class="item">
+      ${c.content} <span class="meta">by user ${c.authorId} on post ${c.postId}</span>
+      <div class="actions"><button class="btn-small btn-danger" onclick="deleteComment(${c.id})">Delete</button></div>
+    </div>`).join('')
+  } catch (e) { console.error(e) }
+}
+
+window.deleteComment = async (id) => {
+  await send('comments.deleteById', id)
+  loadComments()
+}
+
+document.getElementById('commentForm').onsubmit = async (e) => {
+  e.preventDefault()
+  const fd = new FormData(e.target)
+  try {
+    await send('comments.insert', Object.fromEntries(fd))
+    e.target.reset()
+    loadComments()
+  } catch (err) { alert(err.message) }
+}
+
+// ── Init ──
+connect()
+setTimeout(async () => {
+  await loadUsers()
+  await loadPosts()
+  await loadComments()
+}, 500)
+</script>
+</body>
+</html>

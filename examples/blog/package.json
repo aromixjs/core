@@ -1,0 +1,19 @@
+{
+    "name": "@aromix/example-blog",
+    "version": "0.1.0",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "server": "bun run src/server.ts",
+        "test": "bun run src/test-client.ts"
+    },
+    "dependencies": {
+        "@aromix/core": "workspace:^",
+        "@aromix/bun": "workspace:^",
+        "@msgpack/msgpack": "catalog:"
+    },
+    "devDependencies": {
+        "@types/bun": "^1.1.13",
+        "typescript": "catalog:"
+    }
+}
