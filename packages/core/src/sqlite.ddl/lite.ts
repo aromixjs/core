@@ -1,43 +1,63 @@
-import { ax } from '@aromix/validator'
-import { Column } from './column'
-import { ColumnState } from './column.types'
-import { TableColumns, TableInput, TableState } from './table.types'
+import { AxConverter } from "../sqlite.convert/ax"
+import { createColumn } from "./column"
+import { ColumnState } from "./column.state.type"
+import { TableColumns, TableInput, TableState } from "./table.types"
 
 export const lite = {
     int() {
-        return Column.create('int')
+        return createColumn('int')
     },
     real() {
-        return Column.create('real')
+        return createColumn('real')
     },
     text() {
-        return Column.create('text')
+        return createColumn('text')
     },
     blob() {
-        return Column.create('blob')
+        return createColumn('blob')
     },
 
-    table<Cols extends TableColumns>(input: TableInput<Cols>) {
-        const columns: Record<string, ColumnState> = {}
-        for (const key of Object.keys(input.columns)) {
-            columns[key] = input.columns[key].state
-        }
+    table<Cols extends TableColumns>(input: TableInput<Cols>): TableState<Cols> {
+        const rawColumns: Record<string, ColumnState> = {}
 
-        const state: TableState = {
-            columns,
+        for (const key of Object.keys(input.columns)) {
+            rawColumns[key] = input.columns[key].state
+        }
+        const state: TableState<Cols> = {
+            columns: input.columns,
+            rawColumns,
             unique: [],
             primaryKey: [],
             index: [],
             uniqueIndex: [],
             checks: [],
             withoutRowId: false,
+
+            $inferSelect: undefined as any,
+            $inferInsert: undefined as any,
+            $inferUpdate: undefined as any,
+
+            toSelectSchema() {
+                return AxConverter.select(rawColumns)
+            },
+            toInsertSchema() {
+                return AxConverter.insert(rawColumns)
+            },
+            toUpdateSchema() {
+                return AxConverter.update(rawColumns)
+            },
         }
 
         if (input.options !== undefined) {
             input.options({
                 unique(options) {
-                    state.unique.push(options)
+                    state.unique.push({
+                        name: options.name,
+                        cols: options.cols,
+                        conflict: options.conflict ?? 'conflict:error',
+                    })
                 },
+
                 primaryKey(cols) {
                     state.primaryKey.push({ cols })
                 },
@@ -71,20 +91,3 @@ export const lite = {
         return state
     },
 }
-
-
-
-const table =lite.table({
-    columns: {
-        id: lite.int().autoIncrement().primaryKey(),
-        name: lite.text().refine((value) => {
-            const schema = ax.union([ax.literal('admin'), ax.literal('modarator'), ax.literal('user')])
-            return schema.parse(value)
-        })
-    },
-
-    options(ctx){
-    }
-})
-
-

@@ -1,115 +1,114 @@
-import { Chain, RefinedChain } from './chain.types'
-import { Collation, ColumnReference, ColumnState, ColumnType, ColumnTypeMap, ReferenceAction, UniqueConflict } from './column.types'
-export class Column<Type extends ColumnType> {
-    readonly state: ColumnState
+import { Column } from "./column.builder.types"
+import { Collation, ColumnReference, ColumnState, ColumnType, ReferenceAction, UniqueConflict } from "./column.state.type"
 
-    private constructor(state: ColumnState) {
-        this.state = state
+export function createColumn<Type extends ColumnType>(colType: Type): Column<Type> {
+    const state: ColumnState = {
+        colType,
+        primaryKey: false,
+        autoIncrement: false,
+        notNull: false,
+        unique: false,
+        uniqueConflict: 'conflict:error',
+        index: false,
+        checks: [],
+        in: [],
     }
 
-    static create<Type extends ColumnType>(colType: Type): Chain<Type> {
-        return new Column<Type>({
-            colType,
-            primaryKey: false,
-            autoIncrement: false,
-            notNull: false,
-            unique: false,
-            uniqueConflict: 'conflict:error',
-            index: false,
-            checks: [],
-            in: [],
-        }) as any
+    const column = {
+        state,
+
+        notNull() {
+            state.notNull = true
+            return column
+        },
+
+        primaryKey() {
+            state.primaryKey = true
+            state.notNull = true
+            return column
+        },
+
+        autoIncrement() {
+            state.autoIncrement = true
+            return column
+        },
+
+        unique(conflict: UniqueConflict = 'conflict:error') {
+            state.unique = true
+            state.uniqueConflict = conflict
+            return column
+        },
+
+        index() {
+            state.index = true
+            return column
+        },
+
+        collate(value: Collation) {
+            state.collate = value
+            return column
+        },
+
+        gt(value: number) {
+            state.checks.push({ op: 'gt', val: value })
+            return column
+        },
+        gte(value: number) {
+            state.checks.push({ op: 'gte', val: value })
+            return column
+        },
+        lt(value: number) {
+            state.checks.push({ op: 'lt', val: value })
+            return column
+        },
+        lte(value: number) {
+            state.checks.push({ op: 'lte', val: value })
+            return column
+        },
+
+        minLength(value: number) {
+            state.checks.push({ op: 'minLength', val: value })
+            return column
+        },
+        maxLength(value: number) {
+            state.checks.push({ op: 'maxLength', val: value })
+            return column
+        },
+
+        in(values: string[]) {
+            state.in = values
+            return column
+        },
+
+        references(col: ColumnReference, actions: ReferenceAction[] = []) {
+            state.references = { col, actions }
+            return column
+        },
+
+        default(value: unknown) {
+            state.default = value
+            return column
+        },
+
+        defaultFn(fn: () => unknown) {
+            state.defaultFn = fn
+            return column
+        },
+
+        onUpdate(fn: () => unknown) {
+            state.onUpdate = fn
+            return column
+        },
+
+        refine(fn: (value: unknown) => unknown) {
+            state.refine = fn
+            return column
+        },
     }
 
-    primaryKey() {
-        this.state.primaryKey = true
-        this.state.notNull = true
-        return this
-    }
-
-    autoIncrement() {
-        this.state.autoIncrement = true
-        return this
-    }
-
-    notNull() {
-        this.state.notNull = true
-        return this
-    }
-
-    unique(conflict: UniqueConflict = 'conflict:error') {
-        this.state.unique = true
-        this.state.uniqueConflict = conflict
-        return this
-    }
-
-    index() {
-        this.state.index = true
-        return this
-    }
-
-    collate(value: Collation) {
-        this.state.collate = value
-        return this
-    }
-
-    gt(value: number) {
-        this.state.checks.push({ op: 'gt', val: value })
-        return this
-    }
-
-    gte(value: number) {
-        this.state.checks.push({ op: 'gte', val: value })
-        return this
-    }
-
-    lt(value: number) {
-        this.state.checks.push({ op: 'lt', val: value })
-        return this
-    }
-
-    lte(value: number) {
-        this.state.checks.push({ op: 'lte', val: value })
-        return this
-    }
-
-    minLength(value: number) {
-        this.state.checks.push({ op: 'minLength', val: value })
-        return this
-    }
-
-    maxLength(value: number) {
-        this.state.checks.push({ op: 'maxLength', val: value })
-        return this
-    }
-
-    in(values: string[]) {
-        this.state.in = values
-        return this
-    }
-
-    references(col: ColumnReference, actions: ReferenceAction[] = []) {
-        this.state.references = { col, actions }
-        return this
-    }
-
-    default(value: ColumnTypeMap[Type]) {
-        this.state.default = value
-        return this
-    }
-
-    defaultFn(fn: () => ColumnTypeMap[Type]) {
-        this.state.defaultFn = fn
-        return this
-    }
-
-    onUpdate(fn: () => ColumnTypeMap[Type]) {
-        this.state.onUpdate = fn
-        return this
-    }
-
-    refine<Output extends ColumnTypeMap[Type]>(fn: (value: unknown) => Output): RefinedChain<Output> {
-        this.state.refine = fn
-        return this as any
-    }
+    return column as any
 }
+
+
+
+
