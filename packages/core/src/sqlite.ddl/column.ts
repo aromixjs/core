@@ -1,6 +1,6 @@
-import type { Operator } from '@aromix/validator'
-import { Chain, Collation, ColumnReference, ColumnState, ColumnType, ColumnTypeMap, ReferenceAction, UniqueConflict } from './column.types'
-export class Column<Type extends ColumnType>{
+import { Chain } from './chain.types'
+import { Collation, ColumnReference, ColumnState, ColumnType, ColumnTypeMap, ReferenceAction, UniqueConflict } from './column.types'
+export class Column<Type extends ColumnType> {
     readonly state: ColumnState
 
     private constructor(state: ColumnState) {
@@ -18,7 +18,6 @@ export class Column<Type extends ColumnType>{
             index: false,
             checks: [],
             in: [],
-            pipes: [],
         })
     }
 
@@ -84,7 +83,7 @@ export class Column<Type extends ColumnType>{
         return this
     }
 
-    in(values: string[]) {
+    in(values: ColumnTypeMap[Type][]) {
         this.state.in = values
         return this
     }
@@ -106,11 +105,6 @@ export class Column<Type extends ColumnType>{
 
     onUpdate(fn: () => unknown) {
         this.state.onUpdate = fn
-        return this
-    }
-
-    pipe(operator: Operator<any, any>) {
-        this.state.pipes.push(operator)
         return this
     }
 }

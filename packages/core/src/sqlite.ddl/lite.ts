@@ -14,3 +14,11 @@ export const lite = {
         return Column.create('blob')
     },
 }
+
+
+
+const data = {
+    id: lite.int().primaryKey().autoIncrement(),
+    name: lite.text().defaultFn(() => 'test'),
+    admin: lite.int().in([1, 0])
+}
