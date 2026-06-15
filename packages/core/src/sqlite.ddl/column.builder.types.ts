@@ -1,59 +1,105 @@
-import { Collation, ColumnReference, ColumnState, ColumnType, ColumnTypeMap, ReferenceAction, UniqueConflict } from "./column.state.type"
+import { Collation, ColumnReference, ColumnState, ColumnType, ColumnTypeMap, ReferenceAction, UniqueConflict } from './column.state.type'
 
-export interface InferTypes<Select = unknown, Insert = unknown, Update = unknown> {
-    select: Select
-    insert: Insert
-    update: Update
+export interface ColumnTypes {
+    select: unknown
+    insert: unknown
+    update: unknown
 }
 
-export type DefaultTypes<Type extends ColumnType> = InferTypes<ColumnTypeMap[Type] | null, ColumnTypeMap[Type] | undefined, ColumnTypeMap[Type] | undefined>
+export type DefaultColumnTypes<Type extends ColumnType> = {
+    select: ColumnTypeMap[Type] | null
+    insert: ColumnTypeMap[Type] | undefined
+    update: ColumnTypeMap[Type] | undefined
+}
 
-export interface Column<Type extends ColumnType, Types extends InferTypes = DefaultTypes<Type>> {
+export interface ColumnDefinition<Type extends ColumnType = ColumnType, Types extends ColumnTypes = ColumnTypes> {
+    type: Type
+    types: Types
+}
+
+export interface Column<Definition extends ColumnDefinition = ColumnDefinition> {
     readonly state: ColumnState
-    readonly $type: Types
+    readonly $type: Definition['types']
 
-    // narrows select: T|null -> T  (still optional on insert unless combined with default-removal below)
-    notNull(): Column<Type, InferTypes<NonNullable<Types['select']>, Types['insert'], Types['update']>>
+    notNull(): Column<{
+        type: Definition['type']
+        types: {
+            select: NonNullable<Definition['types']['select']>
+            insert: Definition['types']['insert']
+            update: Definition['types']['update']
+        }
+    }>
 
-    // primaryKey implies notNull + (if not autoIncrement) required on insert
-    primaryKey(): Column<Type, InferTypes<NonNullable<Types['select']>, NonNullable<Types['insert']>, Types['update']>>
+    primaryKey(): Column<{
+        type: Definition['type']
+        types: {
+            select: NonNullable<Definition['types']['select']>
+            insert: NonNullable<Definition['types']['insert']>
+            update: Definition['types']['update']
+        }
+    }>
 
-    // autoIncrement -> excluded from insert entirely
-    autoIncrement(): Column<Type, InferTypes<Types['select'], never, Types['update']>>
+    autoIncrement(): Column<{
+        type: Definition['type']
+        types: {
+            select: Definition['types']['select']
+            insert: never
+            update: Definition['types']['update']
+        }
+    }>
 
-    // autoIncrement -> excluded from insert entirely
-    autoIncrement(): Column<Type, InferTypes<Types['select'], never, Types['update']>>
+    default(value: ColumnTypeMap[Definition['type']]): Column<{
+        type: Definition['type']
+        types: {
+            select: NonNullable<Definition['types']['select']>
+            insert: Definition['types']['insert']
+            update: Definition['types']['update']
+        }
+    }>
 
-    // default/defaultFn -> select becomes non-null, insert stays optional (already is)
-    default(value: ColumnTypeMap[Type]): Column<Type, InferTypes<NonNullable<Types['select']>, Types['insert'], Types['update']>>
-    defaultFn(fn: () => ColumnTypeMap[Type]): Column<Type, InferTypes<NonNullable<Types['select']>, Types['insert'], Types['update']>>
+    defaultFn(fn: () => ColumnTypeMap[Definition['type']]): Column<{
+        type: Definition['type']
+        types: {
+            select: NonNullable<Definition['types']['select']>
+            insert: Definition['types']['insert']
+            update: Definition['types']['update']
+        }
+    }>
 
-    onUpdate(fn: () => ColumnTypeMap[Type]): Column<Type, Types>
+    onUpdate(fn: () => ColumnTypeMap[Definition['type']]): Column<Definition>
 
-    // refine — replaces the base type everywhere it appears, preserving null/undefined wrappers
-    refine<RefinedOutput extends ColumnTypeMap[Type]>(
-        fn: (value: ColumnTypeMap[Type]) => RefinedOutput,
-    ): Column<
-        Type,
-        InferTypes<
-            Types['select'] extends null ? RefinedOutput | null : RefinedOutput,
-            Types['insert'] extends undefined ? RefinedOutput | undefined : RefinedOutput,
-            Types['update'] extends undefined ? RefinedOutput | undefined : RefinedOutput
-        >
-    >
+    refine<RefinedOutput extends ColumnTypeMap[Definition['type']]>(
+        fn: (value: ColumnTypeMap[Definition['type']]) => RefinedOutput,
+    ): Column<{
+        type: Definition['type']
+        types: {
+            select: Definition['types']['select'] extends null ? RefinedOutput | null : Definition['types']['select'] extends undefined ? RefinedOutput | undefined : RefinedOutput
 
-    unique(conflict?: UniqueConflict): Column<Type, Types>
-    index(): Column<Type, Types>
-    collate(value: Collation): Column<Type, Types>
+            insert: Definition['types']['insert'] extends null ? RefinedOutput | null : Definition['types']['insert'] extends undefined ? RefinedOutput | undefined : RefinedOutput
 
-    gt(value: number): Column<Type, Types>
-    gte(value: number): Column<Type, Types>
-    lt(value: number): Column<Type, Types>
-    lte(value: number): Column<Type, Types>
-    minLength(value: number): Column<Type, Types>
-    maxLength(value: number): Column<Type, Types>
+            update: Definition['types']['update'] extends null ? RefinedOutput | null : Definition['types']['update'] extends undefined ? RefinedOutput | undefined : RefinedOutput
+        }
+    }>
 
-    in(values: string[]): Column<Type, Types>
+    unique(conflict?: UniqueConflict): Column<Definition>
 
-    references(col: ColumnReference, actions?: ReferenceAction[]): Column<Type, Types>
+    index(): Column<Definition>
+
+    collate(value: Collation): Column<Definition>
+
+    gt(value: number): Column<Definition>
+
+    gte(value: number): Column<Definition>
+
+    lt(value: number): Column<Definition>
+
+    lte(value: number): Column<Definition>
+
+    minLength(value: number): Column<Definition>
+
+    maxLength(value: number): Column<Definition>
+
+    in(values: string[]): Column<Definition>
+
+    references(column: ColumnReference, actions?: ReferenceAction[]): Column<Definition>
 }

@@ -1,5 +1,5 @@
 import { Schema } from '@aromix/validator'
-import { Column } from './column.builder.types'
+import { Column, ColumnDefinition } from './column.builder.types'
 import { ColumnState, ColumnType, UniqueConflict } from './column.state.type'
 
 export interface CheckExpression {
@@ -8,58 +8,94 @@ export interface CheckExpression {
     right: string
 }
 
-export type TableColumns = Record<string, Column<ColumnType, any>>
+export type TableColumns = Record<string, Column<ColumnDefinition>>
 
 export type ColumnKey<Cols extends TableColumns> = keyof Cols & string
 
-export interface TableOptionsCtx<Cols extends TableColumns> {
-    unique(options: { name: string; cols: ColumnKey<Cols>[]; conflict?: UniqueConflict }): void
-    primaryKey(cols: ColumnKey<Cols>[]): void
-    index(options: { name: string; cols: ColumnKey<Cols>[] }): void
-    uniqueIndex(options: { name: string; cols: ColumnKey<Cols>[] }): void
+export interface TableOptionsCtx<Columns extends TableColumns> {
+    unique(options: { name: string; cols: ColumnKey<Columns>[]; conflict?: UniqueConflict }): void
+
+    primaryKey(cols: ColumnKey<Columns>[]): void
+
+    index(options: { name: string; cols: ColumnKey<Columns>[] }): void
+
+    uniqueIndex(options: { name: string; cols: ColumnKey<Columns>[] }): void
+
     checks(exprs: CheckExpression[]): void
-    gt(left: ColumnKey<Cols>, right: ColumnKey<Cols>): CheckExpression
-    gte(left: ColumnKey<Cols>, right: ColumnKey<Cols>): CheckExpression
-    lt(left: ColumnKey<Cols>, right: ColumnKey<Cols>): CheckExpression
-    lte(left: ColumnKey<Cols>, right: ColumnKey<Cols>): CheckExpression
+
+    gt(left: ColumnKey<Columns>, right: ColumnKey<Columns>): CheckExpression
+
+    gte(left: ColumnKey<Columns>, right: ColumnKey<Columns>): CheckExpression
+
+    lt(left: ColumnKey<Columns>, right: ColumnKey<Columns>): CheckExpression
+
+    lte(left: ColumnKey<Columns>, right: ColumnKey<Columns>): CheckExpression
+
     withoutRowId(): void
 }
 
-export interface TableInput<Cols extends TableColumns> {
-    columns: Cols
-    options?(ctx: TableOptionsCtx<Cols>): void
+export interface TableInput<Columns extends TableColumns> {
+    columns: Columns
+
+    options?(ctx: TableOptionsCtx<Columns>): void
 }
 
-type Prettify<T> = { [K in keyof T]: T[K] } & {}
+type Prettify<Type> = {
+    [Key in keyof Type]: Type[Key]
+} & {}
 
-export type EntitySelect<Cols extends TableColumns> = Prettify<{
-    [Key in keyof Cols]: Cols[Key]['$type']['select']
+export type EntitySelect<Columns extends TableColumns> = Prettify<{
+    [Key in keyof Columns]: Columns[Key]['$type']['select']
 }>
 
-export type EntityInsert<Cols extends TableColumns> = Prettify<{
-    [Key in keyof Cols]: Cols[Key]['$type']['insert']
+export type EntityInsert<Columns extends TableColumns> = Prettify<{
+    [Key in keyof Columns]: Columns[Key]['$type']['insert']
 }>
 
-export type EntityUpdate<Cols extends TableColumns> = Prettify<{
-    [Key in keyof Cols]: Cols[Key]['$type']['update']
+export type EntityUpdate<Columns extends TableColumns> = Prettify<{
+    [Key in keyof Columns]: Columns[Key]['$type']['update']
 }>
 
-export interface TableState<Cols extends TableColumns = TableColumns> {
-    readonly columns: { [Key in keyof Cols]: Cols[Key] }
+export interface TableState<Columns extends TableColumns = TableColumns> {
+    readonly columns: {
+        [Key in keyof Columns]: Columns[Key]
+    }
+
     readonly rawColumns: Record<string, ColumnState>
 
-    unique: { name: string; cols: string[]; conflict: UniqueConflict }[]
-    primaryKey: { cols: string[] }[]
-    index: { name: string; cols: string[] }[]
-    uniqueIndex: { name: string; cols: string[] }[]
+    unique: {
+        name: string
+        cols: string[]
+        conflict: UniqueConflict
+    }[]
+
+    primaryKey: {
+        cols: string[]
+    }[]
+
+    index: {
+        name: string
+        cols: string[]
+    }[]
+
+    uniqueIndex: {
+        name: string
+        cols: string[]
+    }[]
+
     checks: CheckExpression[]
+
     withoutRowId: boolean
 
-    readonly $inferSelect: EntitySelect<Cols>
-    readonly $inferInsert: EntityInsert<Cols>
-    readonly $inferUpdate: EntityUpdate<Cols>
+    readonly $inferSelect: EntitySelect<Columns>
 
-    toSelectSchema(): Schema<EntitySelect<Cols>>
-    toInsertSchema(): Schema<EntityInsert<Cols>>
-    toUpdateSchema(): Schema<EntityUpdate<Cols>>
+    readonly $inferInsert: EntityInsert<Columns>
+
+    readonly $inferUpdate: EntityUpdate<Columns>
+
+    toSelectSchema(): Schema<EntitySelect<Columns>>
+
+    toInsertSchema(): Schema<EntityInsert<Columns>>
+
+    toUpdateSchema(): Schema<EntityUpdate<Columns>>
 }

@@ -1,7 +1,7 @@
-import { Column } from "./column.builder.types"
-import { Collation, ColumnReference, ColumnState, ColumnType, ReferenceAction, UniqueConflict } from "./column.state.type"
+import { Column, ColumnDefinition, DefaultColumnTypes } from './column.builder.types'
+import { Collation, ColumnReference, ColumnState, ColumnType, ReferenceAction, UniqueConflict } from './column.state.type'
 
-export function createColumn<Type extends ColumnType>(colType: Type): Column<Type> {
+export function createColumn<Type extends ColumnType>(colType: Type): Column<ColumnDefinition<Type, DefaultColumnTypes<Type>>> {
     const state: ColumnState = {
         colType,
         primaryKey: false,
@@ -108,7 +108,3 @@ export function createColumn<Type extends ColumnType>(colType: Type): Column<Typ
 
     return column as any
 }
-
-
-
-

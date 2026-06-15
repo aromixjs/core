@@ -13,4 +13,3 @@ export * from './sqlite.dml/types'
 export * from './sqlite/adapter'
 export * from './sqlite/entity'
 export * from './sqlite/entity.types'
-

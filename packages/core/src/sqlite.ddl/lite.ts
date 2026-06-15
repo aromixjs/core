@@ -1,7 +1,8 @@
-import { AxConverter } from "../sqlite.convert/ax"
-import { createColumn } from "./column"
-import { ColumnState } from "./column.state.type"
-import { TableColumns, TableInput, TableState } from "./table.types"
+import { ax } from '@aromix/validator'
+import { AxConverter } from '../sqlite.convert/ax'
+import { createColumn } from './column'
+import { ColumnState } from './column.state.type'
+import { TableColumns, TableInput, TableState } from './table.types'
 
 export const lite = {
     int() {
