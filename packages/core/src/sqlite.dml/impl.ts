@@ -1,7 +1,7 @@
 import { Schema } from "@aromix/validator";
-import { SqliteAdapter } from "../adapter";
-import { AxConverter } from "../converter/ax";
-import { EntityInsert, EntitySelect, EntityUpdate, PaginateOptions, PaginateResult, SqliteEntityState, Where } from "../entity.types";
+import { AxConverter } from "../sqlite.convert/ax";
+import { SqliteAdapter } from "../sqlite/adapter";
+import { EntityInsert, EntitySelect, EntityUpdate, PaginateOptions, PaginateResult, SqliteEntityState, Where } from "../sqlite/entity.types";
 
 export class SqliteEntityDml<State> {
     private selectSchema: Schema<EntitySelect<State>>

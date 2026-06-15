@@ -1,7 +1,6 @@
 import type { Operator } from '@aromix/validator'
 import { Chain, Collation, ColumnReference, ColumnState, ColumnType, ColumnTypeMap, ReferenceAction, UniqueConflict } from './column.types'
-export type { Chain, Collation, ColumnReference, ColumnState, ColumnType, ColumnTypeMap, ReferenceAction, UniqueConflict }
-export class Column {
+export class Column<Type extends ColumnType>{
     readonly state: ColumnState
 
     private constructor(state: ColumnState) {
@@ -9,7 +8,7 @@ export class Column {
     }
 
     static create<Type extends ColumnType>(colType: Type): Chain<Type> {
-        return new Column({
+        return new Column<Type>({
             colType,
             primaryKey: false,
             autoIncrement: false,
@@ -95,12 +94,12 @@ export class Column {
         return this
     }
 
-    default(value: unknown) {
+    default(value: ColumnTypeMap[Type]) {
         this.state.default = value
         return this
     }
 
-    defaultFn(fn: () => unknown) {
+    defaultFn(fn: () => ColumnTypeMap[Type]) {
         this.state.defaultFn = fn
         return this
     }

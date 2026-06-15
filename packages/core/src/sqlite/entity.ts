@@ -1,7 +1,7 @@
-import { AxConverter } from './converter/ax'
-import { SqlConverter } from './converter/sql'
-import { SqliteEntityDml } from './dml/impl'
-import { PaginateOptions, Where } from './dml/types'
+import { AxConverter } from '../sqlite.convert/ax'
+import { SqlConverter } from '../sqlite.convert/sql'
+import { SqliteEntityDml } from '../sqlite.dml/impl'
+import { PaginateOptions, Where } from '../sqlite.dml/types'
 import { EntityInsert, EntityUpdate, SqliteEntityInput, SqliteEntityOutput, SqliteEntityState } from './entity.types'
 
 export function SqliteEntity<State extends Record<string, any>>(input: SqliteEntityInput<State>): SqliteEntityOutput<State> {

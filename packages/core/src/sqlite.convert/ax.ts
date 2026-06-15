@@ -1,5 +1,5 @@
 import { AnySchema, ax, Operator, Schema } from '@aromix/validator'
-import { ColumnState } from '../ddl/column'
+import { ColumnState } from '../sqlite.ddl/column'
 
 export namespace AxConverter {
     export function gt(minValue: number): Operator<number, number> {

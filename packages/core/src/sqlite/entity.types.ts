@@ -1,6 +1,6 @@
 import { Schema } from '@aromix/validator'
+import { Chain, ColumnReference, ColumnState, ColumnType, ColumnTypeMap, UniqueConflict } from '../sqlite.ddl/column'
 import { SqliteAdapter } from './adapter'
-import { Chain, ColumnReference, ColumnState, ColumnType, ColumnTypeMap, UniqueConflict } from './ddl/column'
 
 export interface CheckExpression {
     left: string
