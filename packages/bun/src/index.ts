@@ -7,6 +7,7 @@ export interface BunServeOptions {
     provider?: ProviderOutput
     port?: number
     hostname?: string
+    fetch?(req: Request, server: any): Response | Promise<Response>
 }
 
 export interface WsMessage {
@@ -26,7 +27,7 @@ function toBuffer(data: Uint8Array): Buffer {
 
 export async function serve(options: BunServeOptions): Promise<any> {
     const { descriptor, provider, port = 3000, hostname = '0.0.0.0' } = options
-    const { routes, entities } = descriptor.state
+    const { routes, namedRoutes, entities } = descriptor.state
 
     if (provider) {
         provider.boot()
@@ -39,6 +40,9 @@ export async function serve(options: BunServeOptions): Promise<any> {
             if (server.upgrade(req)) {
                 return
             }
+            if (options.fetch) {
+                return options.fetch(req, server)
+            }
             return new Response('Aromix WS server', { status: 200 })
         },
         websocket: {
@@ -46,13 +50,15 @@ export async function serve(options: BunServeOptions): Promise<any> {
                 try {
                     const buf = typeof raw === 'string' ? Buffer.from(raw) : raw
                     const msg = decode(buf) as WsMessage
-                    const entry = routes[msg.route]
-
-                    if (!entry) {
+                    // Support both UUID and named route lookup
+                    const routeId = routes[msg.route] ? msg.route : namedRoutes[msg.route]
+                    if (!routeId) {
                         const response: WsResponse = { route: msg.route, error: `Unknown route: ${msg.route}` }
                         ws.sendBinary(toBuffer(encode(response)))
                         return
                     }
+
+                    const entry = routes[routeId]
 
                     const entity = entities[entry.entityName]
                     if (!entity) {

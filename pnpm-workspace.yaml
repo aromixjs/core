@@ -1,5 +1,6 @@
 packages:
     - 'packages/*'
+    - 'examples/*'
 
 allowBuilds:
     dprint: set this to true or false
