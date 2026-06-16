@@ -1,5 +1,5 @@
 import { AnySchema, ax, Operator, Schema } from '@aromix/validator'
-import { ColumnState } from '../sqlite.ddl/column'
+import { ColumnState } from '../sqlite.ddl/column.types'
 
 export namespace AxConverter {
     export function gt(minValue: number): Operator<number, number> {
@@ -124,11 +124,6 @@ export namespace AxConverter {
                 }
             }
         }
-
-        for (const op of state.pipes) {
-            schema = schema.pipe(op)
-        }
-
         if (!state.notNull) {
             schema = ax.union([schema, ax.null()])
         }

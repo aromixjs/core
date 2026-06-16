@@ -1,11 +1,4 @@
-export interface ColumnTypeMap {
-    int: number
-    real: number
-    text: string
-    blob: Uint8Array
-}
-
-export type ColumnType = keyof ColumnTypeMap
+export type SqliteType = 'int' | 'real' | 'text' | 'blob'
 
 export type UniqueConflict = 'conflict:error' | 'conflict:replace' | 'conflict:ignore'
 export type Collation = 'binary' | 'nocase' | 'rtrim'
@@ -34,7 +27,7 @@ export interface ColumnReference {
 }
 
 export interface ColumnState {
-    colType: ColumnType
+    sqliteType: SqliteType
     primaryKey: boolean
     autoIncrement: boolean
     notNull: boolean
@@ -45,8 +38,7 @@ export interface ColumnState {
     in: string[]
     collate?: Collation
     references?: { col: ColumnReference; actions: ReferenceAction[] }
-    default?: any
-    defaultFn?: () => any
-    onUpdate?: () => any
-    refine?: (value: any) => any
+    default?: unknown
+    defaultFn?: () => unknown
+    onUpdate?: () => unknown
 }

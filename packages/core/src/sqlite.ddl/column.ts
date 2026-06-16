@@ -1,110 +1,108 @@
-import { Column, ColumnDefinition, DefaultColumnTypes } from './column.builder.types'
-import { Collation, ColumnReference, ColumnState, ColumnType, ReferenceAction, UniqueConflict } from './column.state.type'
+import { Collation, ColumnReference, ColumnState, ReferenceAction, SqliteType, UniqueConflict } from './column.types'
+import { ColumnTransitionMap, ColumnType, ColumnTypeMap } from './type.maps'
 
-export function createColumn<Type extends ColumnType>(colType: Type): Column<ColumnDefinition<Type, DefaultColumnTypes<Type>>> {
-    const state: ColumnState = {
-        colType,
-        primaryKey: false,
-        autoIncrement: false,
-        notNull: false,
-        unique: false,
-        uniqueConflict: 'conflict:error',
-        index: false,
-        checks: [],
-        in: [],
+export class Column<Type extends ColumnType> {
+    readonly state: ColumnState
+    declare $type: ColumnTypeMap[Type]
+
+    constructor(colType: Type) {
+        this.state = {
+            sqliteType: colType.split('.')[0] as SqliteType,
+            primaryKey: false,
+            autoIncrement: false,
+            notNull: false,
+            unique: false,
+            uniqueConflict: 'conflict:error',
+            index: false,
+            checks: [],
+            in: [],
+        }
     }
 
-    const column = {
-        state,
-
-        notNull() {
-            state.notNull = true
-            return column
-        },
-
-        primaryKey() {
-            state.primaryKey = true
-            state.notNull = true
-            return column
-        },
-
-        autoIncrement() {
-            state.autoIncrement = true
-            return column
-        },
-
-        unique(conflict: UniqueConflict = 'conflict:error') {
-            state.unique = true
-            state.uniqueConflict = conflict
-            return column
-        },
-
-        index() {
-            state.index = true
-            return column
-        },
-
-        collate(value: Collation) {
-            state.collate = value
-            return column
-        },
-
-        gt(value: number) {
-            state.checks.push({ op: 'gt', val: value })
-            return column
-        },
-        gte(value: number) {
-            state.checks.push({ op: 'gte', val: value })
-            return column
-        },
-        lt(value: number) {
-            state.checks.push({ op: 'lt', val: value })
-            return column
-        },
-        lte(value: number) {
-            state.checks.push({ op: 'lte', val: value })
-            return column
-        },
-
-        minLength(value: number) {
-            state.checks.push({ op: 'minLength', val: value })
-            return column
-        },
-        maxLength(value: number) {
-            state.checks.push({ op: 'maxLength', val: value })
-            return column
-        },
-
-        in(values: string[]) {
-            state.in = values
-            return column
-        },
-
-        references(col: ColumnReference, actions: ReferenceAction[] = []) {
-            state.references = { col, actions }
-            return column
-        },
-
-        default(value: unknown) {
-            state.default = value
-            return column
-        },
-
-        defaultFn(fn: () => unknown) {
-            state.defaultFn = fn
-            return column
-        },
-
-        onUpdate(fn: () => unknown) {
-            state.onUpdate = fn
-            return column
-        },
-
-        refine(fn: (value: unknown) => unknown) {
-            state.refine = fn
-            return column
-        },
+    notNull(): Column<ColumnTransitionMap['notNull'][Type]> {
+        this.state.notNull = true
+        return this as any
     }
 
-    return column as any
+    primaryKey(): Column<ColumnTransitionMap['notNull'][Type]> {
+        this.state.primaryKey = true
+        this.state.notNull = true
+        return this as any
+    }
+
+    autoIncrement(this: Column<Extract<Type, `int.${string}`>>): Column<ColumnTransitionMap['autoIncrement'][Type]> {
+        this.state.autoIncrement = true
+        return this as any
+    }
+
+    default(value: ColumnTypeMap[Type]['select']): Column<ColumnTransitionMap['default'][Type]> {
+        this.state.default = value
+        return this as any
+    }
+
+    defaultFn(fn: () => ColumnTypeMap[Type]['select']): Column<ColumnTransitionMap['default'][Type]> {
+        this.state.defaultFn = fn
+        return this as any
+    }
+
+    onUpdate(fn: () => ColumnTypeMap[Type]['select']): this {
+        this.state.onUpdate = fn
+        return this
+    }
+
+    unique(conflict: UniqueConflict = 'conflict:error'): this {
+        this.state.unique = true
+        this.state.uniqueConflict = conflict
+        return this
+    }
+
+    index(): this {
+        this.state.index = true
+        return this
+    }
+
+    collate(value: Collation): this {
+        this.state.collate = value
+        return this
+    }
+
+    gt(value: number): this {
+        this.state.checks.push({ op: 'gt', val: value })
+        return this
+    }
+
+    gte(value: number): this {
+        this.state.checks.push({ op: 'gte', val: value })
+        return this
+    }
+
+    lt(value: number): this {
+        this.state.checks.push({ op: 'lt', val: value })
+        return this
+    }
+
+    lte(value: number): this {
+        this.state.checks.push({ op: 'lte', val: value })
+        return this
+    }
+
+    minLength(value: number): this {
+        this.state.checks.push({ op: 'minLength', val: value })
+        return this
+    }
+
+    maxLength(value: number): this {
+        this.state.checks.push({ op: 'maxLength', val: value })
+        return this
+    }
+
+    in(values: string[]): this {
+        this.state.in = values
+        return this
+    }
+
+    references(col: ColumnReference, actions: ReferenceAction[] = []): this {
+        this.state.references = { col, actions }
+        return this
+    }
 }
