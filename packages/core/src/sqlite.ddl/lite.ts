@@ -2,40 +2,19 @@ import { Column } from './column'
 
 export const lite = {
     int() {
-        return new Column('int.nullable')
+        return new Column<number | null, number | null | undefined, number | null>('int')
     },
     real() {
-        return new Column('real.nullable')
+        return new Column<number | null, number | null | undefined, number | null>('real')
     },
     text() {
-        return new Column('text.nullable')
+        return new Column<string | null, string | null | undefined, string | null>('text')
     },
     blob() {
-        return new Column('blob.nullable')
+        return new Column<Uint8Array | null, Uint8Array | null | undefined, Uint8Array | null>('blob')
     },
 }
 
 
 
 
-
-const schema = {
-    id: lite.int().primaryKey().autoIncrement(),
-    name: lite.text().notNull(),
-    bio: lite.text(),
-    score: lite.real().default(0),
-    avatar: lite.blob().notNull(),
-    createdAt: lite.int().notNull().default(0),
-}
-
-type SchemaSelect = {
-    [K in keyof typeof schema]: (typeof schema)[K]['$type']['select']
-}
-
-type SchemaInsert = {
-    [K in keyof typeof schema]: (typeof schema)[K]['$type']['insert']
-}
-
-type SchemaUpdate = {
-    [K in keyof typeof schema]: (typeof schema)[K]['$type']['update']
-}
