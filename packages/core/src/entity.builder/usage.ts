@@ -9,16 +9,15 @@ const sqlite = SqliteEntityBuilder({
 
 
   Text: {
-    roles: Operator.Text(() => {
+    roles: Operator.Text((role: 'admin') => {
       return {
         all: ax.literal('creator')
 
       }
     })
   },
-
   Int: {
-    min: Operator.Int(() => {
+    min: Operator.Int((minValue: number) => {
       return {
         select: ax.never()
       }
@@ -26,3 +25,14 @@ const sqlite = SqliteEntityBuilder({
   }
 })
 
+
+
+
+
+sqlite.entity({
+  name: 'users',
+  model: (builder) => [
+    builder.text('uuid').roles('admin'),
+    builder.int('age').min(10)
+  ]
+})

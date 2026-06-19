@@ -15,17 +15,10 @@ export type OperatorDef = (...args: any[]) => Partial<{
     update: AnySchema
 }>
 
+
 export const Operator = {
-    Text(fn: OperatorDef) {
-        return fn
-    },
-    Int(fn: OperatorDef) {
-        return fn
-    },
-    Real(fn: OperatorDef) {
-        return fn
-    },
-    Blob(fn: OperatorDef) {
-        return fn
-    },
+   Text<const Fn extends OperatorDef>(fn: Fn): Fn { return fn },
+   Int<const Fn extends OperatorDef>(fn: Fn): Fn { return fn },
+   Real<const Fn extends OperatorDef>(fn: Fn): Fn { return fn },
+   Blob<const Fn extends OperatorDef>(fn: Fn): Fn { return fn },
 }
