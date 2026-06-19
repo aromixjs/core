@@ -1,4 +1,5 @@
-import { BlobOperatorRecord, IntOperatorRecord, RealOperatorRecord, TextOperatorRecord } from "./operators";
+import { BlobOperatorRecord, IntOperatorRecord, OperatorFn, RealOperatorRecord, TextOperatorRecord } from "./operators";
+import { ColumnState } from "./states";
 
 export interface BuilderInput {
    Text: TextOperatorRecord
@@ -9,11 +10,51 @@ export interface BuilderInput {
 
 
 export class Builder {
-   constructor(operators: BuilderInput) { }
-   text() {
-      // need to wire those operators as a chain here
+   constructor(private operators: BuilderInput) { }
+   text(colName: string) {
+      return new TextModifiers({
+         colName,
+         colType: 'Text',
+         meta: {}
+      }, this.operators.Text)
+
    }
-   int() { }
-   real() { }
-   blob() { }
+   int(colName: string) { }
+   real(colName: string) { }
+   blob(colName: string) { }
+}
+
+
+
+export class TextModifiers<Operators extends TextOperatorRecord> {
+   constructor(
+      private state: ColumnState,
+      protected operators: Operators) {
+
+   }
+}
+
+
+export class IntModifiers {
+   constructor(operators: IntOperatorRecord) {
+
+   }
+}
+
+export class RealModifiers {
+
+
+   constructor(operators: RealOperatorRecord) {
+
+   }
+
+
+}
+
+
+
+export class BlobModifiers {
+   constructor(operators: BlobOperatorRecord) {
+
+   }
 }

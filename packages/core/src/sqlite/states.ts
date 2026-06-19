@@ -5,10 +5,8 @@ export interface ColumnTypeMap {
    Blob: Uint8Array
 }
 export type ColumnType = keyof ColumnTypeMap
-
-
-export interface ColumnState {
+export interface ColumnState<Type extends ColumnType> {
    colName: string,
-   colType: ColumnType
+   colType: Type
    meta: Record<string, unknown>
 }
