@@ -1,17 +1,4 @@
-import type { Collate, GeneratedColumn, Reference, ReferenceRule, SortDirection, UniqueConflict } from '../lite.types/types'
-
-export interface TextState {
-	colName: string
-	colType: 'TEXT'
-	primaryKey: boolean
-	primaryKeyDirection: SortDirection
-	unique: boolean
-	uniqueConflict?: UniqueConflict
-	index: boolean
-	collate?: Collate
-	references?: Reference
-	generated?: GeneratedColumn
-}
+import { Collate, GeneratedColumn, Reference, ReferenceRule, SortDirection, TextState, UniqueConflict } from "../lite.types/states"
 
 export class TextModifier<const Col extends string> {
 	readonly state: TextState

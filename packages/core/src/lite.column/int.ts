@@ -1,18 +1,5 @@
-import type { Collate, GeneratedColumn, Reference, ReferenceRule, SortDirection, UniqueConflict } from '../lite.types/types'
+import { Collate, GeneratedColumn, IntState, Reference, ReferenceRule, SortDirection, UniqueConflict } from "../lite.types/states"
 
-export interface IntState {
-	colName: string
-	colType: 'INTEGER'
-	primaryKey: boolean
-	primaryKeyDirection: SortDirection
-	autoIncrement: boolean
-	unique: boolean
-	uniqueConflict?: UniqueConflict
-	index: boolean
-	collate?: Collate
-	references?: Reference
-	generated?: GeneratedColumn
-}
 export class IntModifier<const Col extends string> {
 	readonly state: IntState
 

@@ -1,17 +1,7 @@
-import type { Collate, GeneratedColumn, Reference, ReferenceRule, SortDirection, UniqueConflict } from '../lite.types/types'
+import { BlobState, Collate, GeneratedColumn, Reference, ReferenceRule, SortDirection, UniqueConflict } from "../lite.types/states"
 
-export interface BlobState {
-	colName: string
-	colType: 'BLOB'
-	primaryKey: boolean
-	primaryKeyDirection: SortDirection
-	unique: boolean
-	uniqueConflict?: UniqueConflict
-	index: boolean
-	collate?: Collate
-	references?: Reference
-	generated?: GeneratedColumn
-}
+
+
 
 export class BlobModifier<const Col extends string> {
 	readonly state: BlobState

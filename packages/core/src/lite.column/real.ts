@@ -1,17 +1,5 @@
-import type { Collate, GeneratedColumn, Reference, ReferenceRule, SortDirection, UniqueConflict } from '../lite.types/types'
+import { Collate, GeneratedColumn, RealState, Reference, ReferenceRule, SortDirection, UniqueConflict } from "../lite.types/states"
 
-export interface RealState {
-	colName: string
-	colType: 'REAL'
-	primaryKey: boolean
-	primaryKeyDirection: SortDirection
-	unique: boolean
-	uniqueConflict?: UniqueConflict
-	index: boolean
-	collate?: Collate
-	references?: Reference
-	generated?: GeneratedColumn
-}
 export class RealModifier<const Col extends string> {
 	readonly state: RealState
 
