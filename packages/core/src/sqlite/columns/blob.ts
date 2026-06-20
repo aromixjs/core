@@ -1,52 +1,66 @@
-import { Reference, ReferenceRule, UniqueConflict } from "../types"
+import { Collate, GeneratedColumn, Reference, ReferenceRule, SortDirection, UniqueConflict } from '../types'
 
 export interface BlobState {
-   colName: string
-   colType: 'BLOB'
-   primaryKey: boolean
-   unique: boolean
-   uniqueConflict?: UniqueConflict
-   index: boolean
-   references?: Reference
+    colName: string
+    colType: 'BLOB'
+    primaryKey: boolean
+    primaryKeyDirection: SortDirection
+    unique: boolean
+    uniqueConflict?: UniqueConflict
+    index: boolean
+    collate?: Collate
+    references?: Reference
+    generated?: GeneratedColumn
 }
 
 export class BlobModifier<const Col extends string> {
+    readonly state: BlobState
 
-   readonly state: BlobState
+    constructor(col: Col) {
+        this.state = {
+            colName: col,
+            colType: 'BLOB',
+            unique: false,
+            index: false,
+            primaryKey: false,
+            primaryKeyDirection: 'asc',
+        }
+    }
 
-   constructor(col: Col) {
+    primaryKey(direction: SortDirection = 'asc') {
+        this.state.primaryKey = true
+        this.state.primaryKeyDirection = direction
+        return this
+    }
 
-      this.state = {
-         colName: col,
-         colType: 'BLOB',
-         unique: false,
-         index: false,
-         primaryKey: false,
-      }
-   }
+    unique(conflict: UniqueConflict = 'conflict:error') {
+        this.state.unique = true
+        this.state.uniqueConflict = conflict
+        return this
+    }
 
-   primaryKey() {
-      this.state.primaryKey = true
-      return this
-   }
+    index() {
+        this.state.index = true
+        return this
+    }
 
-   unique(conflict: UniqueConflict = 'conflict:error') {
-      this.state.unique = true
-      this.state.uniqueConflict = conflict
-      return this
-   }
+    collate(option: Collate) {
+        this.state.collate = option
+        return this
+    }
 
-   index() {
-      this.state.index = true
-      return this
-   }
+    references(ref: Reference, rules: ReferenceRule[] = []) {
+        this.state.references = {
+            entityName: ref.entityName,
+            columnName: ref.columnName,
+            tableState: ref.tableState,
+            rules: rules,
+        }
+        return this
+    }
 
-   references(ref: Reference, rules: ReferenceRule[] = []) {
-      this.state.references = {
-         entityName: ref.entityName,
-         columnName: ref.columnName,
-         tableState: ref.tableState,
-         rules: rules
-      }
-   }
+    generated(expression: string, storage: GeneratedColumn['storage'] = 'virtual') {
+        this.state.generated = { expression, storage }
+        return this
+    }
 }
