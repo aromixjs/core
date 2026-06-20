@@ -1,4 +1,4 @@
-import { Builder } from './fields'
+
 
 
 export interface LiteAdapter {
@@ -8,25 +8,20 @@ export interface LiteAdapter {
 export interface LiteEntityInput {
    name: string
    adapter: LiteAdapter
-   fields: (builder: Builder) => Array<any>
+   // fields: (builder: Builder) => Array<any>
 }
 
-export interface LiteEntityInstance {
-   col: (colName: string) => ReferencedCol
-}
+export function LiteEntity(input: LiteEntityInput) {
 
-export function LiteEntity(input: LiteEntityInput): LiteEntityInstance {
 
-   const builder = new Builder()
 
-   input.fields(builder)
 
    return {
-      col(colName) {
+      col(colName: string) {
          return {
             colName,
             tableName: input.name,
-            tableState: input.fields(builder).map((m) => m.state),
+            // tableState: input.fields(builder).map((m) => m.state),
          }
       },
    }

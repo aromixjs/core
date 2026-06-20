@@ -1,4 +1,15 @@
-import { Collate, Reference, ReferenceRule, TextState, UniqueConflict } from "../state"
+import { Collate, Reference, ReferenceRule, UniqueConflict } from "../types"
+
+export interface TextState {
+   colName: string
+   colType: 'TEXT'
+   primaryKey: boolean
+   unique: boolean
+   uniqueConflict?: UniqueConflict
+   index: boolean
+   collate?: Collate
+   references?: Reference
+}
 
 export class TextModifier<const Col extends string> {
 
@@ -14,7 +25,6 @@ export class TextModifier<const Col extends string> {
          primaryKey: false,
       }
    }
-
 
    primaryKey() {
       this.state.primaryKey = true
@@ -36,9 +46,6 @@ export class TextModifier<const Col extends string> {
       this.state.index = true
       return this
    }
-
-
-
 
    references(ref: Reference, rules: ReferenceRule[] = []) {
       this.state.references = {
