@@ -1,3 +1,5 @@
+import type { BaseModifier } from './column'
+
 export type Collate = 'binary' | 'nocase' | 'rtrim'
 
 export type ReferenceRule =
@@ -18,7 +20,6 @@ export interface Reference {
 	entityName: string
 	columnName: string
 	tableState: any
-	rules: ReferenceRule[]
 }
 
 export type SqliteColType = 'TEXT' | 'REAL' | 'INT' | 'BLOB'
@@ -32,8 +33,9 @@ export interface ColumnState<ColName extends string = string> {
 	index: boolean
 	collate?: Collate
 	references?: Reference
+	referencesRules: ReferenceRule[]
 }
 
-export interface AnyColumn {
-	readonly state: ColumnState
-}
+export interface AnyColumn extends BaseModifier<string> {}
+
+export type ColumnNamesOf<Fields extends readonly AnyColumn[]> = Fields[number]['$name']

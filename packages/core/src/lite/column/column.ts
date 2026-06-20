@@ -1,7 +1,8 @@
-import { Collate, ColumnState, Reference, ReferenceRule, UniqueConflict } from './column.state'
+import type { Collate, ColumnState, Reference, ReferenceRule, UniqueConflict } from './column.state'
 
-export class BaseModifier{
-	readonly state!: ColumnState
+export class BaseModifier<Col extends string> {
+	readonly state!: ColumnState<Col>
+	declare $name: Col
 
 	primaryKey() {
 		this.state.primaryKey = true
@@ -28,13 +29,13 @@ export class BaseModifier{
 			entityName: ref.entityName,
 			columnName: ref.columnName,
 			tableState: ref.tableState,
-			rules: rules,
 		}
+		this.state.referencesRules = rules
 		return this
 	}
 }
 
-export class IntModifier<Col extends string> extends BaseModifier {
+export class IntModifier<Col extends string> extends BaseModifier<Col> {
 	readonly state: ColumnState<Col>
 
 	constructor(col: Col) {
@@ -46,6 +47,7 @@ export class IntModifier<Col extends string> extends BaseModifier {
 			index: false,
 			primaryKey: false,
 			autoIncrement: false,
+			referencesRules: [],
 		}
 	}
 
@@ -55,7 +57,7 @@ export class IntModifier<Col extends string> extends BaseModifier {
 	}
 }
 
-export class BlobModifier<Col extends string> extends BaseModifier {
+export class BlobModifier<Col extends string> extends BaseModifier<Col> {
 	readonly state: ColumnState<Col>
 
 	constructor(col: Col) {
@@ -67,11 +69,12 @@ export class BlobModifier<Col extends string> extends BaseModifier {
 			index: false,
 			primaryKey: false,
 			autoIncrement: false,
+			referencesRules: [],
 		}
 	}
 }
 
-export class RealModifier<Col extends string> extends BaseModifier {
+export class RealModifier<Col extends string> extends BaseModifier<Col> {
 	readonly state: ColumnState<Col>
 
 	constructor(col: Col) {
@@ -83,11 +86,12 @@ export class RealModifier<Col extends string> extends BaseModifier {
 			index: false,
 			primaryKey: false,
 			autoIncrement: false,
+			referencesRules: [],
 		}
 	}
 }
 
-export class TextModifier<Col extends string> extends BaseModifier {
+export class TextModifier<Col extends string> extends BaseModifier<Col> {
 	readonly state: ColumnState<Col>
 
 	constructor(col: Col) {
@@ -99,6 +103,7 @@ export class TextModifier<Col extends string> extends BaseModifier {
 			index: false,
 			primaryKey: false,
 			autoIncrement: false,
+			referencesRules: [],
 		}
 	}
 }
