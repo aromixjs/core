@@ -8,7 +8,6 @@ export interface MongoEntityInput<Schema extends AnySchema> {
 }
 
 
-
 export interface MongoEntityOutput<Schema extends AnySchema> {
    insertOne(doc: Schema['$infer']): Promise<{ insertedId: unknown }>
    insertMany(docs: Schema['$infer'][]): Promise<{ insertedIds: unknown[] }>
@@ -27,32 +26,57 @@ export interface MongoEntityOutput<Schema extends AnySchema> {
 }
 
 
-// todo update it
+
 export function MongoEntity<Schema extends AnySchema>(input: MongoEntityInput<Schema>): MongoEntityOutput<Schema> {
+
    const collection = input.adapter.collection(input.name)
 
    return {
       async insertOne(doc) {
          const validated = input.model.parse(doc)
-         return collection.insertOne(validated)
+         const result = await collection.insertOne(validated)
+         return { insertedId: result.insertedId }
       },
+
       async insertMany(docs) {
          const validated = docs.map((d) => input.model.parse(d))
-         return collection.insertMany(validated)
+         const result = await collection.insertMany(validated)
+         return { insertedIds: Object.values(result.insertedIds) }
       },
+
       async findOne(filter) {
          const raw = await collection.findOne(filter)
          return raw === null ? null : input.model.parse(raw)
       },
+
       async find(filter) {
          const raw = await collection.find(filter)
-         return raw.map((r) => input.model.parse(r))
+         return raw.map((r: unknown) => input.model.parse(r))
       },
-      updateOne: (filter, update) => collection.updateOne(filter, update),
-      updateMany: (filter, update) => collection.updateMany(filter, update),
-      deleteOne: (filter) => collection.deleteOne(filter),
-      deleteMany: (filter) => collection.deleteMany(filter),
+
+      async updateOne(filter, update) {
+         const result = await collection.updateOne(filter, update)
+         return { matchedCount: result.matchedCount, modifiedCount: result.modifiedCount }
+      },
+
+      async updateMany(filter, update) {
+         const result = await collection.updateMany(filter, update)
+         return { matchedCount: result.matchedCount, modifiedCount: result.modifiedCount }
+      },
+
+      async deleteOne(filter) {
+         const result = await collection.deleteOne(filter)
+         return { deletedCount: result.deletedCount }
+      },
+
+      async deleteMany(filter) {
+         const result = await collection.deleteMany(filter)
+         return { deletedCount: result.deletedCount }
+      },
+
       countDocuments: (filter) => collection.countDocuments(filter),
+
       state: { name: input.name, adapter: input.adapter, model: input.model },
    }
+
 }
