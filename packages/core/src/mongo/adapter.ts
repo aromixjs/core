@@ -15,6 +15,6 @@ export interface MongoAdapter {
 }
 
 
-export function createMongoAdapter(adapter: MongoAdapter) {
+export function MongoAdapter(adapter: MongoAdapter) {
    return adapter
 }
