@@ -1,0 +1,7 @@
+{
+  "type": "minor",
+  "comment": "improve adapter",
+  "packageName": "@aromix/core",
+  "email": "istiuak.0@gmail.com",
+  "dependentChangeType": "patch"
+}

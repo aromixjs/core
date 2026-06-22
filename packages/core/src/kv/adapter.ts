@@ -5,6 +5,6 @@ export interface KvAdapter {
 	has(key: string): Promise<boolean>
 }
 
-export function createKvAdapter(adapter: KvAdapter) {
+export function KvAdapter(adapter: KvAdapter) {
 	return adapter
 }
