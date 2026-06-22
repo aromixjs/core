@@ -41,12 +41,19 @@
     "typecheck": "tsc --noEmit"
   },
   "peerDependencies": {
-    "@aromix/validator": "workspace:^"
+    "@aromix/validator": "workspace:^",
+    "mongodb": "^7.3.0"
   },
   "devDependencies": {
     "@aromix/validator": "workspace:^",
     "@types/node": "catalog:",
+    "mongodb": "^7.3.0",
     "tsup": "catalog:",
     "typescript": "catalog:"
+  },
+  "peerDependenciesMeta": {
+    "mongodb": {
+      "optional": true
+    }
   }
 }
