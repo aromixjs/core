@@ -1,4 +1,4 @@
-export * from './kv/adapter';
-export * from './kv/entity';
-export * from './mongo/adapter';
-export * from './mongo/entity';
+export * from './entity/builder';
+export * from './entity/platforms/kv';
+export * from './entity/platforms/mongo';
+
