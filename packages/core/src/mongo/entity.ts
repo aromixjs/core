@@ -27,7 +27,7 @@ export interface MongoEntityOutput<Schema extends AnySchema> {
 }
 
 
-
+// todo update it
 export function MongoEntity<Schema extends AnySchema>(input: MongoEntityInput<Schema>): MongoEntityOutput<Schema> {
    const collection = input.adapter.collection(input.name)
 
