@@ -2,6 +2,21 @@
   "name": "@aromix/core",
   "entries": [
     {
+      "date": "Mon, 22 Jun 2026 11:03:27 GMT",
+      "version": "0.3.2",
+      "tag": "@aromix/core_v0.3.2",
+      "comments": {
+        "patch": [
+          {
+            "author": "istiuak.0@gmail.com",
+            "package": "@aromix/core",
+            "commit": "3dfe4f9d32e8135012e57fd9044ec0dfae90fcdb",
+            "comment": "update mongo adapter and entity"
+          }
+        ]
+      }
+    },
+    {
       "date": "Mon, 22 Jun 2026 10:20:24 GMT",
       "version": "0.3.1",
       "tag": "@aromix/core_v0.3.1",
