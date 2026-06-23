@@ -1,68 +1,83 @@
-import { Schema } from './schema'
-import { AnySchema, LiteralValue, Operator } from './types'
+import { Schema } from "./schema"
+
+namespace User { }
 
 export const ax = {
 	string() {
-		return new Schema<string>({ type: 'string' })
+		return new Schema<{
+			base: string,
+			select: string,
+			insert: string,
+			update: string
+		}>('string')
 	},
 	number() {
-		return new Schema<number>({ type: 'number' })
+		return new Schema<{
+			base: number,
+			select: number,
+			insert: number,
+			update: number
+		}>('number')
 	},
 	boolean() {
-		return new Schema<boolean>({ type: 'boolean' })
+		return new Schema<{
+			base: boolean,
+			select: boolean,
+			insert: boolean,
+			update: boolean
+		}>('boolean')
 	},
 	bigint() {
-		return new Schema<bigint>({ type: 'bigint' })
+		return new Schema<{
+			base: bigint,
+			select: bigint,
+			insert: bigint,
+			update: bigint
+		}>('bigint')
 	},
 	symbol() {
-		return new Schema<symbol>({ type: 'symbol' })
+		return new Schema<{
+			base: symbol,
+			select: symbol,
+			insert: symbol,
+			update: symbol
+		}>('symbol')
 	},
 	null() {
-		return new Schema<null>({ type: 'null' })
+		return new Schema<{
+			base: null,
+			select: null,
+			insert: null,
+			update: null
+		}>('null')
 	},
 	undefined() {
-		return new Schema<undefined>({ type: 'undefined' })
+		return new Schema<{
+			base: undefined,
+			select: undefined,
+			insert: undefined,
+			update: undefined
+		}>('undefined')
 	},
 	unknown() {
-		return new Schema<unknown>({ type: 'unknown' })
+		return new Schema<{
+			base: unknown,
+			select: unknown,
+			insert: unknown,
+			update: unknown
+		}>('unknown')
 	},
 	never() {
-		return new Schema<never>({ type: 'never' })
-	},
-	instance<T extends new (...args: any[]) => any>(cls: T) {
-		return new Schema<InstanceType<T>>({ type: 'instance', instance: { class: cls } })
-	},
+		return new Schema<{
+			base: never,
+			select: never,
+			insert: never,
+			update: never
+		}>('never')
+	}
 
-	literal<Value extends LiteralValue>(value: Value) {
-		return new Schema<Value>({ type: 'literal', literal: { value } })
-	},
-
-	object<Shape extends Record<string, AnySchema>>(shape: Shape) {
-		return new Schema<{ [Key in keyof Shape]: Shape[Key]['$infer'] }>({ type: 'object', object: { shape } })
-	},
-
-	array<Element extends AnySchema>(element: Element) {
-		return new Schema<Element['$infer'][]>({ type: 'array', array: { element } })
-	},
-
-	tuple<Elements extends AnySchema[]>(elements: [...Elements]) {
-		return new Schema<{ [Key in keyof Elements]: Elements[Key]['$infer'] }>({ type: 'tuple', tuple: { elements } })
-	},
-
-	record<Value extends AnySchema>(value: Value) {
-		return new Schema<Record<string, Value['$infer']>>({ type: 'record', record: { value } })
-	},
-
-	union<Schemas extends AnySchema[]>(schemas: [...Schemas]) {
-		return new Schema<Schemas[number]['$infer']>({ type: 'union', union: { schemas } })
-	},
-
-	operator<Input, Output>(run: (value: Input) => Output): Operator<Input, Output> {
-		return { run }
-	},
 }
 
-
-
-const sch= ax.string().nullable()
-type Data =typeof sch.$infer
+const data = ax.string().convert().readonly('test').access({
+	insert: ax.string()
+})

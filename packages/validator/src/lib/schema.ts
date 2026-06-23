@@ -1,40 +1,59 @@
-import { Operator, SchemaState } from './types'
+import { Types } from "./types";
 
-export class Schema<Output> {
-	declare readonly $infer: Output
-	readonly state: SchemaState
-	constructor(input: SchemaState) {
-		this.state = input
+export interface SchemaShape {
+	base: any
+	select: any
+	insert: any
+	update: any
+}
+export class Schema<Shape extends SchemaShape> {
+
+	declare $base: Shape['base']
+	declare $select: Shape['select']
+	declare $insert: Shape['insert']
+	declare $update: Shape['update']
+
+	private state: Record<string, any> = {}
+
+
+	constructor(type: Types) {
+
 	}
 
-	default(value: Output) {
-		this.state.default = { value }
+
+
+
+	parse() {
+
+	}
+
+
+	convert() {
+		this.state.convert = true
 		return this
 	}
 
-	defaultFn(fn: () => Output) {
-		this.state.defaultFn = { fn }
+
+
+	readonly(value: Shape['base']) {
+		this.state.readonly = value
 		return this
 	}
 
-	pipe<Next>(op: Operator<Output, Next>): Schema<Next> {
-		if (!this.state.operators) this.state.operators = []
-		this.state.operators.push(op)
-		return this as any
-	}
-
-
-	optional(): Schema<Output | undefined> {
-
+	readonlyFn(cb: () => Shape['base']) {
+		this.state.readonlyFn = cb
 		return this
 	}
 
 
-	nullish(): Schema<Output | undefined | null> {
-		return this
-	}
-	nullable(): Schema<Output | null> {
+
+	access(accessor: Partial<Accessor>) {
+		this.state.access = accessor
 		return this
 	}
 
+}
+interface Accessor {
+	insert: Schema<any>
+	update: Schema<any>
 }

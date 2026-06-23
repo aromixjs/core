@@ -1,3 +1,15 @@
+export interface TypeMap {
+	string: string,
+	number: number,
+	boolean: boolean,
+	bigint: bigint,
+	symbol: symbol,
+	null: null,
+	undefined: undefined,
+	unknown: unknown,
+	never: never
+}
+export type Types = keyof TypeMap
 export type AxTypes = ['string', 'number', 'boolean', 'bigint', 'symbol', 'null', 'undefined', 'unknown', 'never', 'instance', 'object', 'array', 'tuple', 'literal', 'record', 'union']
 
 export type LiteralValue = string | number | boolean | bigint | null
