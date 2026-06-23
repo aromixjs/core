@@ -1,11 +1,9 @@
-import { AnySchema, Operator, SchemaState } from './types'
-import { Parser } from './parser'
+import { Operator, SchemaState } from './types'
 
-export class Schema<Output> extends Parser<Output> implements AnySchema<Output> {
+export class Schema<Output> {
 	declare readonly $infer: Output
-
+	readonly state: SchemaState
 	constructor(input: SchemaState) {
-		super()
 		this.state = input
 	}
 
@@ -24,4 +22,5 @@ export class Schema<Output> extends Parser<Output> implements AnySchema<Output> 
 		this.state.operators.push(op)
 		return this as any
 	}
+
 }
