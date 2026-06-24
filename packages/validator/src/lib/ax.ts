@@ -1,5 +1,5 @@
-import { PrimitiveSchema, Schema } from './schema'
-import type { AnySchema, Ctor, Primitives } from './types'
+import { ObjectSchema, PrimitiveSchema, Schema } from './schema'
+import type { AnySchema, Ctor, OmitNeverKeys, Primitives } from './types'
 
 export const ax = {
 	string() {
@@ -10,10 +10,8 @@ export const ax = {
 			update: string
 		}>({
 			type: 'string',
-			modifiers: {
-				convert: false,
-				partial: false,
-			},
+			modifiers: {},
+			accessors: {},
 		})
 	},
 
@@ -25,10 +23,8 @@ export const ax = {
 			update: number
 		}>({
 			type: 'number',
-			modifiers: {
-				convert: false,
-				partial: false,
-			},
+			modifiers: {},
+			accessors: {},
 		})
 	},
 
@@ -40,10 +36,8 @@ export const ax = {
 			update: boolean
 		}>({
 			type: 'boolean',
-			modifiers: {
-				convert: false,
-				partial: false,
-			},
+			modifiers: {},
+			accessors: {},
 		})
 	},
 
@@ -55,10 +49,8 @@ export const ax = {
 			update: bigint
 		}>({
 			type: 'bigInt',
-			modifiers: {
-				convert: false,
-				partial: false,
-			},
+			modifiers: {},
+			accessors: {},
 		})
 	},
 
@@ -70,10 +62,8 @@ export const ax = {
 			update: symbol
 		}>({
 			type: 'symbol',
-			modifiers: {
-				convert: false,
-				partial: false,
-			},
+			modifiers: {},
+			accessors: {},
 		})
 	},
 
@@ -85,10 +75,8 @@ export const ax = {
 			update: null
 		}>({
 			type: 'null',
-			modifiers: {
-				convert: false,
-				partial: false,
-			},
+			modifiers: {},
+			accessors: {},
 		})
 	},
 
@@ -100,10 +88,8 @@ export const ax = {
 			update: undefined
 		}>({
 			type: 'undefined',
-			modifiers: {
-				convert: false,
-				partial: false,
-			},
+			modifiers: {},
+			accessors: {},
 		})
 	},
 
@@ -115,10 +101,8 @@ export const ax = {
 			update: unknown
 		}>({
 			type: 'unknown',
-			modifiers: {
-				convert: false,
-				partial: false,
-			},
+			modifiers: {},
+			accessors: {},
 		})
 	},
 	never() {
@@ -129,26 +113,22 @@ export const ax = {
 			update: never
 		}>({
 			type: 'never',
-			modifiers: {
-				convert: false,
-				partial: false,
-			},
+			modifiers: {},
+			accessors: {},
 		})
 	},
 
 	object<Shape extends Record<string, AnySchema>>(shape: Shape) {
-		return new Schema<{
+		return new ObjectSchema<{
 			base: { [Key in keyof Shape]: Shape[Key]['$base'] }
-			select: { [Key in keyof Shape]: Shape[Key]['$select'] }
-			insert: { [Key in keyof Shape]: Shape[Key]['$insert'] }
-			update: { [Key in keyof Shape]: Shape[Key]['$update'] }
+			select: OmitNeverKeys<Shape, '$select'>
+			insert: OmitNeverKeys<Shape, '$insert'>
+			update: OmitNeverKeys<Shape, '$update'>
 		}>({
 			type: 'object',
 			objectShape: shape,
-			modifiers: {
-				convert: false,
-				partial: false,
-			},
+			modifiers: {},
+			accessors: {},
 		})
 	},
 
@@ -161,10 +141,8 @@ export const ax = {
 		}>({
 			type: 'array',
 			arrayElement: element,
-			modifiers: {
-				convert: false,
-				partial: false,
-			},
+			modifiers: {},
+			accessors: {},
 		})
 	},
 
@@ -177,10 +155,8 @@ export const ax = {
 		}>({
 			type: 'tuple',
 			tupleItems: items,
-			modifiers: {
-				convert: false,
-				partial: false,
-			},
+			modifiers: {},
+			accessors: {},
 		})
 	},
 
@@ -193,10 +169,8 @@ export const ax = {
 		}>({
 			type: 'union',
 			unionItems: options,
-			modifiers: {
-				convert: false,
-				partial: false,
-			},
+			modifiers: {},
+			accessors: {},
 		})
 	},
 
@@ -209,10 +183,8 @@ export const ax = {
 		}>({
 			type: 'record',
 			recordElement: value,
-			modifiers: {
-				convert: false,
-				partial: false,
-			},
+			modifiers: {},
+			accessors: {},
 		})
 	},
 
@@ -225,10 +197,8 @@ export const ax = {
 		}>({
 			type: 'literals',
 			literalValues: values,
-			modifiers: {
-				convert: false,
-				partial: false,
-			},
+			modifiers: {},
+			accessors: {},
 		})
 	},
 
@@ -236,10 +206,11 @@ export const ax = {
 		return new Schema({
 			type: 'instance',
 			instanceClass: classRef,
-			modifiers: {
-				convert: false,
-				partial: false,
-			},
+			modifiers: {},
+			accessors: {},
 		})
 	},
 }
+
+
+const str= ax.string().pipe((v)=>v.split(' '))

@@ -25,11 +25,29 @@ export interface SchemaState {
 	literalValues?: readonly Primitives[]
 	instanceClass?: Ctor
 	modifiers: {
-		convert: boolean
-		partial: boolean
+		convert?: boolean
+		partial?: boolean
+		default?: any
+		defaultFn?: Function
+		nullable?: boolean
+		optional?: boolean
+		nullish?: boolean
+		pipes?:Array<any>
+	}
+	accessors: {
+		readonlyValue?: any
+		readonlyFn?: Function
+		locked?: boolean
+		hidden?: boolean
 	}
 }
 
 export type Primitives = string | number | boolean | bigint | null | undefined
 
 export type Ctor = new (...args: any) => any
+
+// Remaps an object's keys, dropping any key whose value at the given Slot is `never`.
+// Use for $insert / $update / $select wherever a modifier (readonly/locked/hidden) can knock a field out entirely.
+export type OmitNeverKeys<Shape extends Record<string, AnySchema>, Slot extends keyof AnySchema> = {
+	[Key in keyof Shape as Shape[Key][Slot] extends never ? never : Key]: Shape[Key][Slot]
+}
