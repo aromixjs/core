@@ -5,8 +5,7 @@ export class Schema<Shape extends SchemaShape> implements AnySchema {
 	declare readonly $select: Shape['select']
 	declare readonly $insert: Shape['insert']
 	declare readonly $update: Shape['update']
-
-	constructor(readonly state: SchemaState) { }
+	constructor(readonly state: SchemaState) {}
 
 	default(value: Shape['base']): Schema<{
 		base: Shape['base'] | undefined
@@ -98,7 +97,6 @@ export class Schema<Shape extends SchemaShape> implements AnySchema {
 		return this
 	}
 
-
 	pipe<Next>(fn: (value: Shape['base']) => Next): Schema<{
 		base: Next
 		select: Next
@@ -107,9 +105,8 @@ export class Schema<Shape extends SchemaShape> implements AnySchema {
 	}> {
 		this.state.modifiers.pipes ??= []
 		this.state.modifiers.pipes.push(fn)
-		return this as any
+		return this
 	}
-
 }
 
 export class PrimitiveSchema<Shape extends SchemaShape> extends Schema<Shape> {

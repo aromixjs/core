@@ -10,6 +10,7 @@ export const ax = {
 			update: string
 		}>({
 			type: 'string',
+			typeMeta: {},
 			modifiers: {},
 			accessors: {},
 		})
@@ -23,6 +24,7 @@ export const ax = {
 			update: number
 		}>({
 			type: 'number',
+			typeMeta: {},
 			modifiers: {},
 			accessors: {},
 		})
@@ -36,6 +38,7 @@ export const ax = {
 			update: boolean
 		}>({
 			type: 'boolean',
+			typeMeta: {},
 			modifiers: {},
 			accessors: {},
 		})
@@ -49,6 +52,7 @@ export const ax = {
 			update: bigint
 		}>({
 			type: 'bigInt',
+			typeMeta: {},
 			modifiers: {},
 			accessors: {},
 		})
@@ -62,6 +66,7 @@ export const ax = {
 			update: symbol
 		}>({
 			type: 'symbol',
+			typeMeta: {},
 			modifiers: {},
 			accessors: {},
 		})
@@ -75,6 +80,7 @@ export const ax = {
 			update: null
 		}>({
 			type: 'null',
+			typeMeta: {},
 			modifiers: {},
 			accessors: {},
 		})
@@ -88,6 +94,7 @@ export const ax = {
 			update: undefined
 		}>({
 			type: 'undefined',
+			typeMeta: {},
 			modifiers: {},
 			accessors: {},
 		})
@@ -101,6 +108,7 @@ export const ax = {
 			update: unknown
 		}>({
 			type: 'unknown',
+			typeMeta: {},
 			modifiers: {},
 			accessors: {},
 		})
@@ -113,6 +121,7 @@ export const ax = {
 			update: never
 		}>({
 			type: 'never',
+			typeMeta: {},
 			modifiers: {},
 			accessors: {},
 		})
@@ -126,7 +135,9 @@ export const ax = {
 			update: OmitNeverKeys<Shape, '$update'>
 		}>({
 			type: 'object',
-			objectShape: shape,
+			typeMeta: {
+				objectShape: shape,
+			},
 			modifiers: {},
 			accessors: {},
 		})
@@ -140,7 +151,9 @@ export const ax = {
 			update: Element['$update'][]
 		}>({
 			type: 'array',
-			arrayElement: element,
+			typeMeta: {
+				arrayElement: element,
+			},
 			modifiers: {},
 			accessors: {},
 		})
@@ -154,7 +167,10 @@ export const ax = {
 			update: { [Key in keyof Items]: Items[Key]['$update'] }
 		}>({
 			type: 'tuple',
-			tupleItems: items,
+
+			typeMeta: {
+				tupleItems: items,
+			},
 			modifiers: {},
 			accessors: {},
 		})
@@ -168,7 +184,9 @@ export const ax = {
 			update: Options[number]['$update']
 		}>({
 			type: 'union',
-			unionItems: options,
+			typeMeta: {
+				unionItems: options,
+			},
 			modifiers: {},
 			accessors: {},
 		})
@@ -182,7 +200,9 @@ export const ax = {
 			update: Record<string, Value['$update']>
 		}>({
 			type: 'record',
-			recordElement: value,
+			typeMeta: {
+				recordElement: value,
+			},
 			modifiers: {},
 			accessors: {},
 		})
@@ -196,7 +216,9 @@ export const ax = {
 			update: Values[number]
 		}>({
 			type: 'literals',
-			literalValues: values,
+			typeMeta: {
+				literalValues: values,
+			},
 			modifiers: {},
 			accessors: {},
 		})
@@ -205,12 +227,11 @@ export const ax = {
 	instance<Class extends Ctor>(classRef: Class) {
 		return new Schema({
 			type: 'instance',
-			instanceClass: classRef,
+			typeMeta: {
+				instanceClass: classRef,
+			},
 			modifiers: {},
 			accessors: {},
 		})
 	},
 }
-
-
-const str= ax.string().pipe((v)=>v.split(' '))
