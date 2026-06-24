@@ -1,59 +1,29 @@
-import { Types } from "./types";
+import { AnySchema, SchemaShape, SchemaState } from './types'
 
-export interface SchemaShape {
-	base: any
-	select: any
-	insert: any
-	update: any
+export class Schema<Shape extends SchemaShape> implements AnySchema {
+	declare readonly $base: Shape['base']
+	declare readonly $select: Shape['select']
+	declare readonly $insert: Shape['insert']
+	declare readonly $update: Shape['update']
+
+	constructor(readonly state: SchemaState) {}
 }
-export class Schema<Shape extends SchemaShape> {
 
-	declare $base: Shape['base']
-	declare $select: Shape['select']
-	declare $insert: Shape['insert']
-	declare $update: Shape['update']
-
-	private state: Record<string, any> = {}
-
-
-	constructor(type: Types) {
-
-	}
-
-
-
-
-	parse() {
-
-	}
-
-
+export class PrimitiveSchema<Shape extends SchemaShape> extends Schema<Shape> {
 	convert() {
-		this.state.convert = true
+		this.state.modifiers.convert = true
 		return this
 	}
-
-
-
-	readonly(value: Shape['base']) {
-		this.state.readonly = value
-		return this
-	}
-
-	readonlyFn(cb: () => Shape['base']) {
-		this.state.readonlyFn = cb
-		return this
-	}
-
-
-
-	access(accessor: Partial<Accessor>) {
-		this.state.access = accessor
-		return this
-	}
-
 }
-interface Accessor {
-	insert: Schema<any>
-	update: Schema<any>
+
+export class ObjectSchema<Shape extends SchemaShape> extends Schema<Shape> {
+	partial(): ObjectSchema<{
+		base: Partial<Shape>
+		select: Partial<Shape>
+		insert: Partial<Shape>
+		update: Partial<Shape>
+	}> {
+		this.state.modifiers.partial = true
+		return this
+	}
 }

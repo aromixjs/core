@@ -1,59 +1,49 @@
 {
-  "name": "@aromix/core",
-  "version": "0.3.2",
-  "description": "The Core Package For Aromix",
-  "type": "module",
-  "license": "MIT",
-  "homepage": "https://aromixjs.github.io/aromix",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/aromixjs/aromix.git",
-    "directory": "packages/core"
-  },
-  "bugs": {
-    "url": "https://github.com/aromixjs/aromix/issues"
-  },
-  "keywords": [
-    "aromix",
-    "core",
-    "server",
-    "framework",
-    "runtime-agnostic",
-    "deno",
-    "node"
-  ],
-  "files": [
-    "dist"
-  ],
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
-    }
-  },
-  "publishConfig": {
-    "access": "public",
-    "registry": "https://registry.npmjs.org"
-  },
-  "scripts": {
-    "build": "tsup",
-    "dev": "tsup --watch",
-    "typecheck": "tsc --noEmit"
-  },
-  "peerDependencies": {
-    "@aromix/validator": "workspace:^",
-    "mongodb": "^7.3.0"
-  },
-  "devDependencies": {
-    "@aromix/validator": "workspace:^",
-    "@types/node": "catalog:",
-    "mongodb": "^7.3.0",
-    "tsup": "catalog:",
-    "typescript": "catalog:"
-  },
-  "peerDependenciesMeta": {
-    "mongodb": {
-      "optional": true
-    }
-  }
+	"name": "@aromix/core",
+	"version": "0.3.2",
+	"description": "The Core Package For Aromix",
+	"type": "module",
+	"license": "MIT",
+	"homepage": "https://aromixjs.github.io/aromix",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/aromixjs/aromix.git",
+		"directory": "packages/core"
+	},
+	"bugs": {
+		"url": "https://github.com/aromixjs/aromix/issues"
+	},
+	"keywords": ["aromix", "core", "server", "framework", "runtime-agnostic", "deno", "node"],
+	"files": ["dist"],
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"import": "./dist/index.js"
+		}
+	},
+	"publishConfig": {
+		"access": "public",
+		"registry": "https://registry.npmjs.org"
+	},
+	"scripts": {
+		"build": "tsup",
+		"dev": "tsup --watch",
+		"typecheck": "tsc --noEmit"
+	},
+	"peerDependencies": {
+		"@aromix/validator": "workspace:^",
+		"mongodb": "^7.3.0"
+	},
+	"devDependencies": {
+		"@aromix/validator": "workspace:^",
+		"@types/node": "catalog:",
+		"mongodb": "^7.3.0",
+		"tsup": "catalog:",
+		"typescript": "catalog:"
+	},
+	"peerDependenciesMeta": {
+		"mongodb": {
+			"optional": true
+		}
+	}
 }

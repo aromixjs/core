@@ -1,431 +1,361 @@
-# @aromix/validator
+# @aromix/validator — Implementation Reference
 
-## Getting Started
-
-```bash
-npm install @aromix/validator
-```
-
-Import the `ax` object — that's your entry point for everything:
-
-```ts
-import { ax } from '@aromix/validator'
-```
-
-Make your first schema:
-
-```ts
-const s = ax.string()
-```
-
-Validate some data:
-
-```ts
-s.parse('hello') // 'hello'
-s.parse(42) // throws ValidationError
-```
-
----
-
-## The Two Parse Methods
-
-Every schema has two ways to validate data.
-
-### `.parse()` — throws on failure
-
-```ts
-try {
-    const val = ax.number().parse('not a number')
-} catch (e) {
-    // e is ValidationError
-}
-```
-
-### `.safeParse()` — never throws
-
-Returns a discriminated union. Check `.success` to know which branch you're in.
-
-```ts
-const result = ax.number().safeParse('hello')
-
-if (result.success) {
-    result.data // typed as number
-    result.errors // null
+```typescript
+const [data, err] = ax.number().parse('not a number')
+if (err) {
+  // err is ValidationError
 } else {
-    result.data // null
-    result.errors // string[] — human-readable messages
+  data // typed as number
 }
 ```
 
-TypeScript narrows the type automatically inside each `if` branch, so `result.data` is properly typed.
+## Parse Methods
 
----
+| Method | Applies |
+|---|---|
+| `.parse(v)` | base validation only, ignores all access-control state |
+| `.parseInsert(v)` | `readonly`, `locked`, `access` entries tagged `'insert'` |
+| `.parseUpdate(v)` | `readonly`, `locked`, `access` entries tagged `'update'`, implicit `.partial()` |
+| `.parseSelect(v)` | strips `.hidden()` fields recursively |
 
-## Primitive Schemas
-
-These cover the basic JavaScript types.
-
-| Schema           | What it accepts                      |
-| ---------------- | ------------------------------------ |
-| `ax.string()`    | any string                           |
-| `ax.number()`    | any number (including NaN, Infinity) |
-| `ax.boolean()`   | true or false                        |
-| `ax.bigint()`    | BigInt values                        |
-| `ax.symbol()`    | Symbol values                        |
-| `ax.null()`      | only null                            |
-| `ax.undefined()` | only undefined                       |
-| `ax.unknown()`   | literally anything — passes through  |
-| `ax.never()`     | nothing — always fails               |
-
-```ts
-ax.string().parse('hello') // ✓
-ax.number().parse(42) // ✓
-ax.boolean().parse(true) // ✓
-ax.bigint().parse(100n) // ✓
-ax.symbol().parse(Symbol()) // ✓
-ax.null().parse(null) // ✓
-ax.undefined().parse(undefined) // ✓
-ax.unknown().parse('anything') // ✓
-ax.never().parse('anything') // ✗
-```
-
----
-
-## Complex Schemas
-
-### object
-
-Define the shape of an object. Each field uses its own schema.
-
-```ts
+```typescript
 const User = ax.object({
-    name: ax.string(),
-    age: ax.number(),
+  id: ax.string().readonly(),
+  email: ax.string(),
+  passwordHash: ax.string().hidden(),
 })
 
-User.parse({ name: 'Alice', age: 30 })
-// { name: 'Alice', age: 30 }
+User.parseInsert({ email: 'a@b.com', passwordHash: 'x' })
+// [null, ValidationError] — passwordHash isn't insertable, id is readonly
+
+User.parseUpdate({ email: 'new@b.com' })
+// [{ email: 'new@b.com' }, null] — partial, only sent fields validated
+
+User.parseSelect({ id: '1', email: 'a@b.com', passwordHash: 'x' })
+// [{ id: '1', email: 'a@b.com' }, null] — passwordHash stripped
 ```
 
-- Missing fields throw.
-- Wrong types throw.
-- Extra fields are **stripped** from the output.
-- Nested objects work fine.
+## Primitives
 
-```ts
+```typescript
+ax.string().parse('hello')      // ['hello', null]
+ax.number().parse(42)           // [42, null]
+ax.boolean().parse(true)        // [true, null]
+ax.bigint().parse(100n)         // [100n, null]
+ax.symbol().parse(Symbol())     // [Symbol(), null]
+ax.null().parse(null)           // [null, null]
+ax.undefined().parse(undefined) // [undefined, null]
+ax.unknown().parse('anything')  // ['anything', null]
+ax.never().parse('anything')    // [null, ValidationError]
+```
+
+## `.convert()`
+
+Coerces input to expected type before validation, falls through to normal error if it can't. Incoming only — applies to `parse`/`parseInsert`/`parseUpdate`, **not** `parseSelect`. Runs before pipes and before access-control checks.
+
+```typescript
+const n = ax.number().convert()
+n.parse('123')          // [123, null]
+n.parse('not a number') // [null, ValidationError]
+
+const b = ax.boolean().convert()
+b.parse('true') // [true, null]
+b.parse(1)       // [true, null]
+```
+
+## `ax.object(shape)`
+
+```typescript
+const User = ax.object({
+  name: ax.string(),
+  age: ax.number(),
+})
+
+User.parse({ name: 'Alice', age: 30 })       // [{ name: 'Alice', age: 30 }, null]
+User.parse({ name: 'Alice' })                // [null, ValidationError] — missing field
+User.parse({ name: 'Alice', age: '30' })     // [null, ValidationError] — wrong type
+User.parse({ name: 'Alice', age: 30, x: 1 }) // [{ name: 'Alice', age: 30 }, null] — x stripped
+
 const Nested = ax.object({
-    inner: ax.object({ value: ax.number() }),
+  inner: ax.object({ value: ax.number() }),
 })
-Nested.parse({ inner: { value: 99 } }) // ✓
+Nested.parse({ inner: { value: 99 } }) // [{ inner: { value: 99 } }, null]
 ```
 
-### array
+### `.partial()`
 
-Every element must match the schema.
+Object-only. All fields structurally optional. If a field has an `access` entry for that op, it still applies when the field is present — `.partial()` only relaxes presence, not type.
 
-```ts
+```typescript
+const PartialUser = User.partial()
+// $infer: { name?: string; age?: number }
+
+PartialUser.parse({}) // [{}, null]
+PartialUser.parse({ age: 30 }) // [{ age: 30 }, null]
+PartialUser.parse({ age: '30' }) // [null, ValidationError] — type still enforced when present
+```
+
+### object-level `.access()` / `.readonly()` / `.hidden()`
+
+- `.readonly()` / `.hidden()` on an object cascades to all children, no exceptions.
+- `.access()` on an object narrows the whole shape for that op.
+- precedence: more specific (child) wins over parent, but a parent rule isn't silently dropped — a child has to explicitly opt out by declaring its own modifier.
+
+```typescript
+const Settings = ax.object({
+  theme: ax.string(),
+  apiKey: ax.string(),
+}).hidden()
+// every child field is treated as hidden, regardless of its own modifiers
+
+const Profile = ax.object({
+  id: ax.string().readonly(),
+  bio: ax.string(),
+}).access((for) => [
+  for('update').value({ bio: '' }),
+])
+```
+
+## `array / tuple / union / record`
+
+```typescript
 const Names = ax.array(ax.string())
-Names.parse(['Alice', 'Bob']) // ✓
-Names.parse([1, 2]) // ✗
-```
+Names.parse(['Alice', 'Bob']) // [['Alice', 'Bob'], null]
+Names.parse([1, 2])           // [null, ValidationError]
 
-Nested arrays:
-
-```ts
-const Matrix = ax.array(ax.array(ax.number()))
-Matrix.parse([
-    [1, 2],
-    [3, 4],
-]) // ✓
-```
-
-### tuple
-
-Fixed length, typed by position.
-
-```ts
 const Coord = ax.tuple([ax.number(), ax.number()])
-Coord.parse([10, 20]) // ✓ [number, number]
+Coord.parse([10, 20])  // [[10, 20], null]
+Coord.parse([1])       // [null, ValidationError] — wrong length
+Coord.parse(['x', 10]) // [null, ValidationError] — wrong type at position
 
-// Wrong length
-Coord.parse([1]) // ✗
-Coord.parse([1, 2, 3]) // ✗
-
-// Wrong type at position
-Coord.parse(['x', 10]) // ✗
-```
-
-### union
-
-Tries each schema in order. Returns the first one that succeeds.
-
-```ts
 const StrOrNum = ax.union([ax.string(), ax.number()])
-StrOrNum.parse('hello') // 'hello'
-StrOrNum.parse(42) // 42
-StrOrNum.parse(true) // ✗
-```
+StrOrNum.parse('hello') // ['hello', null]
+StrOrNum.parse(42)      // [42, null]
+StrOrNum.parse(true)    // [null, ValidationError]
 
-Useful for optional fields and discriminated unions:
-
-```ts
-const Event = ax.union([ax.object({ type: ax.literal('click'), x: ax.number(), y: ax.number() }), ax.object({ type: ax.literal('keydown'), key: ax.string() })])
-```
-
-### record
-
-All values in an object must match the schema. Keys are always strings.
-
-```ts
 const Flags = ax.record(ax.boolean())
-Flags.parse({ a: true, b: false }) // ✓
-Flags.parse({ a: 1 }) // ✗
+Flags.parse({ a: true, b: false }) // [{ a: true, b: false }, null]
+Flags.parse({ a: 1 })              // [null, ValidationError]
 ```
 
----
+## `literal(v)` / `literals(...)`
 
-## Special Schemas
+`literals` is the variadic closed-set version, avoids `union([literal(...)])`. Stored as `state.type === 'literals'` so SDK gen can read the value set directly.
 
-### literal
+```typescript
+ax.literal('admin').parse('admin') // ['admin', null]
+ax.literal('admin').parse('user')  // [null, ValidationError]
 
-Accepts one specific value and nothing else.
-
-```ts
-ax.literal('admin').parse('admin') // ✓
-ax.literal(42).parse(42) // ✓
-ax.literal(true).parse(true) // ✓
-
-ax.literal('admin').parse('user') // ✗
+const Role = ax.literals('admin', 'editor', 'viewer')
+Role.parse('editor') // ['editor', null]
+Role.parse('owner')  // [null, ValidationError]
+// $infer: 'admin' | 'editor' | 'viewer'
 ```
 
-Works with `string | number | boolean | bigint | null`.
+## `instance(Class)`
 
-### instance
+```typescript
+ax.instance(Date).parse(new Date())   // [Date, null]
+ax.instance(Date).parse('2024-01-01') // [null, ValidationError]
 
-Validates using `instanceof`.
-
-```ts
-ax.instance(Date).parse(new Date()) // ✓
-ax.instance(Date).parse('2024-01-01') // ✗
-
-// Custom classes work too
-class MyClass {
-    constructor(public x: number) {}
-}
-ax.instance(MyClass).parse(new MyClass(5)) // ✓
+class MyClass { constructor(public x: number) {} }
+ax.instance(MyClass).parse(new MyClass(5)) // [MyClass, null]
 ```
 
-Output type is inferred as the class's instance type.
+## Defaults / Nullability
 
----
-
-## Default Values
-
-When the input is `undefined`, you can supply a fallback.
-
-### `.default(value)`
-
-```ts
+```typescript
 const s = ax.string().default('guest')
+s.parse('alice')   // ['alice', null]
+s.parse(undefined) // ['guest', null]
+s.parse(null)      // [null, ValidationError] — null is not undefined
 
-s.parse('alice') // 'alice'
-s.parse(undefined) // 'guest'
-s.parse(null) // ✗ (null is not undefined)
-```
-
-Default is applied before pipe operators run, so the operator sees the default:
-
-```ts
-const s = ax
-    .string()
-    .pipe(ax.operator((v) => v.toUpperCase()))
-    .default('anon')
-
-s.parse(undefined) // 'ANON'
-```
-
-### `.defaultFn(fn)`
-
-Same idea, but calls a function each time a default is needed.
-
-```ts
 let counter = 0
-const s = ax.number().defaultFn(() => ++counter)
-
-s.parse(undefined) // 1
-s.parse(undefined) // 2
+const id = ax.number().defaultFn(() => ++counter)
+id.parse(undefined) // [1, null]
+id.parse(undefined) // [2, null]
 ```
 
-Good for timestamps, IDs, random values.
+- `.optional()` → `| undefined`, `.nullable()` → `| null`, `.nullish()` → both. Flags on `state`, no union wrapping.
 
----
-
-## Pipes & Operators
-
-Pipes let you add custom logic to any schema — validation, transformation, or both.
-
-### Creating an Operator
-
-Use `ax.operator()`:
-
-```ts
-const minLen = (n: number) =>
-    ax.operator((v: string) => {
-        if (v.length < n) throw `Min ${n} chars`
-        return v
-    })
+```typescript
+ax.string().optional().parse(undefined) // [undefined, null]
+ax.number().nullable().parse(null)      // [null, null]
+ax.string().nullish().parse(undefined)  // [undefined, null]
 ```
 
-It's just a function `(value) => newValue`. Throw an error to reject the value.
+## `.pipe(fn)`
 
-### Validation
+Takes value, returns validated value or throws (caught, becomes error tuple). Single value only — no `(value, context)`. Any cross-field/contextual logic is explicitly out of scope, lives in a separate guards layer.
 
-```ts
+```typescript
+const minLen = (n: number) => (v: string) => {
+  if (v.length < n) throw `Min ${n} chars`
+  return v
+}
+
 const Name = ax.string().pipe(minLen(2))
+Name.parse('Al') // ['Al', null]
+Name.parse('A')  // [null, ValidationError] — code: 'custom'
 
-Name.parse('Al') // ✓
-Name.parse('A') // ✗ ValidationError (code: 'custom')
+// type changes as you pipe
+const CsvFirst = ax.string()
+  .pipe((v) => v.split(',').map((s) => s.trim())) // string[]
+  .pipe((v) => v[0])                               // string
+
+CsvFirst.parse('a, b, c') // ['a', null]
+
+// chaining
+const Processed = ax.string()
+  .pipe(minLen(2))
+  .pipe((v) => v.toUpperCase())
+  .pipe((v) => v.split(','))
+  .pipe((v) => v[0])
+
+Processed.parse('john, bob') // ['JOHN', null]
+
+ax.string().pipe((v: number) => v * 2); // @ts-expect-error — input type checked against current output type
 ```
 
-### Transformation
+Whatever the function throws — string or `Error` — gets wrapped in `ValidationError` with `code: 'custom'`. Nothing raw leaks out of `.parse()`.
 
-The type changes as you pipe:
+## Access Control
 
-```ts
-const toArray = ax.operator((v: string) => v.split(',').map((s) => s.trim()))
-const first = ax.operator((v: string[]) => v[0])
-const upper = ax.operator((v: string) => v.toUpperCase())
+Metadata only — never affects `.parse()`. Read by `parseInsert/Update/Select` and SDK gen.
 
-const CsvFirst = ax
-    .string()
-    .pipe(toArray) // Schema<string[]>
-    .pipe(first) // Schema<string>
+| Modifier | `$inferInsert` | `$inferUpdate` | `$inferSelect` |
+|---|---|---|---|
+| `.default()/.defaultFn()` | optional | — | — |
+| `.readonly()/.readonlyFn()` | omitted | omitted | — |
+| `.locked()` | normal rules | omitted | — |
+| `.hidden()` | — | — | omitted |
+| `.access(...)` with `.value()`/`.oneOf()` on `'insert'` | narrowed | — | — |
+| `.access(...)` with `.value()`/`.oneOf()` on `'update'` | — | narrowed | — |
+| `.access(...)` with `.range()`/`.length()` | no type change (parse-time only) | no type change (parse-time only) | — |
 
-CsvFirst.parse('a, b, c') // 'a'
+### `.readonly(value?)` / `.readonlyFn(fn)`
+
+Never accepts client value. Omitted from insert+update entirely. There's no separate on/off flag to check — a field is treated as readonly simply because a fallback (`readonlyValue` or `readonlyFn`) is present; that presence *is* the check at parse time.
+
+- `.readonly(value)` — sets a fixed fallback value in one call.
+- `.readonly()` bare — needs a fallback from `.default()`/`.defaultFn()` elsewhere, or `.parseInsert()` errors instead of letting client value through.
+
+```typescript
+const Id = ax.string().readonlyFn(() => crypto.randomUUID())
+Id.parseInsert('whatever-client-sent') // [<uuid>, null] — client value ignored
+
+const Status = ax.string().readonly('active')
+Status.parseInsert('banned')  // ['active', null] — forced regardless of input
+Status.parseUpdate('banned')  // [null, ValidationError]
+
+const Broken = ax.string().readonly() // no fallback configured anywhere
+Broken.parseInsert('x') // [null, ValidationError] — no fallback to fall back to
 ```
 
-### Chaining
+### `.locked()`
 
-```ts
-const Processed = ax.string().pipe(minLen(2)).pipe(upper).pipe(toArray).pipe(first)
+Client sets once at insert (normal rules — required unless defaulted), never after. Omitted from update only.
 
-Processed.parse('john, bob') // 'JOHN'
+```typescript
+const CreatedAt = ax.string().locked().defaultFn(() => new Date().toISOString())
+CreatedAt.parseInsert('2026-01-01') // ['2026-01-01', null]
+CreatedAt.parseUpdate('2027-01-01') // [null, ValidationError]
 ```
 
-### Type Safety
+### `.access((for) => [...])`
 
-The operator's input type is checked against the schema's current output type:
+Centralized narrowing, built per-operation through a small chain instead of passing a full schema. The callback receives `for`, a function you call with `'insert'` or `'update'` to start a chain scoped to that one operation. The array can hold at most one entry per op — one insert entry, one update entry, or both (in either order) — never two for the same op.
 
-```ts
-const s = ax.string()
-// @ts-expect-error — can't pipe a number operator from a string schema
-s.pipe(ax.operator((v: number) => v * 2))
+Each chain only exposes the operations that make sense for the field's base type:
+
+| Chain method | Available when | Effect on inferred type |
+|---|---|---|
+| `.value(v)` | always | narrows to the literal `v` |
+| `.oneOf([...])` | base is a literal union (`literal`/`literals`/`.in([...])`) | narrows to the union of the passed values |
+| `.range({min, max})` | base extends `number \| bigint` | parse-time only, type stays the base numeric type |
+| `.length({min, max})` | base extends `string` | parse-time only, type stays `string` |
+
+`.value()`/`.oneOf()` must stay within the field's existing base type — narrow only, never widen, never arbitrary. `.value()` here is for narrowing what's *allowed*, not for forcing a fixed value regardless of input — use `.readonly(value)` for that.
+
+```typescript
+const Role = ax.literals('admin', 'editor', 'viewer').access((for_) => [
+  for_('insert').oneOf(['viewer']),
+])
+Role.parseInsert('viewer') // ['viewer', null]
+Role.parseInsert('admin')  // [null, ValidationError]
+
+const Status = ax.literals('draft', 'published', 'archived').access((for_) => [
+  for_('update').oneOf(['draft', 'published']),
+])
+Status.parseUpdate('archived')  // [null, ValidationError] — not in update-time set
+Status.parseUpdate('published') // ['published', null]
+
+const Age = ax.number().access((for_) => [
+  for_('insert').range({ min: 0, max: 120 }),
+])
+Age.parseInsert(150) // [null, ValidationError] — parse-time only, $inferInsert is still `number`
+
+// both ops in one call
+const Bio = ax.string().access((for_) => [
+  for_('insert').length({ max: 280 }),
+  for_('update').length({ max: 280 }),
+])
 ```
 
-### Error Wrapping
+Allowed on primitives and on `ax.object()` (see object-level section above).
 
-Whatever your operator throws — string or Error — gets wrapped in a `ValidationError` with `code: 'custom'`. You never get raw thrown values leaking out of `.parse()`.
+### `.hidden()`
 
----
+Omitted from select only. Orthogonal to write perms. Pure metadata on primitives (`state.access.hidden`); `.parseSelect()` strips it at the object level.
 
-## Error Handling
+```typescript
+const PasswordHash = ax.string().hidden()
 
-`ValidationError` carries structured information.
-
-```ts
-import { ValidationError } from '@aromix/validator'
-
-try {
-    ax.object({ name: ax.string() }).parse({ name: 42 })
-} catch (e) {
-    const err = e as ValidationError
-
-    err.name // 'ValidationError'
-    err.message // "Expected string, received number at 'name'"
-    err.issues // [{ code, path, message }]
-}
-```
-
-### `ValidationIssue`
-
-```ts
-{
-  code: 'invalidType',    // machine-readable
-  path: ['name'],         // where the error happened
-  message: string         // human-readable
-}
-```
-
-### Error Codes
-
-| Code               | When it happens                             |
-| ------------------ | ------------------------------------------- |
-| `'invalidType'`    | Wrong type (string instead of number, etc.) |
-| `'invalidLiteral'` | Value doesn't match the literal             |
-| `'custom'`         | Operator threw an error                     |
-
----
-
-## Type Inference
-
-Access the TypeScript type of any schema via `$infer`:
-
-```ts
 const User = ax.object({
-    name: ax.string(),
-    age: ax.number(),
+  id: ax.string(),
+  password: ax.string().hidden(),
 })
-
-type T = typeof User.$infer
-// { name: string; age: number }
+User.parseSelect({ id: '1', password: 'secret' })
+// [{ id: '1' }, null] — password stripped
 ```
 
-Works after pipes too:
+## Error Shape
 
-```ts
-const Slug = ax.string().pipe(ax.operator((v) => v.toLowerCase().replace(/\s+/g, '-')))
-
-type T = typeof Slug.$infer // string
+```typescript
+{
+  name: 'ValidationError',
+  message: "Expected string, received number at 'name'",
+  issues: [
+    { code: 'invalidType', path: ['name'], message: string }
+  ]
+}
 ```
 
----
+| Code | When |
+|---|---|
+| `invalidType` | wrong type |
+| `invalidLiteral` | value doesn't match the literal/literals set |
+| `custom` | a `.pipe()` function threw |
 
-## The Public `.state` Property
+Validator's job stops here — HTTP/RPC mapping is the RPC layer's concern.
 
-Every schema exposes its internal config through `state`:
+## Inference
 
-```ts
+```typescript
+const User = ax.object({ name: ax.string(), age: ax.number() })
+
+type T = typeof User.$infer        // { name: string; age: number }
+type Insert = typeof User.$inferInsert
+type Update = typeof User.$inferUpdate
+type Select = typeof User.$inferSelect
+```
+
+## `.state`
+
+Public, read-only, metaprogramming/SDK-gen surface.
+
+```typescript
 const s = ax.string().default('hello')
-s.state.type // 'string'
+s.state.type    // 'string'
 s.state.default // { value: 'hello' }
-```
-
-Read-only inspection, useful for metaprogramming.
-
----
-
-## Quick Patterns
-
-**Optional field** (union with undefined):
-
-```ts
-ax.union([ax.string(), ax.undefined()])
-```
-
-**Nullable field** (union with null):
-
-```ts
-ax.union([ax.number(), ax.null()])
-```
-
-**Optional + default**:
-
-```ts
-ax.union([ax.literal('admin'), ax.literal('user'), ax.undefined()]).default('user')
-```
-
-**Enum-like**:
-
-```ts
-ax.union([ax.literal('draft'), ax.literal('published'), ax.literal('archived')])
 ```
