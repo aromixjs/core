@@ -1,0 +1,7 @@
+{
+  "type": "minor",
+  "comment": "refactor(entity, validator): streamline entity platforms and validator API",
+  "packageName": "@aromix/core",
+  "email": "istiuak.0@gmail.com",
+  "dependentChangeType": "patch"
+}
