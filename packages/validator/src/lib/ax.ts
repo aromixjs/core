@@ -1,63 +1,237 @@
-import { Schema } from './schema'
-import { AnySchema, LiteralValue, Operator } from './types'
+import { ObjectSchema, PrimitiveSchema, Schema } from './schema'
+import type { AnySchema, Ctor, OmitNeverKeys, Primitives } from './types'
 
 export const ax = {
 	string() {
-		return new Schema<string>({ type: 'string' })
-	},
-	number() {
-		return new Schema<number>({ type: 'number' })
-	},
-	boolean() {
-		return new Schema<boolean>({ type: 'boolean' })
-	},
-	bigint() {
-		return new Schema<bigint>({ type: 'bigint' })
-	},
-	symbol() {
-		return new Schema<symbol>({ type: 'symbol' })
-	},
-	null() {
-		return new Schema<null>({ type: 'null' })
-	},
-	undefined() {
-		return new Schema<undefined>({ type: 'undefined' })
-	},
-	unknown() {
-		return new Schema<unknown>({ type: 'unknown' })
-	},
-	never() {
-		return new Schema<never>({ type: 'never' })
-	},
-	instance<T extends new (...args: any[]) => any>(cls: T) {
-		return new Schema<InstanceType<T>>({ type: 'instance', instance: { class: cls } })
+		return new PrimitiveSchema<{
+			base: string
+			select: string
+			insert: string
+			update: string
+		}>({
+			type: 'string',
+			typeMeta: {},
+			modifiers: {},
+			accessors: {},
+		})
 	},
 
-	literal<Value extends LiteralValue>(value: Value) {
-		return new Schema<Value>({ type: 'literal', literal: { value } })
+	number() {
+		return new PrimitiveSchema<{
+			base: number
+			select: number
+			insert: number
+			update: number
+		}>({
+			type: 'number',
+			typeMeta: {},
+			modifiers: {},
+			accessors: {},
+		})
+	},
+
+	boolean() {
+		return new PrimitiveSchema<{
+			base: boolean
+			select: boolean
+			insert: boolean
+			update: boolean
+		}>({
+			type: 'boolean',
+			typeMeta: {},
+			modifiers: {},
+			accessors: {},
+		})
+	},
+
+	bigint() {
+		return new PrimitiveSchema<{
+			base: bigint
+			select: bigint
+			insert: bigint
+			update: bigint
+		}>({
+			type: 'bigInt',
+			typeMeta: {},
+			modifiers: {},
+			accessors: {},
+		})
+	},
+
+	symbol() {
+		return new Schema<{
+			base: symbol
+			insert: symbol
+			select: symbol
+			update: symbol
+		}>({
+			type: 'symbol',
+			typeMeta: {},
+			modifiers: {},
+			accessors: {},
+		})
+	},
+
+	null() {
+		return new Schema<{
+			base: null
+			insert: null
+			select: null
+			update: null
+		}>({
+			type: 'null',
+			typeMeta: {},
+			modifiers: {},
+			accessors: {},
+		})
+	},
+
+	undefined() {
+		return new Schema<{
+			base: undefined
+			insert: undefined
+			select: undefined
+			update: undefined
+		}>({
+			type: 'undefined',
+			typeMeta: {},
+			modifiers: {},
+			accessors: {},
+		})
+	},
+
+	unknown() {
+		return new Schema<{
+			base: unknown
+			insert: unknown
+			select: unknown
+			update: unknown
+		}>({
+			type: 'unknown',
+			typeMeta: {},
+			modifiers: {},
+			accessors: {},
+		})
+	},
+	never() {
+		return new Schema<{
+			base: never
+			insert: never
+			select: never
+			update: never
+		}>({
+			type: 'never',
+			typeMeta: {},
+			modifiers: {},
+			accessors: {},
+		})
 	},
 
 	object<Shape extends Record<string, AnySchema>>(shape: Shape) {
-		return new Schema<{ [Key in keyof Shape]: Shape[Key]['$infer'] }>({ type: 'object', object: { shape } })
+		return new ObjectSchema<{
+			base: { [Key in keyof Shape]: Shape[Key]['$base'] }
+			select: OmitNeverKeys<Shape, '$select'>
+			insert: OmitNeverKeys<Shape, '$insert'>
+			update: OmitNeverKeys<Shape, '$update'>
+		}>({
+			type: 'object',
+			typeMeta: {
+				objectShape: shape,
+			},
+			modifiers: {},
+			accessors: {},
+		})
 	},
 
 	array<Element extends AnySchema>(element: Element) {
-		return new Schema<Element['$infer'][]>({ type: 'array', array: { element } })
+		return new Schema<{
+			base: Element['$base'][]
+			select: Element['$select'][]
+			insert: Element['$insert'][]
+			update: Element['$update'][]
+		}>({
+			type: 'array',
+			typeMeta: {
+				arrayElement: element,
+			},
+			modifiers: {},
+			accessors: {},
+		})
 	},
 
-	tuple<Elements extends AnySchema[]>(elements: [...Elements]) {
-		return new Schema<{ [Key in keyof Elements]: Elements[Key]['$infer'] }>({ type: 'tuple', tuple: { elements } })
+	tuple<Items extends readonly AnySchema[]>(items: Items) {
+		return new Schema<{
+			base: { [Key in keyof Items]: Items[Key]['$base'] }
+			select: { [Key in keyof Items]: Items[Key]['$select'] }
+			insert: { [Key in keyof Items]: Items[Key]['$insert'] }
+			update: { [Key in keyof Items]: Items[Key]['$update'] }
+		}>({
+			type: 'tuple',
+
+			typeMeta: {
+				tupleItems: items,
+			},
+			modifiers: {},
+			accessors: {},
+		})
+	},
+
+	union<Options extends readonly AnySchema[]>(options: Options) {
+		return new Schema<{
+			base: Options[number]['$base']
+			select: Options[number]['$select']
+			insert: Options[number]['$insert']
+			update: Options[number]['$update']
+		}>({
+			type: 'union',
+			typeMeta: {
+				unionItems: options,
+			},
+			modifiers: {},
+			accessors: {},
+		})
 	},
 
 	record<Value extends AnySchema>(value: Value) {
-		return new Schema<Record<string, Value['$infer']>>({ type: 'record', record: { value } })
+		return new Schema<{
+			base: Record<string, Value['$base']>
+			select: Record<string, Value['$select']>
+			insert: Record<string, Value['$insert']>
+			update: Record<string, Value['$update']>
+		}>({
+			type: 'record',
+			typeMeta: {
+				recordElement: value,
+			},
+			modifiers: {},
+			accessors: {},
+		})
 	},
 
-	union<Schemas extends AnySchema[]>(schemas: [...Schemas]) {
-		return new Schema<Schemas[number]['$infer']>({ type: 'union', union: { schemas } })
+	literals<Values extends readonly Primitives[]>(...values: Values) {
+		return new Schema<{
+			base: Values[number]
+			select: Values[number]
+			insert: Values[number]
+			update: Values[number]
+		}>({
+			type: 'literals',
+			typeMeta: {
+				literalValues: values,
+			},
+			modifiers: {},
+			accessors: {},
+		})
 	},
 
-	operator<Input, Output>(run: (value: Input) => Output): Operator<Input, Output> {
-		return { run }
+	instance<Class extends Ctor>(classRef: Class) {
+		return new Schema({
+			type: 'instance',
+			typeMeta: {
+				instanceClass: classRef,
+			},
+			modifiers: {},
+			accessors: {},
+		})
 	},
 }

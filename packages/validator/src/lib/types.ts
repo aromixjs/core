@@ -1,30 +1,53 @@
-export type AxType = 'string' | 'number' | 'boolean' | 'bigint' | 'symbol' | 'null' | 'undefined' | 'unknown' | 'never' | 'instance' | 'object' | 'array' | 'tuple' | 'literal' | 'record' | 'union'
-
-export type LiteralValue = string | number | boolean | bigint | null
-
-export type ParseResult<T> = { success: true; data: T; errors: null } | { success: false; data: null; errors: string[] }
-
-export interface Operator<Input, Output> {
-	run: (value: Input) => Output
+export type Types = 'string' | 'number' | 'boolean' | 'bigInt' | 'symbol' | 'null' | 'undefined' | 'unknown' | 'never' | 'object' | 'array' | 'tuple' | 'union' | 'record' | 'literals' | 'instance'
+export interface SchemaShape {
+	base: any
+	select: any
+	insert: any
+	update: any
 }
-
-export interface AnySchema<Output = unknown> {
-	readonly $infer: Output
-	parse(value: unknown): Output
-	safeParse(value: unknown): ParseResult<Output>
+export interface AnySchema {
+	state: SchemaState
+	$base: any
+	$select: any
+	$insert: any
+	$update: any
 }
 
 export interface SchemaState {
-	type: AxType
-	object?: { shape: Record<string, AnySchema> }
-	array?: { element: AnySchema }
-	tuple?: { elements: AnySchema[] }
-	literal?: { value: LiteralValue }
-	record?: { value: AnySchema }
-	union?: { schemas: AnySchema[] }
-	instance?: { class: new (...args: any[]) => any }
-	operators?: Operator<any, any>[]
-	// modifiers
-	default?: { value: any }
-	defaultFn?: { fn: () => unknown }
+	type: Types
+	typeMeta: Partial<{
+		objectShape: Record<string, AnySchema>
+		arrayElement: AnySchema
+		tupleItems: readonly AnySchema[]
+		unionItems: readonly AnySchema[]
+		recordElement: AnySchema
+		literalValues: readonly Primitives[]
+		instanceClass: Ctor
+	}>
+	modifiers: Partial<{
+		convert: boolean
+		partial: boolean
+		default: any
+		defaultFn: Function
+		nullable: boolean
+		optional: boolean
+		nullish: boolean
+		pipes: Array<any>
+		changes: any
+	}>
+	accessors: Partial<{
+		readonlyValue: any
+		readonlyFn: Function
+		locked: boolean
+		hidden: boolean
+	}>
+}
+
+export type Primitives = string | number | boolean | bigint | null | undefined
+
+export type Ctor = new (...args: any) => any
+
+// removes the keys that has value of type never
+export type OmitNeverKeys<Shape extends Record<string, AnySchema>, Slot extends keyof AnySchema> = {
+	[Key in keyof Shape as Shape[Key][Slot] extends never ? never : Key]: Shape[Key][Slot]
 }

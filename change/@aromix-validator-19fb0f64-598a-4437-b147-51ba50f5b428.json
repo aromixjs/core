@@ -1,0 +1,7 @@
+{
+  "type": "minor",
+  "comment": "refactor(schema): group type-specific metadata in SchemaState",
+  "packageName": "@aromix/validator",
+  "email": "istiuak.0@gmail.com",
+  "dependentChangeType": "patch"
+}
