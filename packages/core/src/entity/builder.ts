@@ -37,7 +37,7 @@ export namespace EntityBuilder {
 	export function mongo(builderInput: MongoInput) {
 		const db = builderInput.adapter()
 		const result = {
-			entity<Schema extends AnySchema<object>>(entityInput: MongoEntityUserInput<Schema>) {
+			entity<Schema extends AnySchema>(entityInput: MongoEntityUserInput<Schema>) {
 				return new MongoEntity(entityInput, db)
 			},
 		}

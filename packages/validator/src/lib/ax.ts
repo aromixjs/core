@@ -44,7 +44,7 @@ export const ax = {
 		})
 	},
 
-	bigInt() {
+	bigint() {
 		return new PrimitiveSchema<{
 			base: bigint
 			select: bigint

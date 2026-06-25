@@ -1,73 +1,177 @@
-import { AnySchema } from '@aromix/validator'
-import { Collection, Db, Document, ObjectId } from 'mongodb'
+import type { AnySchema } from '@aromix/validator'
+import {
+	Db,
+	Filter,
+	UpdateFilter,
+	FindOptions,
+	UpdateOptions,
+	DeleteOptions,
+	CountDocumentsOptions,
+	InsertOneOptions,
+	BulkWriteOptions,
+	ReplaceOptions,
+	FindOneAndUpdateOptions,
+	FindOneAndDeleteOptions,
+	FindOneAndReplaceOptions,
+	DistinctOptions,
+	AggregateOptions,
+	CreateIndexesOptions,
+	DropIndexesOptions,
+	InsertOneResult,
+	InsertManyResult,
+	UpdateResult,
+	DeleteResult,
+	BulkWriteResult,
+	AggregationCursor,
+} from 'mongodb'
 
 export interface MongoEntityUserInput<Schema extends AnySchema> {
 	name: string
 	model: Schema
 }
 
-export class MongoEntity<Schema extends AnySchema<object>> {
+export class MongoEntity<Schema extends AnySchema> {
 	readonly states: MongoEntityUserInput<Schema>
-	private readonly db: Db
-	private readonly collection: Collection<Document>
-	constructor(userInput: MongoEntityUserInput<Schema>, internal: Db) {
+	private readonly collection: any
+
+	constructor(userInput: MongoEntityUserInput<Schema>, db: Db) {
 		this.states = userInput
-		this.db = internal
-		this.collection = this.db.collection(userInput.name)
+		this.collection = db.collection(userInput.name)
 	}
 
-	async insertOne(doc: Schema['$infer']) {
-		const id = new ObjectId()
-		const validated = this.states.model.parse(doc)
-		const result = await this.collection.insertOne(
-			{
-				_id: id,
-				...validated,
-			},
-			{
-				forceServerObjectId: true,
-			},
-		)
-		console.log(result)
-
-		return result
+	async insertOne(
+		doc: Schema['$insert'],
+		options?: InsertOneOptions,
+	): Promise<InsertOneResult> {
+		return this.collection.insertOne(doc, options)
 	}
 
-	// async insertMany(docs) {
-	//    const validated = docs.map((d) => input.model.parse(d))
-	//    const result = await collection.insertMany(validated)
-	//    return { insertedIds: Object.values(result.insertedIds) }
-	// },
+	async insertMany(
+		docs: Schema['$insert'][],
+		options?: BulkWriteOptions,
+	): Promise<InsertManyResult> {
+		return this.collection.insertMany(docs, options)
+	}
 
-	// async findOne(filter) {
-	//    const raw = await collection.findOne(filter)
-	//    return raw === null ? null : input.model.parse(raw)
-	// },
+	async findOne(
+		filter: Filter<Schema['$select']>,
+		options?: FindOptions,
+	): Promise<Schema['$select'] | null> {
+		return this.collection.findOne(filter, options)
+	}
 
-	// async find(filter) {
-	//    const raw = await collection.find(filter)
-	//    return raw.map((r: unknown) => input.model.parse(r))
-	// },
+	async find(
+		filter: Filter<Schema['$select']>,
+		options?: FindOptions,
+	): Promise<Schema['$select'][]> {
+		return this.collection.find(filter, options).toArray()
+	}
 
-	// async updateOne(filter, update) {
-	//    const result = await collection.updateOne(filter, update)
-	//    return { matchedCount: result.matchedCount, modifiedCount: result.modifiedCount }
-	// },
+	async updateOne(
+		filter: Filter<Schema['$select']>,
+		update: UpdateFilter<Schema['$update']>,
+		options?: UpdateOptions,
+	): Promise<UpdateResult> {
+		return this.collection.updateOne(filter, update, options)
+	}
 
-	// async updateMany(filter, update) {
-	//    const result = await collection.updateMany(filter, update)
-	//    return { matchedCount: result.matchedCount, modifiedCount: result.modifiedCount }
-	// },
+	async updateMany(
+		filter: Filter<Schema['$select']>,
+		update: UpdateFilter<Schema['$update']>,
+		options?: UpdateOptions,
+	): Promise<UpdateResult> {
+		return this.collection.updateMany(filter, update, options)
+	}
 
-	// async deleteOne(filter) {
-	//    const result = await collection.deleteOne(filter)
-	//    return { deletedCount: result.deletedCount }
-	// },
+	async replaceOne(
+		filter: Filter<Schema['$select']>,
+		replacement: Schema['$select'],
+		options?: ReplaceOptions,
+	): Promise<UpdateResult> {
+		return this.collection.replaceOne(filter, replacement, options)
+	}
 
-	// async deleteMany(filter) {
-	//    const result = await collection.deleteMany(filter)
-	//    return { deletedCount: result.deletedCount }
-	// },
+	async deleteOne(
+		filter: Filter<Schema['$select']>,
+		options?: DeleteOptions,
+	): Promise<DeleteResult> {
+		return this.collection.deleteOne(filter, options)
+	}
 
-	// countDocuments: (filter) => collection.countDocuments(filter),
+	async deleteMany(
+		filter: Filter<Schema['$select']>,
+		options?: DeleteOptions,
+	): Promise<DeleteResult> {
+		return this.collection.deleteMany(filter, options)
+	}
+
+	async findOneAndUpdate(
+		filter: Filter<Schema['$select']>,
+		update: UpdateFilter<Schema['$update']>,
+		options?: FindOneAndUpdateOptions,
+	): Promise<Schema['$select'] | null> {
+		return this.collection.findOneAndUpdate(filter, update, options)
+	}
+
+	async findOneAndDelete(
+		filter: Filter<Schema['$select']>,
+		options?: FindOneAndDeleteOptions,
+	): Promise<Schema['$select'] | null> {
+		return this.collection.findOneAndDelete(filter, options)
+	}
+
+	async findOneAndReplace(
+		filter: Filter<Schema['$select']>,
+		replacement: Schema['$select'],
+		options?: FindOneAndReplaceOptions,
+	): Promise<Schema['$select'] | null> {
+		return this.collection.findOneAndReplace(filter, replacement, options)
+	}
+
+	async countDocuments(
+		filter: Filter<Schema['$select']>,
+		options?: CountDocumentsOptions,
+	): Promise<number> {
+		return this.collection.countDocuments(filter, options)
+	}
+
+	async estimatedDocumentCount(): Promise<number> {
+		return this.collection.estimatedDocumentCount()
+	}
+
+	async distinct<Field extends keyof Schema['$select'] & string>(
+		field: Field,
+		filter: Filter<Schema['$select']>,
+		options?: DistinctOptions,
+	): Promise<Array<Schema['$select'][Field]>> {
+		return this.collection.distinct(field, filter, options)
+	}
+
+	aggregate(
+		pipeline: any[],
+		options?: AggregateOptions,
+	): AggregationCursor {
+		return this.collection.aggregate(pipeline, options)
+	}
+
+	async bulkWrite(
+		operations: any[],
+		options?: BulkWriteOptions,
+	): Promise<BulkWriteResult> {
+		return this.collection.bulkWrite(operations, options)
+	}
+
+	async createIndex(
+		indexSpec: any,
+		options?: CreateIndexesOptions,
+	): Promise<string> {
+		return this.collection.createIndex(indexSpec, options)
+	}
+
+	async dropIndex(
+		indexName: string,
+		options?: DropIndexesOptions,
+	): Promise<void> {
+		return this.collection.dropIndex(indexName, options)
+	}
 }
