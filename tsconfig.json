@@ -1,4 +1,4 @@
 {
 	"files": [],
-	"references": [{ "path": "packages/core" }, { "path": "packages/validator" }]
+	"references": [{ "path": "packages/core" }, { "path": "packages/validator" }, { "path": "packages/cli" }]
 }
