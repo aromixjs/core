@@ -22,8 +22,8 @@
 		"change": "beachball change",
 		"bump": "beachball bump",
 		"release": "beachball publish --yes --access public",
- "cli:link": "pnpm --filter @aromix/cli run link",
-    "cli:unlink": "pnpm --filter @aromix/cli run unlink"
+		"cli:link": "pnpm --filter @aromix/cli run link",
+		"cli:unlink": "pnpm --filter @aromix/cli run unlink"
 	},
 	"devDependencies": {
 		"@types/node": "catalog:",
@@ -35,9 +35,6 @@
 		"vitest": "^4.1.6"
 	},
 	"pnpm": {
-		"onlyBuiltDependencies": [
-			"esbuild",
-			"@biomejs/biome"
-		]
+		"onlyBuiltDependencies": ["esbuild", "@biomejs/biome"]
 	}
 }

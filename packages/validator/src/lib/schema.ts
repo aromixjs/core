@@ -5,7 +5,7 @@ export class Schema<Shape extends SchemaShape> implements AnySchema {
 	declare readonly $select: Shape['select']
 	declare readonly $insert: Shape['insert']
 	declare readonly $update: Shape['update']
-	constructor(readonly state: SchemaState) { }
+	constructor(readonly state: SchemaState) {}
 
 	default(value: Shape['base']): Schema<{
 		base: Shape['base'] | undefined
