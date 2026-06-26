@@ -17,11 +17,10 @@ const users = primaryDb.entity({
 	}),
 })
 
-const des =compose({
+const des = compose({
 	entities: [users],
 })
-console.log(des.descriptor);
-console.log(des.descriptor.entities[0].methods);
-
+console.log(des.descriptor)
+console.log(des.descriptor.entities[0].methods)
 
 console.log('compose')
