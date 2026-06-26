@@ -1,0 +1,7 @@
+{
+  "type": "patch",
+  "comment": "init cli",
+  "packageName": "@aromix/cli",
+  "email": "istiuak.0@gmail.com",
+  "dependentChangeType": "patch"
+}

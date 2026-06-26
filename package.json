@@ -21,7 +21,9 @@
 		"test:all": "vitest run",
 		"change": "beachball change",
 		"bump": "beachball bump",
-		"release": "beachball publish --yes --access public"
+		"release": "beachball publish --yes --access public",
+		"cli:link": "pnpm --filter @aromix/cli run link",
+		"cli:unlink": "pnpm --filter @aromix/cli run unlink"
 	},
 	"devDependencies": {
 		"@types/node": "catalog:",

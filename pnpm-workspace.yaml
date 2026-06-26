@@ -4,7 +4,6 @@ packages:
 
 allowBuilds:
   '@biomejs/biome': true
-  dprint: set this to true or false
   esbuild: true
 
 catalog:

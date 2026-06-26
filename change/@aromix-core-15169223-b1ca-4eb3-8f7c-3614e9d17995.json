@@ -1,0 +1,7 @@
+{
+  "type": "patch",
+  "comment": "feat(server): implement HTTP server for composed entities",
+  "packageName": "@aromix/core",
+  "email": "istiuak.0@gmail.com",
+  "dependentChangeType": "patch"
+}

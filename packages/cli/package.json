@@ -1,24 +1,27 @@
 {
-	"name": "@aromix/core",
-	"version": "0.4.0",
-	"description": "The Core Package For Aromix",
+	"name": "@aromix/cli",
+	"version": "0.1.1",
+	"description": "CLI for Aromix",
 	"type": "module",
 	"license": "MIT",
 	"homepage": "https://aromixjs.github.io/aromix",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/aromixjs/aromix.git",
-		"directory": "packages/core"
+		"directory": "packages/cli"
 	},
 	"bugs": {
 		"url": "https://github.com/aromixjs/aromix/issues"
 	},
-	"keywords": ["aromix", "core", "server", "framework", "runtime-agnostic", "deno", "node"],
+	"keywords": ["aromix", "cli", "framework", "tooling"],
 	"files": ["dist"],
+	"bin": {
+		"aromix": "./dist/bin.js"
+	},
 	"exports": {
 		".": {
-			"types": "./dist/index.d.ts",
-			"import": "./dist/index.js"
+			"types": "./dist/bin.d.ts",
+			"import": "./dist/bin.js"
 		}
 	},
 	"publishConfig": {
@@ -28,22 +31,13 @@
 	"scripts": {
 		"build": "tsup",
 		"dev": "tsup --watch",
-		"typecheck": "tsc --noEmit"
-	},
-	"peerDependencies": {
-		"@aromix/validator": "workspace:^",
-		"mongodb": "^7.3.0"
+		"typecheck": "tsc --noEmit",
+		"link": "pnpm build && pnpm add --global .",
+		"unlink": "pnpm remove --global @aromix/cli"
 	},
 	"devDependencies": {
-		"@aromix/validator": "workspace:^",
 		"@types/node": "catalog:",
-		"mongodb": "^7.3.0",
 		"tsup": "catalog:",
 		"typescript": "catalog:"
-	},
-	"peerDependenciesMeta": {
-		"mongodb": {
-			"optional": true
-		}
 	}
 }
