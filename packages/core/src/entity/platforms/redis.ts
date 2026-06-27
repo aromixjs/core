@@ -6,6 +6,9 @@ export interface KvEntityUserInput<Schema extends AnySchema> {
 	model: Schema
 }
 
+
+
+
 export class RedisEntity<Schema extends AnySchema> {
 	readonly state: KvEntityUserInput<Schema>
 	private adapter: Builder.RedisAdapter

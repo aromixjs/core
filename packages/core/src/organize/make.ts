@@ -96,21 +96,21 @@ async function handle(request: Request, composed: Composed): Promise<Response> {
 	}
 }
 
-export function make(composed: Composed) {
-	return {
-		listen(port: number) {
-			const server = createServer((req, res) => {
-				toWebRequest(req)
-					.then((request) => handle(request, composed))
-					.then((response) => writeWebResponse(response, res))
-					.catch((error) => {
-						res.statusCode = 500
-						res.end('internal error')
-					})
-			})
+// export function make(composed: Composed) {
+// 	return {
+// 		listen(port: number) {
+// 			const server = createServer((req, res) => {
+// 				toWebRequest(req)
+// 					.then((request) => handle(request, composed))
+// 					.then((response) => writeWebResponse(response, res))
+// 					.catch((error) => {
+// 						res.statusCode = 500
+// 						res.end('internal error')
+// 					})
+// 			})
 
-			server.listen(port)
-			return server
-		},
-	}
-}
+// 			server.listen(port)
+// 			return server
+// 		},
+// 	}
+// }

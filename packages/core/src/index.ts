@@ -4,4 +4,6 @@ export * from './entity/platforms/redis';
 export * from './organize/compose';
 export * from './organize/descriptor';
 export * from './organize/make';
+export * from './server/make';
+export * from './server/plugin';
 
