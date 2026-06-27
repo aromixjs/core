@@ -1,6 +1,6 @@
-import { AnySchema } from '@aromix/validator'
-import { KvEntity } from '../entity/platforms/kv'
-import { MongoEntity } from '../entity/platforms/mongo'
+import type { AnySchema } from '@aromix/validator'
+import type { MongoEntity } from '../entity/platforms/mongo'
+import type { RedisEntity } from '../entity/platforms/redis'
 
 type Slot = 'insert' | 'update' | 'select'
 
@@ -41,7 +41,7 @@ export class Descriptor {
 		return { type: state.type }
 	}
 
-	kv(entity: KvEntity<AnySchema>) {
+	kv(entity: RedisEntity<AnySchema>) {
 		const name = entity.state.name
 		const model = entity.state.model
 

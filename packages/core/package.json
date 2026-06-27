@@ -13,8 +13,17 @@
 	"bugs": {
 		"url": "https://github.com/aromixjs/aromix/issues"
 	},
-	"keywords": ["aromix", "core", "server", "framework", "runtime-agnostic", "deno", "node"],
-	"files": ["dist"],
+	"keywords": [
+		"aromix",
+		"core",
+		"server",
+		"framework",
+		"node",
+		"rpc"
+	],
+	"files": [
+		"dist"
+	],
 	"exports": {
 		".": {
 			"types": "./dist/index.d.ts",
@@ -32,17 +41,22 @@
 	},
 	"peerDependencies": {
 		"@aromix/validator": "workspace:^",
-		"mongodb": "^7.3.0"
+		"mongodb": "^7.3.0",
+		"redis": "^6.0.1"
 	},
 	"devDependencies": {
 		"@aromix/validator": "workspace:^",
 		"@types/node": "catalog:",
 		"mongodb": "^7.3.0",
+		"redis": "^6.0.1",
 		"tsup": "catalog:",
 		"typescript": "catalog:"
 	},
 	"peerDependenciesMeta": {
 		"mongodb": {
+			"optional": true
+		},
+		"redis": {
 			"optional": true
 		}
 	}

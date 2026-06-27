@@ -1,15 +1,15 @@
 import type { AnySchema } from '@aromix/validator'
-import { KvEntity } from '../entity/platforms/kv'
 import { MongoEntity } from '../entity/platforms/mongo'
+import { RedisEntity } from '../entity/platforms/redis'
 import { Descriptor } from './descriptor'
 
 export interface ComposeInput {
-	entities: Array<MongoEntity<AnySchema> | KvEntity<AnySchema>>
+	entities: Array<MongoEntity<AnySchema> | RedisEntity<AnySchema>>
 }
 
 export function compose(input: ComposeInput) {
 	const descriptors: any[] = []
-	const routes = new Map<string, { entity: MongoEntity<AnySchema> | KvEntity<AnySchema>; methodName: string }>()
+	const routes = new Map<string, { entity: MongoEntity<AnySchema> | RedisEntity<AnySchema>; methodName: string }>()
 
 	const des = new Descriptor()
 
@@ -21,7 +21,7 @@ export function compose(input: ComposeInput) {
 				routes.set(method.route, { entity, methodName: method.name })
 			}
 		}
-		if (entity instanceof KvEntity) {
+		if (entity instanceof RedisEntity) {
 			const descriptor = des.kv(entity)
 
 			descriptors.push(descriptor)
