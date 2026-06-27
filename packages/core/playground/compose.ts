@@ -1,12 +1,12 @@
-import { EntityBuilder, compose } from './../src'
+import { Builder, compose } from './../src'
 import { ax } from '@aromix/validator'
 import { MongoClient, ObjectId } from 'mongodb'
-const primaryDb = EntityBuilder.mongo({
+import { createClient, createClientPool, createCluster, createSentinel } from 'redis'
+const primaryDb = Builder.mongo({
 	adapter() {
 		const connection = new MongoClient('mongodb://aromix:password123@localhost:27017/')
 		return connection.db('root')
 	},
-	transport: 'http',
 })
 
 const users = primaryDb.entity({
@@ -24,3 +24,20 @@ console.log(des.descriptor)
 console.log(des.descriptor.entities[0].methods)
 
 console.log('compose')
+
+
+
+
+const caching = Builder.redis({
+
+
+	adapter() {
+		
+		const client = createCluster({
+			rootNodes: []
+		})
+
+		return client
+	}
+
+})
