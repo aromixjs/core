@@ -1,9 +1,9 @@
 export * from './entity/builder';
-export * from './entity/platforms/mongo';
-export * from './entity/platforms/redis';
 export * from './organize/compose';
 export * from './organize/descriptor';
 export * from './organize/make';
+export * from './platforms/mongo';
+export * from './platforms/redis';
 export * from './server/make';
 export * from './server/plugin';
 

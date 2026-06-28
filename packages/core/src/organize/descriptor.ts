@@ -1,6 +1,6 @@
 import type { AnySchema } from '@aromix/validator'
-import type { MongoEntity } from '../entity/platforms/mongo'
-import type { RedisEntity } from '../entity/platforms/redis'
+import type { MongoEntity } from '../platforms/mongo'
+import type { RedisEntity } from '../platforms/redis'
 
 type Slot = 'insert' | 'update' | 'select'
 

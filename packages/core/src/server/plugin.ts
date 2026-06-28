@@ -1,4 +1,6 @@
-export type PluginCtx = {}
+export type PluginCtx = {
+	
+}
 
 export interface PluginDef<Options = undefined> {
 	name: string

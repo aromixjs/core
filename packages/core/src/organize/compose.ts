@@ -1,6 +1,6 @@
 import type { AnySchema } from '@aromix/validator'
-import { MongoEntity } from '../entity/platforms/mongo'
-import { RedisEntity } from '../entity/platforms/redis'
+import { MongoEntity } from '../platforms/mongo'
+import { RedisEntity } from '../platforms/redis'
 import { Descriptor } from './descriptor'
 
 export interface ComposeInput {
