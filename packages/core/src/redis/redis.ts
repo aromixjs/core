@@ -13,6 +13,4 @@ export interface RedisInput {
 
 export class Redis {
 	constructor(input: RedisInput) {}
-
-
 }

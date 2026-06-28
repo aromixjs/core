@@ -65,22 +65,28 @@ export class Generate {
 		const inner = '  '.repeat(indent + 1)
 
 		switch (node.type) {
-			case 'string':    return 'ax.string()'
-			case 'number':    return 'ax.number()'
-			case 'boolean':   return 'ax.boolean()'
-			case 'bigInt':    return 'ax.bigint()'
-			case 'null':      return 'ax.null()'
-			case 'undefined': return 'ax.undefined()'
-			case 'unknown':   return 'ax.unknown()'
-			case 'never':     return 'ax.never()'
+			case 'string':
+				return 'ax.string()'
+			case 'number':
+				return 'ax.number()'
+			case 'boolean':
+				return 'ax.boolean()'
+			case 'bigInt':
+				return 'ax.bigint()'
+			case 'null':
+				return 'ax.null()'
+			case 'undefined':
+				return 'ax.undefined()'
+			case 'unknown':
+				return 'ax.unknown()'
+			case 'never':
+				return 'ax.never()'
 
 			case 'object': {
 				const shape = node.shape ?? {}
 				const keys = Object.keys(shape)
 				if (keys.length === 0) return 'ax.object({})'
-				const fields = keys
-					.map(k => `${inner}${k}: ${this.schemaToCode(shape[k], indent + 1)}`)
-					.join(',\n')
+				const fields = keys.map((k) => `${inner}${k}: ${this.schemaToCode(shape[k], indent + 1)}`).join(',\n')
 				return `ax.object({\n${fields},\n${pad}})`
 			}
 
@@ -88,16 +94,12 @@ export class Generate {
 				return `ax.array(${this.schemaToCode(node.element!, indent)})`
 
 			case 'tuple': {
-				const items = (node.items ?? [])
-					.map(s => `${inner}${this.schemaToCode(s, indent + 1)}`)
-					.join(',\n')
+				const items = (node.items ?? []).map((s) => `${inner}${this.schemaToCode(s, indent + 1)}`).join(',\n')
 				return `ax.tuple([\n${items},\n${pad}])`
 			}
 
 			case 'union': {
-				const items = (node.items ?? [])
-					.map(s => `${inner}${this.schemaToCode(s, indent + 1)}`)
-					.join(',\n')
+				const items = (node.items ?? []).map((s) => `${inner}${this.schemaToCode(s, indent + 1)}`).join(',\n')
 				return `ax.union([\n${items},\n${pad}])`
 			}
 
@@ -105,7 +107,7 @@ export class Generate {
 				return `ax.record(${this.schemaToCode(node.element!, indent)})`
 
 			case 'literals': {
-				const values = (node.values ?? []).map(v => JSON.stringify(v)).join(', ')
+				const values = (node.values ?? []).map((v) => JSON.stringify(v)).join(', ')
 				return `ax.literals(${values})`
 			}
 

@@ -1,14 +1,32 @@
-import { MongoClient } from "mongodb";
-import { mongo } from "./../src";
+import { ax } from '@aromix/validator'
+import { MongoCluster, MongoDatabase, MongoEntity } from './../src'
+import { MongoClient } from 'mongodb'
 
-export const cluster1 = mongo({
-   name: "primary.cluster",
-   client() {
-      return new MongoClient('')
-   },
-   db: ['root']
+export const users = MongoEntity({
+	name: 'users',
+	model: ax.object({}),
+	guards: [],
+	effects: [],
 })
 
+export const rootDb = MongoDatabase({
+	name: 'root',
+	entities: [users],
+	guards: [],
+	effects: [],
+})
 
+export const cluster1 = MongoCluster({
+	name: 'cluster1',
+	client() {
+		return new MongoClient('')
+	},
+	databases: [rootDb],
 
-cluster1.root.entity()
+	onConnect(client) {},
+
+	onDisconnect(client) {},
+	onError() {},
+	guards: [],
+	effects: [],
+})
