@@ -1,28 +1,26 @@
-import { AnySchema } from "@aromix/validator";
-import { Builder } from "../server/builder";
-import { loadEnvFile } from "node:process";
+import { AnySchema } from '@aromix/validator'
+import { Builder } from '../server/builder'
+import { loadEnvFile } from 'process'
 
-export interface ValidateEnvConfig<Schema extends AnySchema> {
-   path: string
-   schema: Record<string, Schema>
-   onError?(err: unknown): void
+export interface ValidateEnvConfig<Schema extends Record<string, AnySchema>> {
+	path: string
+	schema: Schema
+	onError?(err: unknown): void
 }
 
-export function ValidateEnv<const Schema extends AnySchema>(config: ValidateEnvConfig<Schema>) {
-   const builder = Builder({
-      name: 'validate.env',
-      setup(state) {
-         loadEnvFile(config.path)
-         state.port = process.env.PORT ?? 3000
-      },
-      async launch(server) {
-         console.log(process.env);
-      },
-   })
+export function ValidateEnv<const Schema extends Record<string, AnySchema>>(config: ValidateEnvConfig<Schema>) {
+	const builder = Builder({
+		name: 'validate.env',
+		onRegister(state) {
+			loadEnvFile(config.path)
+			console.log(state)
+			console.log(process.env)
+		},
+	})
 
-   function env<Key extends string & keyof typeof config.schema>(key: Key, fallback?: Schema['$base']): Schema['$base'] {
-      return (process.env[key as string] ?? fallback) as Schema['$base']
-   }
+	function env<Key extends keyof Schema>(key: Key, fallback?: Schema[Key]['$base']): Schema[Key]['$base'] {
+		return process.env[key as string] ?? fallback
+	}
 
-   return [builder, env] as const
+	return [builder, env] as const
 }

@@ -1,25 +1,20 @@
-import { MongoClient } from "mongodb"
-import { Builder } from "../server/builder"
-import { MongoDatabase } from "./database"
-import { ClusterResult, MongoClusterInput } from "./types"
-
-
+import { MongoClient } from 'mongodb'
+import { Builder } from '../server/builder'
+import { MongoDatabase } from './database'
+import { ClusterResult, MongoClusterInput } from './types'
 
 export function MongoCluster<const Databases extends readonly string[]>(options: MongoClusterInput<Databases>) {
-
 	const client = new MongoClient(options.uri)
 	const databases: Record<string, MongoDatabase> = {}
-
 
 	for (const name of options.databases) {
 		databases[name] = new MongoDatabase()
 	}
 
-
 	const builder = Builder({
 		name: options.name,
 
-		launch: async () => {
+		async onListen() {
 			try {
 				await client.connect()
 
@@ -35,7 +30,7 @@ export function MongoCluster<const Databases extends readonly string[]>(options:
 			}
 		},
 
-		shutdown: async () => {
+		async onShutdown() {
 			await options.onDisconnect?.(client)
 			await client.close()
 		},
