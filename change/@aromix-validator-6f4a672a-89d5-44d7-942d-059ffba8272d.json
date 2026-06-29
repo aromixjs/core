@@ -1,7 +1,0 @@
-{
-	"type": "none",
-	"comment": "feat(core, cli): introduce entity composition and cli generate command",
-	"packageName": "@aromix/validator",
-	"email": "istiuak.0@gmail.com",
-	"dependentChangeType": "none"
-}
