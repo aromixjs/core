@@ -1,15 +1,16 @@
-import { AnySchema } from '@aromix/validator'
-import { MongoEntityDef } from './entity'
-import { GuardDef } from '../layer/guard'
-import { EffectDef } from '../layer/effect'
+import { Db } from "mongodb"
 
-export interface MongoDatabaseDef {
-	name: string
-	entities: MongoEntityDef<AnySchema>[]
-	guards: GuardDef[]
-	effects: EffectDef[]
-}
+export class MongoDatabase {
+  public db!: Db
 
-export function MongoDatabase(def: MongoDatabaseDef) {
-	return def
+  constructor() {}
+
+  /** internal attach */
+  attach(db: Db) {
+    this.db = db
+  }
+
+  entity() {
+    // placeholder
+  }
 }

@@ -1,9 +1,13 @@
-/* 
-Builders are the core primitive that participates directly in server building step 
-These can add routes , add headers, run any arbitrary codes at different phases of the server lifecycle these should get the states and the full server instance
-*/
+import { Server } from 'http'
+import { MaybePromise } from '../global'
+
 export interface Builder {
-   onPreprocess(): void
-   onServerStart(): void
-   onServerStop(): void
+	name: string
+	preprocess?(ctx: object): MaybePromise<void>
+	start?(server: Server): MaybePromise<void>
+	stop?(): MaybePromise<void>
+}
+
+export function Builder(def: Builder) {
+	return def
 }

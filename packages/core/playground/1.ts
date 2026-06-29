@@ -1,6 +1,5 @@
 import { ax } from '@aromix/validator'
-import { MongoCluster, MongoDatabase, MongoEntity } from './../src'
-import { MongoClient } from 'mongodb'
+import { bootstrap, MongoCluster, MongoEntity } from './../src'
 
 export const users = MongoEntity({
 	name: 'users',
@@ -9,24 +8,20 @@ export const users = MongoEntity({
 	effects: [],
 })
 
-export const rootDb = MongoDatabase({
-	name: 'root',
-	entities: [users],
-	guards: [],
-	effects: [],
+const db = MongoCluster({
+  name: "mongo",
+  uri: "mongodb://localhost:27017",
+  databases: ["root", "auth"],
 })
 
-export const cluster1 = MongoCluster({
-	name: 'cluster1',
-	client() {
-		return new MongoClient('')
-	},
-	databases: [rootDb],
 
-	onConnect(client) {},
 
-	onDisconnect(client) {},
-	onError() {},
-	guards: [],
-	effects: [],
+db.root.entity()
+db.auth.entity()
+
+const server = bootstrap()
+
+server.register({
+	name: '',
+	preprocess(ctx) {},
 })
