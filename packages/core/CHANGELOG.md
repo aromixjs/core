@@ -1,8 +1,16 @@
 # Change Log - @aromix/core
 
-<!-- This log was last generated on Thu, 25 Jun 2026 08:50:12 GMT and should not be manually modified. -->
+<!-- This log was last generated on Mon, 29 Jun 2026 16:09:28 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 0.4.2
+
+Mon, 29 Jun 2026 16:09:28 GMT
+
+### Patches
+
+- update hooks & package json (istiuak.0@gmail.com)
 
 ## 0.4.0
 
