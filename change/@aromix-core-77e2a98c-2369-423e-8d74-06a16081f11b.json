@@ -1,6 +1,6 @@
 {
   "type": "patch",
-  "comment": "update hooks",
+  "comment": "update hooks & package json",
   "packageName": "@aromix/core",
   "email": "istiuak.0@gmail.com",
   "dependentChangeType": "patch"
