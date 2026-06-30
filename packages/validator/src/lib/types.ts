@@ -33,7 +33,7 @@ export interface SchemaState {
 		optional: boolean
 		nullish: boolean
 		pipes: Array<any>
-		changes: any
+		access: any
 	}>
 	accessors: Partial<{
 		readonlyValue: any

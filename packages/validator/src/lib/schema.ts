@@ -124,7 +124,7 @@ export class Schema<Shape extends SchemaShape> implements AnySchema {
 		update: Prettify<Update extends AnySchema ? Update['$update'] : Shape['update']>
 		select: Prettify<Select extends AnySchema ? Select['$select'] : Shape['select']>
 	}> {
-		this.state.modifiers.changes = control
+		this.state.modifiers.access = control
 		return this
 	}
 }
