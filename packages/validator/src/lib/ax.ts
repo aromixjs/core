@@ -1,5 +1,5 @@
 import { ObjectSchema, PrimitiveSchema, Schema } from './schema'
-import type { AnySchema, Ctor, OmitNeverKeys, Primitives } from './types'
+import type { AnySchema, Ctor, OmitNeverKeys, Prettify, Primitives } from './types'
 
 export const ax = {
 	string() {
@@ -129,10 +129,10 @@ export const ax = {
 
 	object<Shape extends Record<string, AnySchema>>(shape: Shape) {
 		return new ObjectSchema<{
-			base: { [Key in keyof Shape]: Shape[Key]['$base'] }
-			select: OmitNeverKeys<Shape, '$select'>
-			insert: OmitNeverKeys<Shape, '$insert'>
-			update: OmitNeverKeys<Shape, '$update'>
+			base: Prettify<{ [Key in keyof Shape]: Shape[Key]['$base'] }>
+			select: Prettify<OmitNeverKeys<Shape, '$select'>>
+			insert: Prettify<OmitNeverKeys<Shape, '$insert'>>
+			update: Prettify<OmitNeverKeys<Shape, '$update'>>
 		}>({
 			type: 'object',
 			meta: {
@@ -145,10 +145,10 @@ export const ax = {
 
 	array<Element extends AnySchema>(element: Element) {
 		return new Schema<{
-			base: Element['$base'][]
-			select: Element['$select'][]
-			insert: Element['$insert'][]
-			update: Element['$update'][]
+			base: Prettify<Element['$base']>[]
+			select: Prettify<Element['$select']>[]
+			insert: Prettify<Element['$insert']>[]
+			update: Prettify<Element['$update']>[]
 		}>({
 			type: 'array',
 			meta: {
@@ -161,10 +161,10 @@ export const ax = {
 
 	tuple<Items extends readonly AnySchema[]>(items: Items) {
 		return new Schema<{
-			base: { [Key in keyof Items]: Items[Key]['$base'] }
-			select: { [Key in keyof Items]: Items[Key]['$select'] }
-			insert: { [Key in keyof Items]: Items[Key]['$insert'] }
-			update: { [Key in keyof Items]: Items[Key]['$update'] }
+			base: Prettify<{ [Key in keyof Items]: Items[Key]['$base'] }>
+			select: Prettify<{ [Key in keyof Items]: Items[Key]['$select'] }>
+			insert: Prettify<{ [Key in keyof Items]: Items[Key]['$insert'] }>
+			update: Prettify<{ [Key in keyof Items]: Items[Key]['$update'] }>
 		}>({
 			type: 'tuple',
 
@@ -178,10 +178,10 @@ export const ax = {
 
 	union<Options extends readonly AnySchema[]>(options: Options) {
 		return new Schema<{
-			base: Options[number]['$base']
-			select: Options[number]['$select']
-			insert: Options[number]['$insert']
-			update: Options[number]['$update']
+			base: Prettify<Options[number]['$base']>
+			select: Prettify<Options[number]['$select']>
+			insert: Prettify<Options[number]['$insert']>
+			update: Prettify<Options[number]['$update']>
 		}>({
 			type: 'union',
 			meta: {
@@ -194,10 +194,10 @@ export const ax = {
 
 	record<Value extends AnySchema>(value: Value) {
 		return new Schema<{
-			base: Record<string, Value['$base']>
-			select: Record<string, Value['$select']>
-			insert: Record<string, Value['$insert']>
-			update: Record<string, Value['$update']>
+			base: Prettify<Record<string, Value['$base']>>
+			select: Prettify<Record<string, Value['$select']>>
+			insert: Prettify<Record<string, Value['$insert']>>
+			update: Prettify<Record<string, Value['$update']>>
 		}>({
 			type: 'record',
 			meta: {

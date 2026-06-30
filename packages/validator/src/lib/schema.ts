@@ -1,11 +1,11 @@
-import {  AnySchema, NarrowerInsert, NarrowerSelect, NarrowerUpdate, SchemaShape, SchemaState } from './types'
+import { AnySchema, NarrowerInsert, NarrowerSelect, NarrowerUpdate, Prettify, SchemaShape, SchemaState } from './types'
 
 export class Schema<Shape extends SchemaShape> implements AnySchema {
 	declare readonly $base: Shape['base']
 	declare readonly $select: Shape['select']
 	declare readonly $insert: Shape['insert']
 	declare readonly $update: Shape['update']
-	constructor(readonly state: SchemaState) { }
+	constructor(readonly state: SchemaState) {}
 
 	default(value: Shape['base']): Schema<{
 		base: Shape['base'] | undefined
@@ -108,26 +108,25 @@ export class Schema<Shape extends SchemaShape> implements AnySchema {
 		return this
 	}
 
-
 	access<
 		Insert extends NarrowerInsert<Shape['insert']> | undefined = undefined,
 		Update extends NarrowerUpdate<Shape['update']> | undefined = undefined,
-		Select extends NarrowerSelect<Shape['select']> | undefined = undefined
-	>(control: Partial<{
-		insert: Insert
-		update?: Update
-		select?: Select
-	}>): Schema<{
-		base: Shape['base']
-		insert: Insert extends AnySchema ? Insert['$insert'] : Shape['insert']
-		update: Update extends AnySchema ? Update['$update'] : Shape['update']
-		select: Select extends AnySchema ? Select['$select'] : Shape['select']
+		Select extends NarrowerSelect<Shape['select']> | undefined = undefined,
+	>(
+		control: Partial<{
+			insert: Insert
+			update?: Update
+			select?: Select
+		}>,
+	): Schema<{
+		base: Prettify<Shape['base']>
+		insert: Prettify<Insert extends AnySchema ? Insert['$insert'] : Shape['insert']>
+		update: Prettify<Update extends AnySchema ? Update['$update'] : Shape['update']>
+		select: Prettify<Select extends AnySchema ? Select['$select'] : Shape['select']>
 	}> {
 		this.state.modifiers.changes = control
 		return this
 	}
-
-
 }
 
 export class PrimitiveSchema<Shape extends SchemaShape> extends Schema<Shape> {
@@ -139,10 +138,10 @@ export class PrimitiveSchema<Shape extends SchemaShape> extends Schema<Shape> {
 
 export class ObjectSchema<Shape extends SchemaShape> extends Schema<Shape> {
 	partial(): ObjectSchema<{
-		base: Partial<Shape>
-		select: Partial<Shape>
-		insert: Partial<Shape>
-		update: Partial<Shape>
+		base: Prettify<Partial<Shape['base']>>
+		select: Prettify<Partial<Shape['select']>>
+		insert: Prettify<Partial<Shape['insert']>>
+		update: Prettify<Partial<Shape['update']>>
 	}> {
 		this.state.modifiers.partial = true
 		return this
