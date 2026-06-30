@@ -1,4 +1,27 @@
 {
-	"files": [],
-	"references": [{ "path": "packages/core" }, { "path": "packages/validator" }, { "path": "packages/cli" }]
+	"compilerOptions": {
+		"target": "ESNext",
+		"module": "ESNext",
+		"moduleResolution": "Bundler",
+		"lib": [
+			"ESNext"
+		],
+		"strict": true,
+		"esModuleInterop": true,
+		"skipLibCheck": true,
+		"forceConsistentCasingInFileNames": true,
+		"declaration": true,
+		"emitDeclarationOnly": true,
+		"declarationMap": false,
+		"experimentalDecorators": true,
+		"resolveJsonModule": true,
+		"types": [
+			"node",
+			"vitest/globals"
+		]
+	},
+	"include": [
+		"src/**/*.ts",
+		"src/**/*.d.ts"
+	]
 }
