@@ -11,9 +11,8 @@ export function LoadEnv<Shape extends AxSchemaShape = AxSchemaShape>(
 	options: Partial<{
 		path: string
 		schema: AxObjectSchema<Shape>
-	}>
+	}>,
 ) {
-
 	const path = resolve(options.path ?? '.env')
 
 	if (!existsSync(path)) {
@@ -27,7 +26,7 @@ export function LoadEnv<Shape extends AxSchemaShape = AxSchemaShape>(
 	if (options.schema) {
 		const [result, issues] = options.schema.parseBase(process.env)
 		if (issues) {
-			console.error("[LoadEnv] Env Validation failed:");
+			console.error('[LoadEnv] Env Validation failed:')
 			console.error(issues)
 			process.exit(1)
 		}

@@ -6,15 +6,11 @@ export function system() {
 	const units: Unit[] = []
 	let state: SystemState = 'idle'
 
-
-
-
 	function assertIdle(action: string) {
 		if (state !== 'idle') {
 			throw new Error(`[Aromix] Cannot ${action}: system is "${state}", expected "idle".`)
 		}
 	}
-
 
 	function load(loader: Loader<unknown>) {
 		assertIdle('add a config loader')
@@ -25,7 +21,6 @@ export function system() {
 		assertIdle('register a unit')
 		unitLoaders.push(loader)
 	}
-	
 
 	async function stop() {
 		if (state === 'stopped' || state === 'stopping') return
