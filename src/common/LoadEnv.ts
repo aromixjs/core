@@ -27,8 +27,9 @@ export function LoadEnv<Shape extends AxSchemaShape = AxSchemaShape>(
 	if (options.schema) {
 		const [result, issues] = options.schema.parseBase(process.env)
 		if (issues) {
+			console.error("[LoadEnv] Env Validation failed:");
 			console.error(issues)
-			throw new Error('[LoadEnv] Schema validation failed')
+			process.exit(1)
 		}
 		values = result
 	}
