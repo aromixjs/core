@@ -37,5 +37,5 @@ export function LoadEnv<Shape extends AxSchemaShape = AxSchemaShape>(
 		return values[key]
 	}
 
-	return { env }
+	return env
 }
