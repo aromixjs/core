@@ -5,5 +5,3 @@ export interface Unit {
 	start(): void | Promise<void>
 	stop?(): void | Promise<void>
 }
-
-export type SystemState = 'idle' | 'loading' | 'starting' | 'running' | 'stopping' | 'stopped'
