@@ -3,7 +3,9 @@
 		"target": "ESNext",
 		"module": "ESNext",
 		"moduleResolution": "Bundler",
-		"lib": ["ESNext"],
+		"lib": [
+			"ESNext"
+		],
 		"strict": true,
 		"esModuleInterop": true,
 		"skipLibCheck": true,
@@ -13,7 +15,14 @@
 		"declarationMap": false,
 		"experimentalDecorators": true,
 		"resolveJsonModule": true,
-		"types": ["node", "vitest/globals"]
+		"types": [
+			"node",
+			"vitest/globals"
+		]
 	},
-	"include": ["src/**/*.ts", "src/**/*.d.ts"]
+	"include": [
+		"src/**/*.ts",
+		"src/**/*.d.ts",
+		"playground/**/*.ts"
+	]
 }

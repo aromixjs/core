@@ -10,18 +10,13 @@ export interface MongoClusterOptions<Databases extends Record<string, string>> {
 
 export type MongoClusterInstance<Databases extends Record<string, string>> = Unit & { [Key in keyof Databases]: Db }
 
-
 export function MongoCluster<Databases extends Record<string, string>>(options: MongoClusterOptions<Databases>): MongoClusterInstance<Databases> {
-
-
 	const client = new MongoClient(options.uri)
 	const databases = {} as { [Key in keyof Databases]: Db }
 
 	for (const key in options.databases) {
 		databases[key] = client.db(options.databases[key])
 	}
-
-
 
 	return {
 		name: options.name,
@@ -30,7 +25,7 @@ export function MongoCluster<Databases extends Record<string, string>>(options: 
 				await client.connect()
 				await client.db('admin').command({ ping: 1 })
 			} catch (err) {
-				await client.close().catch(() => { })
+				await client.close().catch(() => {})
 				const reason = err instanceof Error ? err.message : String(err)
 				throw new Error(`[${options.name}] start failed: ${reason}`, { cause: err })
 			}
