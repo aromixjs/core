@@ -52,7 +52,7 @@ export function FormatLog(event: LogEvent): string {
 	const time = `${colors.blue}${formatTime(event.timestamp)}${colors.reset}`
 	const level = `${levelColor[event.level]}${event.level.toUpperCase().padEnd(5)}${colors.reset}`
 	const name = `${colors.bold}${event.name}${colors.reset}`
-	const attr = event.attributes && formatAttributes(event.attributes);
+	const attr = event.attributes && formatAttributes(event.attributes)
 
 	return `${time} ${level} ${name}${attr}`
 }

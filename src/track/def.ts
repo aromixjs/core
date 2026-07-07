@@ -1,8 +1,7 @@
-import { randomUUID } from "node:crypto"
-import { LogEvent, LogInput, MetricEvent, MetricInput, TraceEvent, TraceInput, TrackConfig } from "./types"
-import { HostCtx } from "./context"
-import { State } from "./state"
-
+import { randomUUID } from 'node:crypto'
+import { LogEvent, LogInput, MetricEvent, MetricInput, TraceEvent, TraceInput, TrackConfig } from './types'
+import { HostCtx } from './context'
+import { State } from './state'
 
 export const track = {
 	log(input: LogInput) {
@@ -62,11 +61,7 @@ export const track = {
 		}
 	},
 
-
-
 	config(options: TrackConfig) {
 		State.config(options)
 	},
-
 }
-
