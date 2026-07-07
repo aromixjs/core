@@ -3,7 +3,9 @@ function main() {
 
    context({
       data: 123,
-      test: 'ax'
+      test: 'ax',
+      meta: import.meta,
+      
    })
 
 

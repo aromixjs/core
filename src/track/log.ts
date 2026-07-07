@@ -1,6 +1,6 @@
 import { randomUUID } from 'crypto'
 import { HostCtx } from './context'
-import { consoleSink } from './console.sink'
+import { consoleSink } from './sinks/console'
 
 export interface LogEvent {
 	id: string

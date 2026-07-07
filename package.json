@@ -13,8 +13,17 @@
 	"bugs": {
 		"url": "https://github.com/aromixjs/aromix/issues"
 	},
-	"keywords": ["aromix", "core", "server", "framework", "node", "rpc"],
-	"files": ["dist"],
+	"keywords": [
+		"aromix",
+		"core",
+		"server",
+		"framework",
+		"node",
+		"rpc"
+	],
+	"files": [
+		"dist"
+	],
 	"exports": {
 		".": {
 			"types": "./dist/index.d.ts",
@@ -59,8 +68,5 @@
 		"redis": {
 			"optional": true
 		}
-	},
-	"dependencies": {
-		"picocolors": "^1.1.1"
 	}
 }

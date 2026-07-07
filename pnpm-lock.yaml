@@ -7,10 +7,6 @@ settings:
 importers:
 
   .:
-    dependencies:
-      picocolors:
-        specifier: ^1.1.1
-        version: 1.1.1
     devDependencies:
       '@aromix/validator':
         specifier: 0.5.5
