@@ -1,5 +1,5 @@
 import { context } from "./context"
-import { LogEvent, TrackConfig } from "./types"
+import { LogEvent, MetricEvent, TraceEvent, TrackConfig } from "./types"
 
 
 export class State {
@@ -23,6 +23,21 @@ export class State {
 
 
 
+   static pushMetric(event: MetricEvent) {
+      if (this.handlers.onMetric) {
+         Promise.resolve(this.handlers.onMetric(event)).catch((err) => {
+            console.error('[track]: onMetric handler failed', err)
+         })
+      }
+   }
+
+   static  pushTrace(event: TraceEvent) {
+      if (this.handlers.onTrace) {
+         Promise.resolve(this.handlers.onTrace(event)).catch((err) => {
+            console.error('[track]: onTrace handler failed', err)
+         })
+      }
+   }
 
 }
 
