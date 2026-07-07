@@ -1,6 +1,6 @@
 {
 	"name": "@aromix/core",
-	"version": "0.5.2",
+	"version": "0.5.3",
 	"description": "The Core Package For Aromix",
 	"type": "module",
 	"license": "MIT",
