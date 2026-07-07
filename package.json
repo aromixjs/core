@@ -13,8 +13,17 @@
 	"bugs": {
 		"url": "https://github.com/aromixjs/aromix/issues"
 	},
-	"keywords": ["aromix", "core", "server", "framework", "node", "rpc"],
-	"files": ["dist"],
+	"keywords": [
+		"aromix",
+		"core",
+		"server",
+		"framework",
+		"node",
+		"rpc"
+	],
+	"files": [
+		"dist"
+	],
 	"exports": {
 		".": {
 			"types": "./dist/index.d.ts",
@@ -36,28 +45,20 @@
 		"release": "beachball publish --yes --access public"
 	},
 	"peerDependencies": {
-		"@aromix/validator": "0.5.5",
-		"mongodb": "^7.3.0",
-		"redis": "^6.0.1"
+		"@aromix/validator": "0.5.5"
 	},
 	"devDependencies": {
 		"@aromix/validator": "0.5.5",
 		"@biomejs/biome": "^1.9.4",
 		"@types/node": "^22.10.2",
 		"beachball": "^2.65.5",
-		"mongodb": "^7.3.0",
 		"redis": "^6.0.1",
 		"rimraf": "^6.1.3",
 		"tsup": "^8.3.5",
 		"typescript": "^5.7.2",
 		"vitest": "^4.1.6"
 	},
-	"peerDependenciesMeta": {
-		"mongodb": {
-			"optional": true
-		},
-		"redis": {
-			"optional": true
-		}
+	"dependencies": {
+		"mongodb": "^7.4.0"
 	}
 }

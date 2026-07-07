@@ -7,6 +7,10 @@ settings:
 importers:
 
   .:
+    dependencies:
+      mongodb:
+        specifier: ^7.4.0
+        version: 7.4.0
     devDependencies:
       '@aromix/validator':
         specifier: 0.5.5
@@ -20,9 +24,6 @@ importers:
       beachball:
         specifier: ^2.65.5
         version: 2.65.5(typescript@5.9.3)
-      mongodb:
-        specifier: ^7.3.0
-        version: 7.4.0
       redis:
         specifier: ^6.0.1
         version: 6.1.0
