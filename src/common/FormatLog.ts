@@ -1,4 +1,4 @@
-import type { LogEvent, Sink } from '../types'
+import type { LogEvent } from '../track/types'
 
 const colors = {
 	reset: '\x1b[0m',
@@ -48,21 +48,11 @@ function formatAttributes(attributes: Record<string, unknown>): string {
 	return `\n${colors.gray}${colors.dim}${indented}${colors.reset}`
 }
 
-function formatLog(event: LogEvent): string {
+export function FormatLog(event: LogEvent): string {
 	const time = `${colors.blue}${formatTime(event.timestamp)}${colors.reset}`
 	const level = `${levelColor[event.level]}${event.level.toUpperCase().padEnd(5)}${colors.reset}`
 	const name = `${colors.bold}${event.name}${colors.reset}`
 	const attr = event.attributes && formatAttributes(event.attributes);
 
 	return `${time} ${level} ${name}${attr}`
-}
-
-export const ConsoleSink: Sink = {
-	mode: 'immediate',
-	async writeLogs(events) {
-		for (const event of events) {
-			const line = formatLog(event)
-			console.log(line)
-		}
-	},
 }

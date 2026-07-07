@@ -1,16 +1,3 @@
-export interface BufferOptions {
-   flushIntervalMs: number
-   maxBatchSize: number
-}
-
-export interface TrackConfig {
-   console: boolean
-   sqlite: string | false
-   sinks: Sink[]
-   buffer: BufferOptions
-   context: Record<string, unknown>
-}
-
 export interface LogEvent {
    id: string
    timestamp: number
@@ -19,15 +6,15 @@ export interface LogEvent {
    attributes?: Record<string, unknown>
 }
 
-export type LogInput = {
+export interface LogInput {
    name: string
-} & Partial<{
-   attributes: Record<string, unknown>
-   level: LogEvent['level']
-}>
-
-export interface Sink {
-   mode: 'immediate' | 'buffered'
-   writeLogs(events: LogEvent[]): Promise<void>
+   level?: LogEvent['level']
+   attributes?: Record<string, unknown>
 }
 
+
+
+export interface TrackConfig {
+   onLog?: (event: LogEvent) => void | Promise<void>
+   context?: Record<string, unknown>
+}
