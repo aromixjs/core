@@ -1,28 +1,9 @@
 import { randomUUID } from 'crypto'
-import { HostCtx } from './context'
-import { consoleSink } from './sinks/console'
-
-export interface LogEvent {
-	id: string
-	timestamp: number
-	name: string
-	level: 'debug' | 'info' | 'warn' | 'error'
-	attributes?: Record<string, unknown>
-}
-
-export type LogInput = {
-	name: string
-} & Partial<{
-	attributes: Record<string, unknown>
-	level: LogEvent['level']
-}>
-
-export interface Sink {
-	writeLogs(events: LogEvent[]): Promise<void>
-}
+import { context, HostCtx } from './context'
+import { LogEvent, LogInput, TrackConfig } from './types'
+import { state } from './config'
 
 
-const sinks: Sink[] = [consoleSink]
 
 export function log(input: LogInput) {
 	const event: LogEvent = {
@@ -36,12 +17,23 @@ export function log(input: LogInput) {
 		},
 	}
 
-
-
-	for (const sink of sinks) {
-
-		sink.writeLogs([event]).catch(err => console.error('[track]: sink failed', { cause: err }))
+	for (const sink of state.immediateSinks) {
+		sink.writeLogs([event]).catch((err) => console.error('[track]: sink failed', { cause: err }))
 	}
+	state.buffer.push(event)
 
 
+}
+
+
+export function config(options: Partial<TrackConfig>) {
+	state.config(options)
+	if (options.context) {
+		context(options.context)
+	}
+}
+
+
+export function flush() {
+	return state.buffer.flush()
 }
