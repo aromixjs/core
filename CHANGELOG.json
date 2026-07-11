@@ -1,0 +1,20 @@
+{
+  "name": "@aromix/core",
+  "entries": [
+    {
+      "date": "Sat, 11 Jul 2026 17:51:50 GMT",
+      "version": "0.5.7",
+      "tag": "@aromix/core_v0.5.7",
+      "comments": {
+        "patch": [
+          {
+            "author": "istiuak.0@gmail.com",
+            "package": "@aromix/core",
+            "commit": "762718f16356932b81f03f1166755c85fe2fe4d4",
+            "comment": "remove commons"
+          }
+        ]
+      }
+    }
+  ]
+}
