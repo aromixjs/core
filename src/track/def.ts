@@ -1,7 +1,50 @@
 import { randomUUID } from 'node:crypto'
 import { LogEvent, LogInput, MetricEvent, MetricInput, TraceEvent, TraceInput, TrackConfig } from './types'
-import { HostCtx } from './context'
-import { State } from './state'
+import { AsyncLocalStorage } from 'node:async_hooks'
+
+export const AttributeContext = new AsyncLocalStorage<Record<string, unknown>>()
+export class State {
+	static handlers: TrackConfig = {}
+
+	static config(options: TrackConfig) {
+		this.handlers = { ...this.handlers, ...options }
+		if (options.context) {
+			AttributeContext.enterWith({
+				...AttributeContext.getStore(),
+				...options.context,
+			})
+		}
+	}
+
+	static pushLog(event: LogEvent) {
+		if (this.handlers.onLog) {
+			Promise.resolve(this.handlers.onLog(event)).catch((err) => {
+				console.error('[track]: onLog handler failed', err)
+			})
+		}
+	}
+
+	static pushMetric(event: MetricEvent) {
+		if (this.handlers.onMetric) {
+			Promise.resolve(this.handlers.onMetric(event)).catch((err) => {
+				console.error('[track]: onMetric handler failed', err)
+			})
+		}
+	}
+
+	static pushTrace(event: TraceEvent) {
+		if (this.handlers.onTrace) {
+			Promise.resolve(this.handlers.onTrace(event)).catch((err) => {
+				console.error('[track]: onTrace handler failed', err)
+			})
+		}
+	}
+}
+
+
+
+
+
 
 export const track = {
 	log(input: LogInput) {
@@ -11,7 +54,7 @@ export const track = {
 			name: input.name,
 			level: input.level ?? 'info',
 			attributes: {
-				...HostCtx.getStore(),
+				...AttributeContext.getStore(),
 				...input.attributes,
 			},
 		}
@@ -26,7 +69,7 @@ export const track = {
 			name: input.name,
 			value: input.value,
 			attributes: {
-				...HostCtx.getStore(),
+				...AttributeContext.getStore(),
 				...input.attributes,
 			},
 		}
@@ -53,7 +96,7 @@ export const track = {
 				name: input.name,
 				status,
 				attributes: {
-					...HostCtx.getStore(),
+					...AttributeContext.getStore(),
 					...input.attributes,
 				},
 			}
@@ -63,5 +106,13 @@ export const track = {
 
 	config(options: TrackConfig) {
 		State.config(options)
+	},
+
+	context: AttributeContext,
+	setContext: (values: Record<string, unknown>) => {
+		AttributeContext.enterWith({
+			...AttributeContext.getStore(),
+			...values,
+		})
 	},
 }

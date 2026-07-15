@@ -14,16 +14,13 @@ export function system() {
 	}
 
 	async function stop() {
-		// Stop in exact reverse order of successful startup.
-		// If a unit's stop() throws, it bubbles up.
-		// The unit is responsible for handling/logging its own teardown errors.
 		for (let i = units.length - 1; i >= 0; i--) {
 			await units[i].stop?.()
 		}
 	}
 
 	async function start() {
-		// 1. Run synchronous pre-flight configs
+		// 1. Run pre-flight configs
 		for (const loader of configLoaders) {
 			await loader()
 		}
@@ -40,8 +37,6 @@ export function system() {
 				await unit.start()
 				units.push(unit)
 			} catch (err) {
-				// If a unit fails to start, roll back the ones that already started.
-				// We don't log or wrap the error here. We just let the original error bubble up.
 				await stop()
 				throw err
 			}
