@@ -1,13 +1,10 @@
 import { Loader, Unit } from './types'
 
 export function system() {
-	const configLoaders: Loader<unknown>[] = []
 	const unitLoaders: Loader<Unit>[] = []
 	const units: Unit[] = []
 
-	function load(loader: Loader<unknown>) {
-		configLoaders.push(loader)
-	}
+
 
 	function register(loader: Loader<Unit>) {
 		unitLoaders.push(loader)
@@ -20,12 +17,8 @@ export function system() {
 	}
 
 	async function start() {
-		// 1. Run pre-flight configs
-		for (const loader of configLoaders) {
-			await loader()
-		}
 
-		// 2. Register and start units linearly
+		// 1. Register and start units linearly
 		for (const loader of unitLoaders) {
 			const { default: unit } = await loader()
 
@@ -42,7 +35,7 @@ export function system() {
 			}
 		}
 
-		// 3. Wire OS signals for graceful shutdown
+		// 2. Wire OS signals for graceful shutdown
 		const onSignal = async () => {
 			await stop()
 			process.exit(0)
@@ -51,5 +44,5 @@ export function system() {
 		process.once('SIGTERM', onSignal)
 	}
 
-	return { load, register, start, stop }
+	return { register, start, stop }
 }

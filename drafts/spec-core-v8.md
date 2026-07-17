@@ -1,0 +1,473 @@
+# Aromix v8 Spec
+
+---
+
+## 1. Config
+
+Static object or factory function. `env()` is provided by the `validateEnv` plugin — it types and validates all env vars at startup so `env()` is always safe to call.
+
+```ts
+// config.ts
+export default config({
+    db: { uri: env('DATABASE_URL'), poolSize: 10 },
+    server: { port: env('PORT', '3000') },
+})
+
+// factory — when values depend on each other
+export default config(() => {
+    const db = env('DATABASE_URL')
+    return { db: { uri: db }, cache: { prefix: `${db}:cache` } }
+})
+
+// read anywhere after serve() starts
+config.get('db.uri')
+config.get('db')
+```
+
+---
+
+## 2. Entity
+
+The core primitive. Defines storage, schema, access guards, scope filters, and effects.\
+Auto-generates typed CRUD + subscribe methods. No hooks, no services, no inject.
+
+```ts
+// entities/user.entity.ts
+export const UserEntity = entity({
+    name: 'user',
+    storage: 'postgres', // postgres | sqlite | d1 | mysql | kv | s3
+
+    schema: (t) => {
+        t.increments('id')
+        t.string('name').notNullable()
+        t.string('email').unique()
+        t.string('passwordHash').internal() // stripped from all client responses
+        t.string('stripeId').internal()
+        t.string('status').defaultTo('active')
+        t.string('role').defaultTo('staff')
+        t.integer('orgId').references(OrgEntity)
+        t.computed('label', (row) => row.name.toUpperCase()) // client-only derived field
+        t.timestamps()
+    },
+
+    // Guards — flat list, run before DB access.
+    // ctx.op tells each guard what operation is happening.
+    // Guards can also mutate ctx.query to scope reads/writes.
+    guards: [ActiveAccount, AdminOnly, OrgScoped],
+
+    // Effects — named, run after a successful commit.
+    effects: [WelcomeEmail, DeactivationAlert],
+})
+```
+
+### Schema field modifiers
+
+| Modifier              | Effect                                            |
+| --------------------- | ------------------------------------------------- |
+| `.notNullable()`      | DB NOT NULL + validation                          |
+| `.unique()`           | DB unique constraint                              |
+| `.defaultTo(value)`   | DB default + client default                       |
+| `.references(Entity)` | FK to another entity's primary key                |
+| `.internal()`         | Never sent to client, excluded from SDK types     |
+| `.computed(fn)`       | Derived field added to client response, not in DB |
+| `.timestamps()`       | Adds `createdAt` / `updatedAt`, auto-managed      |
+
+### Auto-generated client methods
+
+| Storage | Methods                                                             |
+| ------- | ------------------------------------------------------------------- |
+| SQL     | `find()` `findOne()` `insert()` `update()` `delete()` `subscribe()` |
+| KV      | `get()` `set()` `delete()` `list()`                                 |
+| S3      | `upload()` `get()` `delete()` `list()`                              |
+
+`subscribe()` opens a live WS subscription. The client receives updates in real time whenever matching rows change.\
+Conflict resolution uses a ledger sequence — last-write-wins by default. Add `.crdt()` to a field for automatic merge.
+
+### Client usage
+
+```ts
+const users = client.entity(UserEntity)
+
+// Live subscription — updates automatically
+const active = users.subscribe({ status: 'active' })
+active.on('change', (data) => render(data))
+
+// Mutations
+await users.insert({ name: 'Alice', email: 'a@b.com' })
+await users.update('123', { status: 'inactive' })
+await users.delete('123')
+```
+
+---
+
+## 3. Guards
+
+Guards answer: _is this user allowed, and how should the query be scoped?_\
+They run before any DB access. Flat list on the entity — `ctx.op` tells each guard what operation is happening.\
+Guards can reject by returning false, or mutate `ctx.query` to narrow the query scope.
+
+```ts
+// ctx shape — defined once for your whole app
+interface AppContext {
+    user: {
+        id: string
+        role: 'admin' | 'staff' | 'client'
+        isActive: boolean
+        orgId: string
+    }
+    op: 'insert' | 'update' | 'delete' | 'read'
+    db: QueryRunner // for guards that need a DB check
+    query: QueryBuilder // mutate to scope reads/writes
+}
+```
+
+```ts
+// guards/active.guard.ts
+export const ActiveAccount = guard({
+    name: 'ActiveAccount',
+    description: 'Requires an active account for all operations',
+    check: (ctx: AppContext) => ctx.user.isActive,
+})
+
+// guards/admin.guard.ts — uses ctx.op to only restrict writes
+export const AdminOnly = guard({
+    name: 'AdminOnly',
+    description: 'Write and delete operations require admin role',
+    check: (ctx: AppContext) => {
+        if (ctx.op === 'read') {
+            return true
+        }
+        return ctx.user.role === 'admin'
+    },
+})
+
+// guards/org.guard.ts — scopes all queries to user's org
+export const OrgScoped = guard({
+    name: 'OrgScoped',
+    description: "Scopes all queries to the current user's org",
+    check: (ctx: AppContext) => {
+        ctx.query.where({ orgId: ctx.user.orgId })
+        return true
+    },
+})
+
+// guards that need a DB check
+export const UnderQuota = guard({
+    name: 'UnderQuota',
+    description: 'User must be under their plan quota',
+    check: async (ctx: AppContext) => {
+        const count = await ctx.db.count('orders', { userId: ctx.user.id })
+        return count < 100
+    },
+})
+```
+
+Guards are reusable across any entity. If a guard returns false or throws, the operation is rejected before touching the DB.
+
+---
+
+## 3a. validateEnv Plugin
+
+`env()` is not a standalone utility — it is provided by the `validateEnv` plugin installed at bootstrap.\
+This validates all required env vars at startup and makes `env()` typed and safe to call anywhere.
+
+```ts
+app.install(validateEnv, {
+    DATABASE_URL: v.string(),
+    PORT: v.string().optional(),
+    SMTP_HOST: v.string(),
+    STRIPE_KEY: v.string(),
+})
+```
+
+If any required var is missing, the app throws before accepting connections. No silent `undefined` at runtime.
+
+---
+
+## 4. Effects
+
+Effects answer: _after this commit happened, what should run?_\
+They are named, documented, and listed in generated docs per entity.
+
+```ts
+// effects/user.effects.ts
+import type { UserEntity } from '../entities/user.entity'
+
+export const WelcomeEmail = effect({
+    name: 'WelcomeEmail',
+    description: 'Sends a welcome email when a user is created',
+    on: 'insert',
+    run: async (data: InferModel<typeof UserEntity>) => {
+        await SendEmailJob.dispatch({ to: data.email, subject: 'Welcome' })
+    },
+})
+
+export const DeactivationAlert = effect({
+    name: 'DeactivationAlert',
+    description: 'Notifies user when their account is deactivated',
+    on: 'update',
+    when: (data) => data.status === 'inactive', // optional narrowing
+    run: async (data: InferModel<typeof UserEntity>) => {
+        await SendEmailJob.dispatch({
+            to: data.email,
+            subject: 'Account deactivated',
+        })
+    },
+})
+```
+
+`import type` is erased at runtime — no circular dependency.\
+For effects reusable across entities, declare only the fields you need:
+
+```ts
+export const AuditLog = effect({
+    name: 'AuditLog',
+    description: 'Logs every write to the audit table',
+    on: ['insert', 'update', 'delete'],
+    run: async (data: { id: string | number }, ctx: AppContext) => {
+        await ctx.db.insert('audit_log', {
+            entityId: data.id,
+            userId: ctx.user.id,
+            op: ctx.op,
+            at: new Date(),
+        })
+    },
+})
+```
+
+---
+
+## 5. Jobs & Crons
+
+### Job
+
+Fire-and-forget or queued async work. Dispatched from effects, other jobs, or directly from client.
+
+```ts
+// jobs/email.job.ts
+export const SendEmailJob = Job.define({
+    name: 'send-email',
+    queue: 'mail',
+    input: v.object({ to: v.string(), subject: v.string() }),
+    async run(payload) {
+        await mailer.send(payload.to, payload.subject)
+    },
+})
+```
+
+### Cron
+
+```ts
+// crons/cleanup.cron.ts
+export const CleanupCron = Cron.define({
+    name: 'cleanup',
+    schedule: '0 * * * *',
+    async run() {
+        await UserEntity.delete({ status: 'inactive' })
+    },
+})
+```
+
+### Client dispatch
+
+```ts
+await client.job(SendEmailJob).dispatch({ to: 'a@b.com', subject: 'Hi' })
+```
+
+---
+
+## 6. Workflows
+
+Durable multi-step execution with persistent state. Use when steps can fail independently and need to resume.\
+For simple sequential logic, use a job.
+
+```ts
+// workflows/onboarding.workflow.ts
+export const OnboardingWorkflow = Workflow.define({
+    name: 'onboarding',
+    input: v.object({ userId: v.string(), videoPath: v.string() }),
+
+    steps: (wire) => [
+        wire(ProcessVideo, {
+            input: (wf) => ({ path: wf.input.videoPath }),
+        }),
+        wire(SendWelcomeEmail, {
+            when: (wf) => wf.steps.ProcessVideo.success,
+            input: (wf) => ({ userId: wf.input.userId }),
+        }),
+    ],
+})
+```
+
+Steps are defined separately and reusable:
+
+```ts
+export const ProcessVideo = Workflow.step({
+    name: 'process-video',
+    input: v.object({ path: v.string() }),
+    output: v.object({ path: v.string() }),
+    async run(input) {
+        return ffmpeg(input.path).compress()
+    },
+})
+```
+
+### Client dispatch
+
+```ts
+await client.workflow(OnboardingWorkflow).trigger({
+    userId: 'u_123',
+    videoPath: '/uploads/abc.mp4',
+})
+```
+
+---
+
+## 7. Plugins
+
+Extend the framework with cross-cutting capabilities. Plugins can hook into app lifecycle and HTTP layer.
+
+```ts
+// plugins/admin.plugin.ts
+export const AdminPanel = plugin((app) => {
+    app.hook({
+        on: 'HttpRequest',
+        run: async (req, res) => {
+            if (!req.url.startsWith('/admin')) {
+                return
+            }
+            res.end(generateAdminUI(app.entities))
+        },
+    })
+})
+
+// plugins/validate-env.plugin.ts
+export const ValidateEnv = plugin((app) => {
+    app.hook({
+        on: 'Ready',
+        run: () => {
+            if (!process.env.DATABASE_URL) {
+                throw new Error('DATABASE_URL missing')
+            }
+        },
+    })
+})
+```
+
+Available lifecycle hooks: `Ready` `Close` `HttpRequest` `HttpResponse` `Error`
+
+---
+
+## 8. Bootstrap
+
+```ts
+// server/index.ts
+import { serve } from '@aromix/node'
+import { make } from '@aromix/core'
+import { validateEnv } from '@aromix/env'
+
+import config from './config'
+import { CleanupCron } from './crons'
+import { OrgEntity, UserEntity } from './entities'
+import { SendEmailJob } from './jobs'
+import { AdminPanel } from './plugins'
+import { OnboardingWorkflow } from './workflows'
+
+const app = make({
+    entities: [UserEntity, OrgEntity],
+    jobs: [SendEmailJob],
+    crons: [CleanupCron],
+    workflows: [OnboardingWorkflow],
+})
+
+// validates env vars at startup — makes env() safe everywhere
+app.install(validateEnv, {
+    DATABASE_URL: v.string(),
+    PORT: v.string().optional(),
+    SMTP_HOST: v.string(),
+})
+
+app.use(AdminPanel)
+
+serve(app, config)
+```
+
+---
+
+## 9. Client
+
+```ts
+// client/main.ts
+import { createClient } from './sdk/client'
+import { UserEntity } from './sdk/entities'
+
+const client = createClient('ws://localhost:3000', {
+    authToken: getUserToken(),
+    offline: true, // IndexedDB persistence + replay on reconnect
+})
+
+// Entity
+const users = client.entity(UserEntity)
+const active = users.subscribe({ status: 'active' })
+active.on('change', render)
+
+await users.insert({ name: 'Alice', email: 'a@b.com' })
+
+// Job
+await client.job(SendEmailJob).dispatch({ to: 'a@b.com', subject: 'Hi' })
+
+// Workflow
+await client.workflow(OnboardingWorkflow).trigger({
+    userId: 'u_1',
+    videoPath: '...',
+})
+```
+
+---
+
+## 10. SDK & Docs Generation
+
+```bash
+npx aromix generate --output ./sdk
+```
+
+Outputs:
+
+- `sdk/client.js` — runtime WS client
+- `sdk/client.d.ts` — fully typed, derived from all entity schemas
+- `sdk/docs/` — one Markdown file per entity
+
+### Example generated doc — `docs/user.md`
+
+```
+## UserEntity  storage: postgres
+
+### Schema
+| field     | type   | notes                |
+|-----------|--------|----------------------|
+| id        | int    | auto increment       |
+| name      | string | required             |
+| email     | string | unique               |
+| status    | string | default: active      |
+| role      | string | default: staff       |
+| orgId     | int    | → OrgEntity          |
+| label     | string | computed, client only|
+
+(passwordHash, stripeId excluded — internal)
+
+### Guards
+| guard         | description                                      |
+|---------------|--------------------------------------------------|
+| ActiveAccount | Requires an active account for all operations    |
+| AdminOnly     | Write and delete operations require admin role   |
+| OrgScoped     | Scopes all queries to the current user's org     |
+
+### Effects
+| trigger                  | effect            | description                          |
+|--------------------------|-------------------|--------------------------------------|
+| insert                   | WelcomeEmail      | Sends welcome email on user creation |
+| update (status=inactive) | DeactivationAlert | Notifies user on deactivation        |
+```
+
+Everything in the doc is derived from `name`, `description`, and the entity definition.\
+No separate documentation to write.
