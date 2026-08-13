@@ -4,14 +4,13 @@
 	"description": "The Core Package For Aromix",
 	"type": "module",
 	"license": "MIT",
-	"homepage": "https://aromixjs.github.io/aromix",
+	"homepage": "https://github.com/aromixjs/core",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/aromixjs/aromix.git",
-		"directory": "packages/core"
+		"url": "https://github.com/aromixjs/core.git"
 	},
 	"bugs": {
-		"url": "https://github.com/aromixjs/aromix/issues"
+		"url": "https://github.com/aromixjs/core/issues"
 	},
 	"keywords": ["aromix", "core", "server", "framework", "node", "rpc"],
 	"files": ["dist"],

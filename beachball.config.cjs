@@ -1,4 +1,6 @@
 module.exports = {
 	disallowedChangeTypes: null,
-	bumpDeps: true,
+	bumpDeps: false,
+	branch: 'main',
+	generateChangelog: 'md',
 }

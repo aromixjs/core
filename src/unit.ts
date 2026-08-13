@@ -4,7 +4,6 @@ export interface Unit {
 	stop?(): void | Promise<void>
 }
 
-
 export function unit<T extends Unit>(def: T) {
 	return def
 }
