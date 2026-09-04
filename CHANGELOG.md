@@ -1,8 +1,16 @@
 # Change Log - @aromix/core
 
-<!-- This log was last generated on Thu, 13 Aug 2026 21:03:09 GMT and should not be manually modified. -->
+<!-- This log was last generated on Fri, 04 Sep 2026 05:08:16 GMT and should not be manually modified. -->
 
 <!-- Start content -->
+
+## 0.6.0
+
+Fri, 04 Sep 2026 05:08:16 GMT
+
+### Minor changes
+
+- update lifecycle (istiuak.0@gmail.com)
 
 ## 0.5.8
 
